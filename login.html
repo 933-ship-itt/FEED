@@ -97,7 +97,7 @@
 </head>
 <body class="min-h-screen flex flex-col lg:flex-row pb-[200px]">
 
-    <!-- Left Side: Advert Frame[cite: 1] -->
+    <!-- Left Side: Advert Frame -->
     <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
         <iframe
             title="FEED Advert"
@@ -239,7 +239,7 @@
         </iframe>
     </div>
 
-    <!-- Right Side: Login Frame[cite: 1] -->
+    <!-- Right Side: Login Frame -->
     <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
         <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
         <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
@@ -281,8 +281,7 @@
     <!-- Live Debug Terminal (Fixed at Bottom) -->
     <div id="debug-terminal">Initializing Popup System Diagnostics...</div>
 
-    <!-- Firebase v10 SDK Integration (Popup Version) -->
-    <!-- Firebase v10 SDK Integration (Popup Version with Safety Fallback) -->
+    <!-- Firebase v10 SDK Integration (Popup Version with Safety Timeout Fallback) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -388,7 +387,6 @@
 
                 const userRef = doc(db, "users", user.uid);
                 
-                // Race condition: tries to write to Firestore, but forces continuation after 3 seconds if it hangs
                 try {
                     await Promise.race([
                         setDoc(userRef, userPayload, { merge: true }),
