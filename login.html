@@ -81,12 +81,12 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 220px;
+            height: 200px;
             background-color: rgba(15, 15, 20, 0.95);
             color: #00ffcc;
             font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            padding: 15px;
+            font-size: 12px;
+            padding: 12px;
             overflow-y: auto;
             z-index: 9999;
             border-top: 2px solid #6036E1;
@@ -95,9 +95,9 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col lg:flex-row pb-[220px]"> <!-- Added bottom padding to clear terminal -->
+<body class="min-h-screen flex flex-col lg:flex-row pb-[200px]">
 
-    <!-- Left Side: Advert Frame -->
+    <!-- Left Side: Advert Frame[cite: 1] -->
     <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
         <iframe
             title="FEED Advert"
@@ -239,7 +239,7 @@
         </iframe>
     </div>
 
-    <!-- Right Side: Login Frame -->
+    <!-- Right Side: Login Frame[cite: 1] -->
     <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
         <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
         <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
@@ -279,17 +279,17 @@
     </div>
 
     <!-- Live Debug Terminal (Fixed at Bottom) -->
-    <div id="debug-terminal">Loading diagnostics...</div>
+    <div id="debug-terminal">Initializing Popup System Diagnostics...</div>
 
-    <!-- Firebase v10 SDK Integration -->
+    <!-- Firebase v10 SDK Integration (Popup Version) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // --- Custom Logging System ---
         const terminal = document.getElementById('debug-terminal');
-        terminal.innerHTML = ''; // Clear initial message
+        terminal.innerHTML = '';
 
         function logInfo(message, data = null) {
             const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
@@ -302,7 +302,7 @@
                     try {
                         logString += `    ✅ DATA: ${JSON.stringify(data, null, 2)}\n`;
                     } catch (e) {
-                        logString += `    ✅ DATA: [Object could not be stringified]\n`;
+                        logString += `    ✅ DATA: [Object stringify error]\n`;
                     }
                 }
             }
@@ -312,7 +312,7 @@
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        logInfo("Initializing Firebase System...");
+        logInfo("Initializing Firebase System (Popup Mode)...");
         
         const firebaseConfig = {
             apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
@@ -331,6 +331,7 @@
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
+            // Forces the account selector prompt inside the popup
             provider.setCustomParameters({ prompt: 'select_account' });
             logInfo("Firebase Initialization Complete.");
         } catch (initErr) {
@@ -346,86 +347,69 @@
             return {
                 userAgent: navigator.userAgent || "Unknown",
                 platform: navigator.platform || "Unknown",
-                language: navigator.language || "Unknown"
+                language: navigator.language || "Unknown",
+                screenResolution: `${window.screen.width}x${window.screen.height}`
             };
         };
 
-        // --- AUTH STATE LISTENER (Sanity Check) ---
+        // --- AUTH STATE LISTENER ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                logInfo("Auth Listener: Firebase recognizes an active session.", { uid: user.uid, email: user.email });
+                logInfo("Auth Listener: Active session detected.", { uid: user.uid, email: user.email });
             } else {
-                logInfo("Auth Listener: No active session found.");
+                logInfo("Auth Listener: No active session.");
             }
         });
 
-        // --- REDIRECT HANDLER ---
-        window.addEventListener('DOMContentLoaded', async () => {
-            logInfo("DOM Loaded. Checking for Google Redirect payload...");
-            
-            try {
-                const result = await getRedirectResult(auth);
-                
-                if (result) {
-                    logInfo("Redirect Payload Caught! User successfully authenticated with Google.");
-                    
-                    // UI Update
-                    signInBtn.disabled = true;
-                    btnText.textContent = "Finalizing setup...";
-                    btnLoader.style.display = "block";
-
-                    const user = result.user;
-                    logInfo("Preparing to write user data to Firestore Document (users/" + user.uid + ")");
-                    
-                    const userPayload = {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL,
-                        lastLogin: serverTimestamp(),
-                        authProvider: "Google",
-                        forensics: getForensicDetails()
-                    };
-
-                    try {
-                        const userRef = doc(db, "users", user.uid);
-                        // THIS IS THE STEP THAT USUALLY FAILS DUE TO PERMISSIONS
-                        await setDoc(userRef, userPayload, { merge: true }); 
-                        
-                        logInfo("FIRESTORE WRITE SUCCESSFUL! Redirecting user to /dashboard.html in 1 second...");
-                        btnText.textContent = "Redirecting...";
-                        
-                        setTimeout(() => {
-                            window.location.href = "/dashboard.html";
-                        }, 1000);
-
-                    } catch (firestoreError) {
-                        logInfo("FIRESTORE WRITE BLOCKED OR FAILED!", firestoreError);
-                        errorContainer.textContent = `Database Error: Check terminal logs for permission issues.`;
-                        errorContainer.classList.remove('hidden');
-                        btnText.textContent = "Error saving profile";
-                        btnLoader.style.display = "none";
-                    }
-
-                } else {
-                    logInfo("No redirect payload found. Waiting for user action.");
-                }
-            } catch (authError) {
-                logInfo("Error processing Google Redirect Result.", authError);
-                errorContainer.textContent = `Authentication failed: ${authError.message}`;
-                errorContainer.classList.remove('hidden');
-            }
-        });
-
-        // --- CLICK HANDLER ---
-        signInBtn.addEventListener('click', () => {
-            logInfo("Login button clicked. Triggering signInWithRedirect...");
+        // --- POPUP CLICK HANDLER ---
+        signInBtn.addEventListener('click', async () => {
+            logInfo("Login button clicked. Triggering signInWithPopup...");
             signInBtn.disabled = true;
-            btnText.textContent = "Connecting to Google...";
+            btnText.textContent = "Opening Google Sign-In...";
             btnLoader.style.display = "block";
             errorContainer.classList.add('hidden');
             
-            signInWithRedirect(auth, provider);
+            try {
+                // Opens the Google OAuth Popup window
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                logInfo("Google Popup Sign-In Successful!", { uid: user.uid, email: user.email });
+                
+                btnText.textContent = "Finalizing profile...";
+                logInfo("Preparing to write user document to Firestore (users/" + user.uid + ")");
+
+                const userPayload = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    lastLogin: serverTimestamp(),
+                    authProvider: "Google",
+                    forensics: getForensicDetails()
+                };
+
+                const userRef = doc(db, "users", user.uid);
+                // Save user record to Firestore database
+                await setDoc(userRef, userPayload, { merge: true });
+                
+                logInfo("FIRESTORE WRITE SUCCESSFUL! Redirecting to /dashboard.html...");
+                btnText.textContent = "Redirecting...";
+                
+                setTimeout(() => {
+                    window.location.href = "/dashboard.html";
+                }, 800);
+
+            } catch (error) {
+                logInfo("Popup Sign-In or Firestore Write FAILED.", error);
+                errorContainer.textContent = `Authentication failed: ${error.message}`;
+                errorContainer.classList.remove('hidden');
+                
+                // Reset Button State
+                signInBtn.disabled = false;
+                btnText.textContent = "Continue with Google";
+                btnLoader.style.display = "none";
+            }
         });
     </script>
 </body>
