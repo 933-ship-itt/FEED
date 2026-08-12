@@ -61,109 +61,110 @@
     <!-- Use type="module" to load Firebase v10 SDK via CDN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithPopup, 
-            GoogleAuthProvider, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { 
+    getAuth, 
+    signInWithRedirect, 
+    getRedirectResult,
+    GoogleAuthProvider, 
+    signOut, 
+    onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-        // Your exact Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-            authDomain: "feed-65b35.firebaseapp.com",
-            projectId: "feed-65b35",
-            storageBucket: "feed-65b35.firebasestorage.app",
-            messagingSenderId: "1085499159984",
-            appId: "1:1085499159984:web:317e0443941085964a5275",
-            measurementId: "G-FVPRRX9X1M"
-        };
+// Your Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+    authDomain: "feed-65b35.firebaseapp.com",
+    projectId: "feed-65b35",
+    storageBucket: "feed-65b35.firebasestorage.app",
+    messagingSenderId: "1085499159984",
+    appId: "1:1085499159984:web:317e0443941085964a5275",
+    measurementId: "G-FVPRRX9X1M"
+};
 
-        // --- Custom Logging System ---
-        const logWindow = document.getElementById('log-window');
-        
-        function logInfo(message, data = null) {
-            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-            let logString = `[${timestamp}] ℹ️ ${message}\n`;
-            
-            if (data) {
-                if (data instanceof Error) {
-                    logString += `    ❌ ERROR: ${data.message} (Code: ${data.code || 'N/A'})\n`;
-                } else {
-                    logString += `    ✅ DATA: ${JSON.stringify(data, null, 2)}\n`;
-                }
-            }
-            
-            // Output to both the screen and the browser console
-            console.log(`[${timestamp}]`, message, data ? data : '');
-            logWindow.textContent += logString + '\n';
-            logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to bottom
+// --- Custom Logging System ---
+const logWindow = document.getElementById('log-window');
+
+function logInfo(message, data = null) {
+    const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+    let logString = `[${timestamp}] ℹ️ ${message}\n`;
+    
+    if (data) {
+        if (data instanceof Error) {
+            logString += `    ❌ ERROR: ${data.message} (Code: ${data.code || 'N/A'})\n`;
+        } else {
+            logString += `    ✅ DATA: ${JSON.stringify(data, null, 2)}\n`;
         }
+    }
+    
+    console.log(`[${timestamp}]`, message, data ? data : '');
+    logWindow.textContent += logString + '\n';
+    logWindow.scrollTop = logWindow.scrollHeight; 
+}
 
-        // --- Initialization ---
-        logInfo("Initializing Firebase...");
-        let app, auth, provider;
+// --- Initialization ---
+logInfo("Initializing Firebase...");
+let app, auth, provider;
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            provider = new GoogleAuthProvider();
-            logInfo("Firebase initialized successfully. Waiting for Auth State...");
-        } catch (error) {
-            logInfo("Failed to initialize Firebase.", error);
+try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    provider = new GoogleAuthProvider();
+    
+    // 🔥 FORCES THE GOOGLE ACCOUNT SELECTION SCREEN 🔥
+    provider.setCustomParameters({
+        prompt: 'select_account'
+    });
+    
+    logInfo("Firebase initialized. Checking for redirect results...");
+} catch (error) {
+    logInfo("Failed to initialize Firebase.", error);
+}
+
+// --- Handle Redirect Result ---
+// This runs when the page reloads after Google sends the user back
+getRedirectResult(auth)
+    .then((result) => {
+        if (result) {
+            logInfo("Redirect Sign-In Resolved SUCCESSFULLY!", {
+                uid: result.user.uid,
+                email: result.user.email
+            });
         }
+    }).catch((error) => {
+        logInfo("Redirect Sign-In FAILED.", error);
+    });
 
-        // --- Auth State Listener ---
-        // This fires automatically when the page loads, and whenever the user logs in/out
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                logInfo("Auth State Fired: USER IS LOGGED IN", {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    emailVerified: user.emailVerified
-                });
-            } else {
-                logInfo("Auth State Fired: NO USER (Logged out)");
-            }
+// --- Auth State Listener ---
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        logInfo("Auth State Fired: USER IS LOGGED IN", {
+            uid: user.uid,
+            email: user.email
         });
+    } else {
+        logInfo("Auth State Fired: NO USER (Logged out)");
+    }
+});
 
-        // --- Button Event Listeners ---
-        const btnLogin = document.getElementById('btn-login');
-        const btnLogout = document.getElementById('btn-logout');
+// --- Button Event Listeners ---
+const btnLogin = document.getElementById('btn-login');
+const btnLogout = document.getElementById('btn-logout');
 
-        btnLogin.addEventListener('click', async () => {
-            logInfo("Initiating Google Popup Sign-In...");
-            try {
-                const result = await signInWithPopup(auth, provider);
-                
-                // Get Google Access Token (useful if you need to access Google APIs later)
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential?.accessToken;
-                
-                // Get Signed-In User info
-                const user = result.user;
-                
-                logInfo("Popup Sign-In Promise Resolved SUCCESSFULLY!", {
-                    uid: user.uid,
-                    email: user.email,
-                    hasGoogleAccessToken: !!token
-                });
-            } catch (error) {
-                logInfo("Popup Sign-In FAILED.", error);
-            }
-        });
+btnLogin.addEventListener('click', () => {
+    logInfo("Navigating away to full Google Sign-In page...");
+    // This will immediately redirect the browser tab
+    signInWithRedirect(auth, provider); 
+});
 
-        btnLogout.addEventListener('click', async () => {
-            logInfo("Initiating Sign-Out...");
-            try {
-                await signOut(auth);
-                logInfo("Sign-Out Promise Resolved SUCCESSFULLY!");
-            } catch (error) {
-                logInfo("Sign-Out FAILED.", error);
-            }
-        });
+btnLogout.addEventListener('click', async () => {
+    logInfo("Initiating Sign-Out...");
+    try {
+        await signOut(auth);
+        logInfo("Sign-Out Promise Resolved SUCCESSFULLY!");
+    } catch (error) {
+        logInfo("Sign-Out FAILED.", error);
+    }
+});
     </script>
 </body>
 </html>
