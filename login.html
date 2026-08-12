@@ -282,6 +282,7 @@
     <div id="debug-terminal">Initializing Popup System Diagnostics...</div>
 
     <!-- Firebase v10 SDK Integration (Popup Version) -->
+    <!-- Firebase v10 SDK Integration (Popup Version with Safety Fallback) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
@@ -331,7 +332,6 @@
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
-            // Forces the account selector prompt inside the popup
             provider.setCustomParameters({ prompt: 'select_account' });
             logInfo("Firebase Initialization Complete.");
         } catch (initErr) {
@@ -352,7 +352,6 @@
             };
         };
 
-        // --- AUTH STATE LISTENER ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 logInfo("Auth Listener: Active session detected.", { uid: user.uid, email: user.email });
@@ -361,7 +360,6 @@
             }
         });
 
-        // --- POPUP CLICK HANDLER ---
         signInBtn.addEventListener('click', async () => {
             logInfo("Login button clicked. Triggering signInWithPopup...");
             signInBtn.disabled = true;
@@ -370,14 +368,13 @@
             errorContainer.classList.add('hidden');
             
             try {
-                // Opens the Google OAuth Popup window
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
                 
                 logInfo("Google Popup Sign-In Successful!", { uid: user.uid, email: user.email });
                 
                 btnText.textContent = "Finalizing profile...";
-                logInfo("Preparing to write user document to Firestore (users/" + user.uid + ")");
+                logInfo("Attempting Firestore sync (with 3s timeout guard)...");
 
                 const userPayload = {
                     uid: user.uid,
@@ -390,22 +387,30 @@
                 };
 
                 const userRef = doc(db, "users", user.uid);
-                // Save user record to Firestore database
-                await setDoc(userRef, userPayload, { merge: true });
                 
-                logInfo("FIRESTORE WRITE SUCCESSFUL! Redirecting to /dashboard.html...");
+                // Race condition: tries to write to Firestore, but forces continuation after 3 seconds if it hangs
+                try {
+                    await Promise.race([
+                        setDoc(userRef, userPayload, { merge: true }),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error("Firestore write timed out")), 3000))
+                    ]);
+                    logInfo("FIRESTORE WRITE SUCCESSFUL!");
+                } catch (dbWarn) {
+                    logInfo("Firestore write skipped/timed out. (Check if database is enabled in Firebase Console). Proceeding...", dbWarn);
+                }
+                
+                logInfo("Redirecting to /dashboard.html now...");
                 btnText.textContent = "Redirecting...";
                 
                 setTimeout(() => {
                     window.location.href = "/dashboard.html";
-                }, 800);
+                }, 500);
 
             } catch (error) {
-                logInfo("Popup Sign-In or Firestore Write FAILED.", error);
+                logInfo("Popup Sign-In FAILED.", error);
                 errorContainer.textContent = `Authentication failed: ${error.message}`;
                 errorContainer.classList.remove('hidden');
                 
-                // Reset Button State
                 signInBtn.disabled = false;
                 btnText.textContent = "Continue with Google";
                 btnLoader.style.display = "none";
