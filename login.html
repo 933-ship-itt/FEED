@@ -265,13 +265,12 @@
     </div>
 
     <!-- Firebase v10 SDK Integration -->
+    <!-- Firebase v10 SDK Integration -->
     <script type="module">
-        // Import Firebase App & Services
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Provided Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
             authDomain: "feed-65b35.firebaseapp.com",
@@ -282,19 +281,16 @@
             measurementId: "G-FVPRRX9X1M"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // DOM Elements
         const signInBtn = document.getElementById('googleSignInBtn');
         const btnText = document.getElementById('btn-text');
         const btnLoader = document.getElementById('btn-loader');
         const errorContainer = document.getElementById('error-message');
 
-        // Helper function to capture forensic details
         const getForensicDetails = () => {
             return {
                 userAgent: navigator.userAgent || "Unknown",
@@ -307,52 +303,52 @@
             };
         };
 
-        // Handle Sign-In Logic
-        signInBtn.addEventListener('click', async () => {
-            // UI Update: Loading State
-            signInBtn.disabled = true;
-            btnText.textContent = "Verifying...";
-            btnLoader.style.display = "block";
-            errorContainer.classList.add('hidden');
-
+        // 1. Check if the user just returned from the Google redirect
+        window.addEventListener('DOMContentLoaded', async () => {
             try {
-                // 1. Trigger Google Popup Auth
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                // 2. Build User Document Data
-                const forensicData = getForensicDetails();
+                const result = await getRedirectResult(auth);
                 
-                const userPayload = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    lastLogin: serverTimestamp(),
-                    authProvider: "Google",
-                    forensics: forensicData
-                };
+                if (result) {
+                    // UI Update: Let the user know we are finalizing
+                    signInBtn.disabled = true;
+                    btnText.textContent = "Finalizing setup...";
+                    btnLoader.style.display = "block";
 
-                // 3. Write/Merge to Firestore under 'users/{uid}'
-                const userRef = doc(db, "users", user.uid);
-                await setDoc(userRef, userPayload, { merge: true });
+                    const user = result.user;
+                    const forensicData = getForensicDetails();
+                    
+                    const userPayload = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        lastLogin: serverTimestamp(),
+                        authProvider: "Google",
+                        forensics: forensicData
+                    };
 
-                // 4. Successful Verification - Redirect
-                btnText.textContent = "Redirecting...";
-                window.location.href = "/dashboard.html";
+                    const userRef = doc(db, "users", user.uid);
+                    await setDoc(userRef, userPayload, { merge: true });
 
+                    btnText.textContent = "Redirecting...";
+                    window.location.href = "/dashboard.html";
+                }
             } catch (error) {
                 console.error("Authentication Error:", error);
-                
-                // UI Update: Revert on error
-                signInBtn.disabled = false;
-                btnText.textContent = "Continue with Google";
-                btnLoader.style.display = "none";
-                
-                // Display user-friendly error
                 errorContainer.textContent = `Authentication failed: ${error.message}`;
                 errorContainer.classList.remove('hidden');
             }
+        });
+
+        // 2. Handle the initial click by triggering the redirect
+        signInBtn.addEventListener('click', () => {
+            signInBtn.disabled = true;
+            btnText.textContent = "Connecting to Google...";
+            btnLoader.style.display = "block";
+            errorContainer.classList.add('hidden');
+            
+            // Redirects the current page to Google's auth flow
+            signInWithRedirect(auth, provider);
         });
     </script>
 </body>
