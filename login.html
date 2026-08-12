@@ -3,287 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign into FEED</title>
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/PxzBtXjz/logo.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Firebase Google Auth Test</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
-
-        :root {
-            --violet: #6036E1;
-            --magenta: #D83DC2;
-            --ink: #0b0b12;
-            --gradient: linear-gradient(to right, #6036E1, #D83DC2);
-        }
-
         body {
-            font-family: 'Inter', sans-serif;
-            color: var(--ink);
-            background-color: #f8f8fc;
-            margin: 0;
-            overflow-x: hidden;
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-
-        .font-display { font-family: 'Archivo', sans-serif; }
-
-        .text-gradient {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
+        .controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        .bg-gradient-custom {
-            background: var(--gradient);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
         }
-
-        .bg-gradient-custom:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
-        }
-
-        .premium-frame {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid #ececf3;
-            box-shadow: 0 24px 80px rgba(32, 18, 80, 0.08);
-        }
-
-        .google-btn {
-            transition: all 0.2s ease;
-        }
+        #btn-login { background-color: #4285F4; }
+        #btn-login:hover { background-color: #3367D6; }
+        #btn-logout { background-color: #db4437; }
+        #btn-logout:hover { background-color: #c53929; }
         
-        .google-btn:hover {
-            background: #faf9ff;
-            border-color: rgba(96,54,225,0.3);
-            box-shadow: 0 8px 20px rgba(32, 18, 80, 0.04);
-            transform: translateY(-1px);
+        #log-window {
+            background-color: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
-
-        /* Custom spinner for loading state */
-        .loader {
-            border: 3px solid rgba(96,54,225,0.2);
-            border-top-color: #6036E1;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col lg:flex-row">
+<body>
 
-    <!-- Left Side: Advert Frame -->
-    <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
-        <iframe
-            title="FEED Advert"
-            srcdoc="&lt;!DOCTYPE html&gt;
-&lt;html lang=&quot;en&quot;&gt;
-&lt;head&gt;
-    &lt;meta charset=&quot;UTF-8&quot;&gt;
-    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;FEED | Social Network &amp; Digital Asset Platform&lt;/title&gt;
-    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js&quot;&gt;&lt;/script&gt;
-    &lt;style&gt;
-        @import url(&#x27;https://fonts.googleapis.com/css2?family=Archivo:wght@900&amp;family=Inter:wght@400;700;900&amp;display=swap&#x27;);
-        :root { --pure-white: #ffffff; --main-gradient: linear-gradient(to right, #6036E1, #D83DC2); --text-main: #1e1b4b; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--pure-white); overflow: hidden; font-family: &#x27;Inter&#x27;, sans-serif; }
-        #mainContent { position: relative; width: 100%; height: 100%; z-index: 10; }
-        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; }
-        .app-logo-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 6; width: clamp(300px, 50vw, 600px); opacity: 0.12; pointer-events: none; }
-        .director-ui { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10; pointer-events: none; }
-        .scene-content { position: absolute; text-align: center; opacity: 0; transform: translateY(15px); filter: blur(8px); transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); width: 90%; visibility: hidden; }
-        .scene-content.active { opacity: 1; transform: translateY(0); filter: blur(0px); visibility: visible; }
-        .scene-content.exit { opacity: 0; transform: scale(1.05); filter: blur(15px); visibility: visible; }
-        h1 { font-size: clamp(2.5rem, 8vw, 6.5rem); margin: 0; background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1; font-weight: 900; font-family: &#x27;Archivo&#x27;, sans-serif; letter-spacing: -0.05em; }
-        .feed-wordmark { font-family: &#x27;Archivo&#x27;, sans-serif; font-weight: 900; letter-spacing: -0.05em; }
-        .feed-wordmark .feed-black { color: #000; -webkit-text-fill-color: #000; }
-        .feed-wordmark .feed-ee { background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
-        p { font-size: clamp(0.9rem, 2vw, 1.3rem); color: var(--text-main); margin-top: 15px; font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; }
-        #finaleStage { position: absolute; inset: 0; z-index: 2000; background: var(--pure-white); display: none; justify-content: center; align-items: center; perspective: 2000px; }
-        .intro-frame { position: relative; display: flex; justify-content: center; align-items: center; }
-        .intro-svg { width: min(900px, 92vw); height: 300px; overflow: visible; }
-        .final-feed-text { font-size: 110px; font-weight: 900; font-family: &#x27;Archivo&#x27;, sans-serif; }
-        .sub-url-path { font-size: 28px; font-weight: 700; fill: #7c3aed; letter-spacing: 0.3em; opacity: 0; }
-        .logo-final-container { position: absolute; width: 350px; height: 350px; opacity: 0; transform: scale(0.8); display: flex; justify-content: center; align-items: center; }
-    &lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-    &lt;div id=&quot;mainContent&quot;&gt;
-        &lt;img src=&quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&quot; class=&quot;app-logo-watermark&quot; alt=&quot;FEED Logo&quot;&gt;
-        &lt;div class=&quot;director-ui&quot;&gt;
-            &lt;div class=&quot;scene-content active&quot;&gt;&lt;h1 class=&quot;feed-wordmark&quot;&gt;&lt;span class=&quot;feed-black&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;feed-ee&quot;&gt;EE&lt;/span&gt;&lt;span class=&quot;feed-black&quot;&gt;D&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;Social Network &amp;amp; Digital Asset&lt;/p&gt;&lt;/div&gt;
-            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;USDC Paired.&lt;/h1&gt;&lt;p&gt;Designed for Direct Trading&lt;/p&gt;&lt;/div&gt;
-            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;Live Community.&lt;/h1&gt;&lt;p&gt;Chat, Streams &amp;amp; Networking&lt;/p&gt;&lt;/div&gt;
-            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;FEED Access.&lt;/h1&gt;&lt;p&gt;Explore the Platform&lt;/p&gt;&lt;/div&gt;
-        &lt;/div&gt;
-        &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
-    &lt;/div&gt;
-    &lt;div id=&quot;finaleStage&quot;&gt;
-        &lt;div class=&quot;intro-frame&quot; id=&quot;introFrame&quot;&gt;
-            &lt;svg class=&quot;intro-svg&quot; viewBox=&quot;0 0 900 250&quot;&gt;
-                &lt;defs&gt;
-                    &lt;linearGradient id=&quot;svgGrad&quot; x1=&quot;0%&quot; y1=&quot;0%&quot; x2=&quot;100%&quot; y2=&quot;0%&quot;&gt;
-                        &lt;stop offset=&quot;0%&quot; style=&quot;stop-color:#6036E1;stop-opacity:1&quot; /&gt;
-                        &lt;stop offset=&quot;100%&quot; style=&quot;stop-color:#D83DC2;stop-opacity:1&quot; /&gt;
-                    &lt;/linearGradient&gt;
-                &lt;/defs&gt;
-                &lt;text x=&quot;50%&quot; y=&quot;45%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot; class=&quot;final-feed-text&quot; id=&quot;feedFinalText&quot; clip-path=&quot;inset(100% 0% 0% 0%)&quot;&gt;
-                    &lt;tspan fill=&quot;#000&quot;&gt;F&lt;/tspan&gt;&lt;tspan fill=&quot;url(#svgGrad)&quot;&gt;EE&lt;/tspan&gt;&lt;tspan fill=&quot;#000&quot;&gt;D&lt;/tspan&gt;
-                &lt;/text&gt;
-                &lt;text x=&quot;50%&quot; y=&quot;85%&quot; text-anchor=&quot;middle&quot; class=&quot;sub-url-path&quot; id=&quot;urlLayer&quot;&gt;SOCIAL • CHAT • ASSET ACCESS&lt;/text&gt;
-            &lt;/svg&gt;
-        &lt;/div&gt;
-        &lt;div class=&quot;logo-final-container&quot; id=&quot;logoFinal&quot;&gt;
-            &lt;img src=&quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&quot; style=&quot;width:100%&quot; alt=&quot;FEED Logo&quot;&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;script&gt;
-        const canvas = document.getElementById(&#x27;canvas&#x27;); const ctx = canvas.getContext(&#x27;2d&#x27;);
-        const scenes = document.querySelectorAll(&#x27;.scene-content&#x27;);
-        let width, height, currentScene = 0, frame = 0, loopActive = true;
-        const SPEED = 14; const SCENE_DURATION = 140; 
-        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
-        window.addEventListener(&#x27;resize&#x27;, resize); resize();
-        class Particle {
-            constructor(preWarm = false) { this.reset(preWarm); }
-            reset(preWarm = false) {
-                this.x = (Math.random() - 0.5) * 4500; this.y = (Math.random() - 0.5) * 4500;
-                this.z = preWarm ? Math.random() * 2000 : 2000; this.pz = this.z;
-                this.size = Math.random() * 1.5 + 1; this.color = Math.random() &gt; 0.5 ? &#x27;#6366f1&#x27; : &#x27;#a855f7&#x27;;
-            }
-            update() { this.pz = this.z; this.z -= SPEED; if (this.z &lt; 1) this.reset(); }
-            draw() {
-                const s = 800 / this.z; const ps = 800 / this.pz;
-                const x = this.x * s + width/2; const y = this.y * s + height/2;
-                const px = this.x * ps + width/2; const py = this.y * ps + height/2;
-                ctx.globalAlpha = Math.min(0.4, (1600 - this.z) / 1000);
-                ctx.strokeStyle = this.color; ctx.lineWidth = this.size * s; ctx.lineCap = &#x27;round&#x27;;
-                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(px, py); ctx.stroke();
-            }
-        }
-        const particles = Array.from({length: 600}, () =&gt; new Particle(true));
-        let finaleTimeline = null; let animationFrameId = null; let sceneTimeouts = [];
-        function clearSceneTimeouts() { sceneTimeouts.forEach(id =&gt; clearTimeout(id)); sceneTimeouts = []; }
-        function resetToStart() {
-            clearSceneTimeouts();
-            if (finaleTimeline) { finaleTimeline.kill(); finaleTimeline = null; }
-            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
-            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
-            gsap.set(finaleStage, { display: &#x27;none&#x27;, opacity: 1 }); gsap.set(mainContent, { display: &#x27;block&#x27;, opacity: 1 });
-            gsap.set(&quot;#feedFinalText&quot;, { clipPath: &quot;inset(100% 0% 0% 0%)&quot;, opacity: 1 });
-            gsap.set(&quot;#urlLayer&quot;, { opacity: 0, y: 0 }); gsap.set(&quot;#introFrame&quot;, { scale: 1, x: 0, opacity: 1 });
-            gsap.set(&quot;#logoFinal&quot;, { opacity: 0, scale: 0.8 });
-            currentScene = 0; frame = 0; loopActive = true;
-            scenes.forEach(s =&gt; s.classList.remove(&#x27;active&#x27;, &#x27;exit&#x27;)); scenes[0].classList.add(&#x27;active&#x27;);
-            animationFrameId = requestAnimationFrame(animate);
-        }
-        function runFinale() {
-            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
-            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
-            gsap.to(mainContent, { opacity: 0, duration: 0.45, ease: &quot;power1.out&quot;, onComplete: () =&gt; { mainContent.style.display = &#x27;none&#x27;; finaleStage.style.display = &#x27;flex&#x27;; finaleStage.style.opacity = &#x27;1&#x27;; startGSAPFinale(); } });
-        }
-        function startGSAPFinale() {
-            finaleTimeline = gsap.timeline({ onComplete: () =&gt; { resetToStart(); } });
-            finaleTimeline.to(&quot;#feedFinalText&quot;, { clipPath: &quot;inset(0% 0% 0% 0%)&quot;, duration: 1.05, ease: &quot;power3.out&quot; })
-                .to(&quot;#urlLayer&quot;, { opacity: 1, y: -10, duration: 0.55, ease: &quot;power2.out&quot; }, &quot;-=0.15&quot;)
-                .to({}, { duration: 1.0 })
-                .to(&quot;#introFrame&quot;, { scale: 24, x: &quot;10%&quot;, opacity: 0, duration: 1.1, ease: &quot;expo.in&quot; })
-                .to(&quot;#logoFinal&quot;, { opacity: 1, scale: 1, duration: 0.75, ease: &quot;power2.out&quot; }, &quot;-=0.85&quot;)
-                .to({}, { duration: 1.25 });
-        }
-        function animate() {
-            if (!loopActive) return; frame++;
-            if (frame &gt;= SCENE_DURATION) {
-                frame = 0;
-                if (currentScene === scenes.length - 1) { loopActive = false; runFinale(); return; }
-                const previousScene = currentScene;
-                scenes[previousScene].classList.remove(&#x27;active&#x27;); scenes[previousScene].classList.add(&#x27;exit&#x27;);
-                sceneTimeouts.push(setTimeout(() =&gt; { if (scenes[previousScene]) { scenes[previousScene].classList.remove(&#x27;exit&#x27;); } }, 800));
-                currentScene++; scenes[currentScene].classList.add(&#x27;active&#x27;);
-            }
-            ctx.fillStyle = &#x27;rgba(255, 255, 255, 0.72)&#x27;; ctx.fillRect(0, 0, width, height);
-            particles.forEach(p =&gt; { p.update(); p.draw(); });
-            animationFrameId = requestAnimationFrame(animate);
-        }
-        resetToStart();
-    &lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;"
-            class="w-full h-full border-0 absolute inset-0"
-            allow="autoplay">
-        </iframe>
+    <div class="controls">
+        <h2>Authentication Tester</h2>
+        <button id="btn-login">Sign in with Google</button>
+        <button id="btn-logout">Sign Out</button>
     </div>
 
-    <!-- Right Side: Login Frame -->
-    <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
-        <!-- Decorative Background Orbs -->
-        <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
-        <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
+    <h3>Live Execution Logs:</h3>
+    <div id="log-window"></div>
 
-        <!-- Central Login Card -->
-        <div class="premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10">
-            <div class="text-center mb-10">
-                <a href="/" class="inline-block font-display text-4xl font-black tracking-[-0.06em]">
-                    F<span class="text-gradient">EE</span>D
-                </a>
-                <h1 class="font-display text-2xl font-bold mt-6 text-gray-900">Sign into FEED</h1>
-                <p class="mt-2 text-sm text-gray-500 leading-relaxed">
-                    Access your social network &amp; digital asset dashboard.
-                </p>
-            </div>
-
-            <!-- Login Container -->
-            <div id="login-container">
-                <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    <span id="btn-text">Continue with Google</span>
-                    <div id="btn-loader" class="loader ml-2"></div>
-                </button>
-            </div>
-
-            <!-- Error Message State -->
-            <div id="error-message" class="hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center"></div>
-
-            <div class="mt-8 text-center border-t border-gray-100 pt-6">
-                <p class="text-xs text-gray-400">
-                    By proceeding, you agree to the <a href="#" class="text-violet-600 hover:underline">Terms of Service</a> and <a href="#" class="text-violet-600 hover:underline">Privacy Policy</a>.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase Authentication -->
+    <!-- Use type="module" to load Firebase v10 SDK via CDN -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import {
-            getAuth,
-            signInWithPopup,
-            GoogleAuthProvider,
-            setPersistence,
-            browserLocalPersistence
-        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import {
-            getFirestore,
-            doc,
-            setDoc,
-            serverTimestamp
-        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-        // Vercel-hosted FEED + Firebase Authentication.
-        // Popup auth is used intentionally: it requires no vercel.json,
-        // no Firebase Hosting rewrite, and no redirect-result handling.
+        // Your exact Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
             authDomain: "feed-65b35.firebaseapp.com",
@@ -294,111 +80,90 @@
             measurementId: "G-FVPRRX9X1M"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+        // --- Custom Logging System ---
+        const logWindow = document.getElementById('log-window');
+        
+        function logInfo(message, data = null) {
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+            let logString = `[${timestamp}] ℹ️ ${message}\n`;
+            
+            if (data) {
+                if (data instanceof Error) {
+                    logString += `    ❌ ERROR: ${data.message} (Code: ${data.code || 'N/A'})\n`;
+                } else {
+                    logString += `    ✅ DATA: ${JSON.stringify(data, null, 2)}\n`;
+                }
+            }
+            
+            // Output to both the screen and the browser console
+            console.log(`[${timestamp}]`, message, data ? data : '');
+            logWindow.textContent += logString + '\n';
+            logWindow.scrollTop = logWindow.scrollHeight; // Auto-scroll to bottom
+        }
 
-        provider.setCustomParameters({
-            prompt: "select_account"
+        // --- Initialization ---
+        logInfo("Initializing Firebase...");
+        let app, auth, provider;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            provider = new GoogleAuthProvider();
+            logInfo("Firebase initialized successfully. Waiting for Auth State...");
+        } catch (error) {
+            logInfo("Failed to initialize Firebase.", error);
+        }
+
+        // --- Auth State Listener ---
+        // This fires automatically when the page loads, and whenever the user logs in/out
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                logInfo("Auth State Fired: USER IS LOGGED IN", {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    emailVerified: user.emailVerified
+                });
+            } else {
+                logInfo("Auth State Fired: NO USER (Logged out)");
+            }
         });
 
-        const signInBtn = document.getElementById("googleSignInBtn");
-        const btnText = document.getElementById("btn-text");
-        const btnLoader = document.getElementById("btn-loader");
-        const errorContainer = document.getElementById("error-message");
+        // --- Button Event Listeners ---
+        const btnLogin = document.getElementById('btn-login');
+        const btnLogout = document.getElementById('btn-logout');
 
-        function setLoading(message) {
-            signInBtn.disabled = true;
-            btnText.textContent = message;
-            btnLoader.style.display = "block";
-        }
-
-        function resetButton() {
-            signInBtn.disabled = false;
-            btnText.textContent = "Continue with Google";
-            btnLoader.style.display = "none";
-        }
-
-        function showError(error) {
-            console.error("FEED authentication error:", error);
-
-            const code = error?.code || "unknown";
-            let message = error?.message || "Google sign-in could not be completed.";
-
-            if (code === "auth/popup-blocked") {
-                message = "Your browser blocked the Google sign-in window. Allow popups for feed-azure.vercel.app and try again.";
-            } else if (code === "auth/popup-closed-by-user") {
-                message = "Google sign-in was cancelled.";
-            } else if (code === "auth/unauthorized-domain") {
-                message = "feed-azure.vercel.app is not authorized in Firebase Authentication.";
-            } else if (code === "auth/operation-not-allowed") {
-                message = "Google sign-in is not enabled in Firebase Authentication.";
-            } else if (code === "auth/network-request-failed") {
-                message = "A network error occurred while contacting Google or Firebase.";
-            }
-
-            errorContainer.textContent = `Authentication failed (${code}): ${message}`;
-            errorContainer.classList.remove("hidden");
-            resetButton();
-        }
-
-        function getForensicDetails() {
-            return {
-                userAgent: navigator.userAgent || "Unknown",
-                platform: navigator.platform || "Unknown",
-                language: navigator.language || "Unknown",
-                screenResolution: `${window.screen.width}x${window.screen.height}`,
-                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                vendor: navigator.vendor || "Unknown",
-                cookiesEnabled: navigator.cookieEnabled
-            };
-        }
-
-        async function finishSignIn(user) {
-            // Firebase authentication has succeeded at this point.
-            // Firestore profile sync is secondary and cannot turn a successful
-            // login into a reported authentication failure.
+        btnLogin.addEventListener('click', async () => {
+            logInfo("Initiating Google Popup Sign-In...");
             try {
-                await setDoc(
-                    doc(db, "users", user.uid),
-                    {
-                        uid: user.uid,
-                        email: user.email || null,
-                        displayName: user.displayName || null,
-                        photoURL: user.photoURL || null,
-                        lastLogin: serverTimestamp(),
-                        authProvider: "Google",
-                        forensics: getForensicDetails()
-                    },
-                    { merge: true }
-                );
-            } catch (firestoreError) {
-                console.warn("Google authentication succeeded, but Firestore profile sync failed:", firestoreError);
-            }
-
-            btnText.textContent = "Redirecting...";
-            window.location.replace("/dashboard.html");
-        }
-
-        async function signInWithGoogle() {
-            try {
-                errorContainer.classList.add("hidden");
-                setLoading("Opening Google...");
-
-                await setPersistence(auth, browserLocalPersistence);
-
-                // Supported Firebase popup flow. No redirect helper or
-                // cross-origin /__/auth/* storage is involved.
                 const result = await signInWithPopup(auth, provider);
-
-                await finishSignIn(result.user);
+                
+                // Get Google Access Token (useful if you need to access Google APIs later)
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential?.accessToken;
+                
+                // Get Signed-In User info
+                const user = result.user;
+                
+                logInfo("Popup Sign-In Promise Resolved SUCCESSFULLY!", {
+                    uid: user.uid,
+                    email: user.email,
+                    hasGoogleAccessToken: !!token
+                });
             } catch (error) {
-                showError(error);
+                logInfo("Popup Sign-In FAILED.", error);
             }
-        }
+        });
 
-        signInBtn.addEventListener("click", signInWithGoogle);
+        btnLogout.addEventListener('click', async () => {
+            logInfo("Initiating Sign-Out...");
+            try {
+                await signOut(auth);
+                logInfo("Sign-Out Promise Resolved SUCCESSFULLY!");
+            } catch (error) {
+                logInfo("Sign-Out FAILED.", error);
+            }
+        });
     </script>
 </body>
 </html>
