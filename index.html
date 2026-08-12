@@ -337,7 +337,21 @@
                 linear-gradient(to right,#6036E1,#D83DC2) border-box;
         }
 
-    </style>
+    
+/* Unified landing/login view */
+#loginView { display:none; }
+#loginView.active { display:flex; }
+#loginView .login-page-bg {
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background-color:#f8f8fc;
+}
+#loginView .login-page-bg .login-hidden-mobile { display:none; }
+@media (min-width:768px) {
+    #loginView .login-page-bg .login-hidden-mobile { display:block; }
+}
+
+</style>
 </head>
 
 <body class="bg-white text-gray-900 antialiased overflow-x-hidden selection:bg-[#D83DC2] selection:text-white">
@@ -356,10 +370,11 @@
             <a href="#social" class="hover:text-gray-900 transition">Social</a>
             <a href="#security" class="hover:text-gray-900 transition">Security</a>
             <a href="#faq" class="hover:text-gray-900 transition">FAQ</a>
+            <a href="#login" data-show-login class="font-semibold text-gray-900 hover:text-violet-600 transition">Sign in</a>
         </div>
 
-        <a href="#overview" class="bg-gradient-custom text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-violet-200/30">
-            Explore FEED
+        <a href="#login" data-show-login class="bg-gradient-custom text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-violet-200/30">
+            Get Started
         </a>
     </nav>
 
@@ -382,8 +397,8 @@
                 </p>
 
                 <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="#overview" class="bg-gradient-custom text-white px-8 py-4 rounded-full text-base font-semibold shadow-xl shadow-violet-200/40">
-                        Discover the architecture
+                    <a href="#login" data-show-login class="bg-gradient-custom text-white px-8 py-4 rounded-full text-base font-semibold shadow-xl shadow-violet-200/40">
+                        Get Started
                     </a>
                     <a href="#security" class="border border-gray-200 bg-white px-8 py-4 rounded-full text-base font-semibold text-gray-900 hover:border-gray-300 transition shadow-sm">
                         Explore the security model
@@ -1504,6 +1519,49 @@ p {
     </main>
 
     <!-- Footer -->
+
+    <!-- Unified Login View: same document, no second HTML page required -->
+    <section id="loginView" class="min-h-screen w-full login-page-bg">
+        <!-- Right Side: Login Frame -->
+    <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
+        <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
+        <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
+
+        <div class="premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10">
+            <div class="text-center mb-10">
+                <a href="#top" data-show-landing class="inline-block font-display text-4xl font-black tracking-[-0.06em]">
+                    F<span class="text-gradient">EE</span>D
+                </a>
+                <h1 class="font-display text-2xl font-bold mt-6 text-gray-900">Sign into FEED</h1>
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+                    Access your social network &amp; digital asset dashboard.
+                </p>
+            </div>
+
+            <div id="login-container">
+                <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    <span id="btn-text">Continue with Google</span>
+                    <div id="btn-loader" class="loader ml-2"></div>
+                </button>
+            </div>
+
+            <div id="error-message" class="hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center"></div>
+
+            <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                <p class="text-xs text-gray-400">
+                    By proceeding, you agree to the <a href="#" class="text-violet-600 hover:underline">Terms of Service</a> and <a href="#" class="text-violet-600 hover:underline">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+    </section>
+
     <footer class="border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-5 items-center justify-between">
             <div class="font-display text-2xl font-black tracking-[-0.05em]">
@@ -1595,6 +1653,171 @@ p {
             } else {
                 nodes.forEach(node => node.classList.add('is-visible'));
             }
+        });
+    </script>
+
+
+    <!-- Firebase authentication from the supplied login page -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // --- Clean Developer Console Logging ---
+        function logInfo(message, data = null) {
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+            if (data) {
+                console.log(`[${timestamp}] ℹ️ ${message}`, data);
+            } else {
+                console.log(`[${timestamp}] ℹ️ ${message}`);
+            }
+        }
+
+        logInfo("Initializing Firebase System (Popup Mode)...");
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+            authDomain: "feed-65b35.firebaseapp.com",
+            projectId: "feed-65b35",
+            storageBucket: "feed-65b35.firebasestorage.app",
+            messagingSenderId: "1085499159984",
+            appId: "1:1085499159984:web:317e0443941085964a5275",
+            measurementId: "G-FVPRRX9X1M"
+        };
+
+        let app, auth, db, provider;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            logInfo("Firebase Initialization Complete.");
+        } catch (initErr) {
+            logInfo("Critical Error during Firebase Init", initErr);
+        }
+
+        const signInBtn = document.getElementById('googleSignInBtn');
+        const btnText = document.getElementById('btn-text');
+        const btnLoader = document.getElementById('btn-loader');
+        const errorContainer = document.getElementById('error-message');
+
+        const getForensicDetails = () => {
+            return {
+                userAgent: navigator.userAgent || "Unknown",
+                platform: navigator.platform || "Unknown",
+                language: navigator.language || "Unknown",
+                screenResolution: `${window.screen.width}x${window.screen.height}`
+            };
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                logInfo("Auth Listener: Active session detected.", { uid: user.uid, email: user.email });
+            } else {
+                logInfo("Auth Listener: No active session.");
+            }
+        });
+
+        signInBtn.addEventListener('click', async () => {
+            logInfo("Login button clicked. Triggering signInWithPopup...");
+            signInBtn.disabled = true;
+            btnText.textContent = "Opening Google Sign-In...";
+            btnLoader.style.display = "block";
+            errorContainer.classList.add('hidden');
+            
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                logInfo("Google Popup Sign-In Successful!", { uid: user.uid, email: user.email });
+                
+                btnText.textContent = "Finalizing profile...";
+                logInfo("Attempting Firestore sync (with 3s timeout guard)...");
+
+                const userPayload = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    lastLogin: serverTimestamp(),
+                    authProvider: "Google",
+                    forensics: getForensicDetails()
+                };
+
+                const userRef = doc(db, "users", user.uid);
+                
+                try {
+                    await Promise.race([
+                        setDoc(userRef, userPayload, { merge: true }),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error("Firestore write timed out")), 3000))
+                    ]);
+                    logInfo("FIRESTORE WRITE SUCCESSFUL!");
+                } catch (dbWarn) {
+                    logInfo("Firestore write skipped/timed out. (Check if database is enabled in Firebase Console). Proceeding...", dbWarn);
+                }
+                
+                logInfo("Redirecting to /dashboard.html now...");
+                btnText.textContent = "Redirecting...";
+                
+                setTimeout(() => {
+                    window.location.href = "/dashboard.html";
+                }, 500);
+
+            } catch (error) {
+                logInfo("Popup Sign-In FAILED.", error);
+                errorContainer.textContent = `Authentication failed: ${error.message}`;
+                errorContainer.classList.remove('hidden');
+                
+                signInBtn.disabled = false;
+                btnText.textContent = "Continue with Google";
+                btnLoader.style.display = "none";
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const landing = document.getElementById('top');
+            const loginView = document.getElementById('loginView');
+
+            function showLogin(pushState = true) {
+                landing.style.display = 'none';
+                loginView.classList.add('active');
+                document.body.classList.remove('overflow-x-hidden');
+                document.body.classList.add('overflow-x-hidden');
+                window.scrollTo({ top: 0, behavior: 'auto' });
+                if (pushState) history.pushState({ view: 'login' }, '', '#login');
+            }
+
+            function showLanding(pushState = true) {
+                loginView.classList.remove('active');
+                landing.style.display = '';
+                window.scrollTo({ top: 0, behavior: 'auto' });
+                if (pushState) history.pushState({ view: 'landing' }, '', '#top');
+            }
+
+            document.querySelectorAll('[data-show-login]').forEach(el => {
+                el.addEventListener('click', event => {
+                    event.preventDefault();
+                    showLogin();
+                });
+            });
+
+            document.querySelectorAll('[data-show-landing]').forEach(el => {
+                el.addEventListener('click', event => {
+                    event.preventDefault();
+                    showLanding();
+                });
+            });
+
+            window.addEventListener('popstate', () => {
+                if (location.hash.toLowerCase() === '#login') showLogin(false);
+                else showLanding(false);
+            });
+
+            if (location.hash.toLowerCase() === '#login') showLogin(false);
         });
     </script>
 
