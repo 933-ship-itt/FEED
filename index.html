@@ -354,76 +354,55 @@
             background: #f8f8fc;
         }
 
-    </style>
-    <style>
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
-
-        :root {
-            --violet: #6036E1;
-            --magenta: #D83DC2;
-            --ink: #0b0b12;
-            --gradient: linear-gradient(to right, #6036E1, #D83DC2);
+    
+        /* Login layout is deliberately independent of Tailwind responsive classes. */
+        #login-view .login-layout {
+            width: 100%;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--ink);
-            background-color: #f8f8fc;
-            margin: 0;
-            overflow-x: hidden;
+        #login-view .login-advert-panel {
+            position: relative;
+            min-width: 0;
+            min-height: 50vh;
+            background: #fff;
+            border-right: 0;
+            overflow: hidden;
         }
-
-        .font-display { font-family: 'Archivo', sans-serif; }
-
-        .text-gradient {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
+        #login-view .login-form-panel {
+            position: relative;
+            min-width: 0;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, #fff, #f9fafb);
         }
-
-        .bg-gradient-custom {
-            background: var(--gradient);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+        #login-view .login-advert-panel > iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 50vh;
+            border: 0;
+            display: block;
         }
-
-        .bg-gradient-custom:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
+        @media (min-width: 1024px) {
+            #login-view .login-layout {
+                grid-template-columns: minmax(0, 1fr) minmax(420px, 1fr);
+            }
+            #login-view .login-advert-panel {
+                min-height: 100vh;
+                border-right: 1px solid #e5e7eb;
+            }
+            #login-view .login-form-panel {
+                min-height: 100vh;
+            }
+            #login-view .login-advert-panel > iframe {
+                min-height: 100vh;
+            }
         }
-
-        .premium-frame {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid #ececf3;
-            box-shadow: 0 24px 80px rgba(32, 18, 80, 0.08);
-        }
-
-        .google-btn {
-            transition: all 0.2s ease;
-        }
-        
-        .google-btn:hover {
-            background: #faf9ff;
-            border-color: rgba(96,54,225,0.3);
-            box-shadow: 0 8px 20px rgba(32, 18, 80, 0.04);
-            transform: translateY(-1px);
-        }
-
-        .loader {
-            border: 3px solid rgba(96,54,225,0.2);
-            border-top-color: #6036E1;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+</style>
 </head>
 
 <body class="bg-white text-gray-900 antialiased overflow-x-hidden selection:bg-[#D83DC2] selection:text-white">
@@ -1685,14 +1664,16 @@ p {
     </script>
 
 
-    <!-- Unified Login View: rendered directly in the main document so Firebase sees the real Vercel origin. -->
-    <section id="login-view" aria-label="FEED Login" hidden>
-        <div class="w-full h-screen overflow-auto">
-<!-- Left Side: Advert Frame -->
-    <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
-        <iframe
-            title="FEED Advert"
-            srcdoc="&lt;!DOCTYPE html&gt;
+    <!-- Unified Login View: original login.html preserved inside an isolated frame -->
+        <section id="login-view" aria-label="FEED Login" hidden>
+        <div class="min-h-screen w-full flex flex-col lg:flex-row">
+
+
+ Left Side: Advert Frame 
+
+
+<div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
+<iframe allow="autoplay" class="w-full h-full border-0 absolute inset-0" srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
@@ -1700,9 +1681,9 @@ p {
     &lt;title&gt;FEED | Social Network &amp; Digital Asset Platform&lt;/title&gt;
     &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
-        @import url(&#x27;https://fonts.googleapis.com/css2?family=Archivo:wght@900&amp;family=Inter:wght@400;700;900&amp;display=swap&#x27;);
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@900&amp;family=Inter:wght@400;700;900&amp;display=swap');
         :root { --pure-white: #ffffff; --main-gradient: linear-gradient(to right, #6036E1, #D83DC2); --text-main: #1e1b4b; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--pure-white); overflow: hidden; font-family: &#x27;Inter&#x27;, sans-serif; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--pure-white); overflow: hidden; font-family: 'Inter', sans-serif; }
         #mainContent { position: relative; width: 100%; height: 100%; z-index: 10; }
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; }
         .app-logo-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 6; width: clamp(300px, 50vw, 600px); opacity: 0.12; pointer-events: none; }
@@ -1710,15 +1691,15 @@ p {
         .scene-content { position: absolute; text-align: center; opacity: 0; transform: translateY(15px); filter: blur(8px); transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); width: 90%; visibility: hidden; }
         .scene-content.active { opacity: 1; transform: translateY(0); filter: blur(0px); visibility: visible; }
         .scene-content.exit { opacity: 0; transform: scale(1.05); filter: blur(15px); visibility: visible; }
-        h1 { font-size: clamp(2.5rem, 8vw, 6.5rem); margin: 0; background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1; font-weight: 900; font-family: &#x27;Archivo&#x27;, sans-serif; letter-spacing: -0.05em; }
-        .feed-wordmark { font-family: &#x27;Archivo&#x27;, sans-serif; font-weight: 900; letter-spacing: -0.05em; }
+        h1 { font-size: clamp(2.5rem, 8vw, 6.5rem); margin: 0; background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1; font-weight: 900; font-family: 'Archivo', sans-serif; letter-spacing: -0.05em; }
+        .feed-wordmark { font-family: 'Archivo', sans-serif; font-weight: 900; letter-spacing: -0.05em; }
         .feed-wordmark .feed-black { color: #000; -webkit-text-fill-color: #000; }
         .feed-wordmark .feed-ee { background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
         p { font-size: clamp(0.9rem, 2vw, 1.3rem); color: var(--text-main); margin-top: 15px; font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; }
         #finaleStage { position: absolute; inset: 0; z-index: 2000; background: var(--pure-white); display: none; justify-content: center; align-items: center; perspective: 2000px; }
         .intro-frame { position: relative; display: flex; justify-content: center; align-items: center; }
         .intro-svg { width: min(900px, 92vw); height: 300px; overflow: visible; }
-        .final-feed-text { font-size: 110px; font-weight: 900; font-family: &#x27;Archivo&#x27;, sans-serif; }
+        .final-feed-text { font-size: 110px; font-weight: 900; font-family: 'Archivo', sans-serif; }
         .sub-url-path { font-size: 28px; font-weight: 700; fill: #7c3aed; letter-spacing: 0.3em; opacity: 0; }
         .logo-final-container { position: absolute; width: 350px; height: 350px; opacity: 0; transform: scale(0.8); display: flex; justify-content: center; align-items: center; }
     &lt;/style&gt;
@@ -1754,18 +1735,18 @@ p {
         &lt;/div&gt;
     &lt;/div&gt;
     &lt;script&gt;
-        const canvas = document.getElementById(&#x27;canvas&#x27;); const ctx = canvas.getContext(&#x27;2d&#x27;);
-        const scenes = document.querySelectorAll(&#x27;.scene-content&#x27;);
+        const canvas = document.getElementById('canvas'); const ctx = canvas.getContext('2d');
+        const scenes = document.querySelectorAll('.scene-content');
         let width, height, currentScene = 0, frame = 0, loopActive = true;
         const SPEED = 14; const SCENE_DURATION = 140; 
         function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
-        window.addEventListener(&#x27;resize&#x27;, resize); resize();
+        window.addEventListener('resize', resize); resize();
         class Particle {
             constructor(preWarm = false) { this.reset(preWarm); }
             reset(preWarm = false) {
                 this.x = (Math.random() - 0.5) * 4500; this.y = (Math.random() - 0.5) * 4500;
                 this.z = preWarm ? Math.random() * 2000 : 2000; this.pz = this.z;
-                this.size = Math.random() * 1.5 + 1; this.color = Math.random() &gt; 0.5 ? &#x27;#6366f1&#x27; : &#x27;#a855f7&#x27;;
+                this.size = Math.random() * 1.5 + 1; this.color = Math.random() &gt; 0.5 ? '#6366f1' : '#a855f7';
             }
             update() { this.pz = this.z; this.z -= SPEED; if (this.z &lt; 1) this.reset(); }
             draw() {
@@ -1773,7 +1754,7 @@ p {
                 const x = this.x * s + width/2; const y = this.y * s + height/2;
                 const px = this.x * ps + width/2; const py = this.y * ps + height/2;
                 ctx.globalAlpha = Math.min(0.4, (1600 - this.z) / 1000);
-                ctx.strokeStyle = this.color; ctx.lineWidth = this.size * s; ctx.lineCap = &#x27;round&#x27;;
+                ctx.strokeStyle = this.color; ctx.lineWidth = this.size * s; ctx.lineCap = 'round';
                 ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(px, py); ctx.stroke();
             }
         }
@@ -1783,20 +1764,20 @@ p {
         function resetToStart() {
             clearSceneTimeouts();
             if (finaleTimeline) { finaleTimeline.kill(); finaleTimeline = null; }
-            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
-            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
-            gsap.set(finaleStage, { display: &#x27;none&#x27;, opacity: 1 }); gsap.set(mainContent, { display: &#x27;block&#x27;, opacity: 1 });
+            const finaleStage = document.getElementById('finaleStage');
+            const mainContent = document.getElementById('mainContent');
+            gsap.set(finaleStage, { display: 'none', opacity: 1 }); gsap.set(mainContent, { display: 'block', opacity: 1 });
             gsap.set(&quot;#feedFinalText&quot;, { clipPath: &quot;inset(100% 0% 0% 0%)&quot;, opacity: 1 });
             gsap.set(&quot;#urlLayer&quot;, { opacity: 0, y: 0 }); gsap.set(&quot;#introFrame&quot;, { scale: 1, x: 0, opacity: 1 });
             gsap.set(&quot;#logoFinal&quot;, { opacity: 0, scale: 0.8 });
             currentScene = 0; frame = 0; loopActive = true;
-            scenes.forEach(s =&gt; s.classList.remove(&#x27;active&#x27;, &#x27;exit&#x27;)); scenes[0].classList.add(&#x27;active&#x27;);
+            scenes.forEach(s =&gt; s.classList.remove('active', 'exit')); scenes[0].classList.add('active');
             animationFrameId = requestAnimationFrame(animate);
         }
         function runFinale() {
-            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
-            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
-            gsap.to(mainContent, { opacity: 0, duration: 0.45, ease: &quot;power1.out&quot;, onComplete: () =&gt; { mainContent.style.display = &#x27;none&#x27;; finaleStage.style.display = &#x27;flex&#x27;; finaleStage.style.opacity = &#x27;1&#x27;; startGSAPFinale(); } });
+            const mainContent = document.getElementById('mainContent');
+            const finaleStage = document.getElementById('finaleStage');
+            gsap.to(mainContent, { opacity: 0, duration: 0.45, ease: &quot;power1.out&quot;, onComplete: () =&gt; { mainContent.style.display = 'none'; finaleStage.style.display = 'flex'; finaleStage.style.opacity = '1'; startGSAPFinale(); } });
         }
         function startGSAPFinale() {
             finaleTimeline = gsap.timeline({ onComplete: () =&gt; { resetToStart(); } });
@@ -1813,333 +1794,208 @@ p {
                 frame = 0;
                 if (currentScene === scenes.length - 1) { loopActive = false; runFinale(); return; }
                 const previousScene = currentScene;
-                scenes[previousScene].classList.remove(&#x27;active&#x27;); scenes[previousScene].classList.add(&#x27;exit&#x27;);
-                sceneTimeouts.push(setTimeout(() =&gt; { if (scenes[previousScene]) { scenes[previousScene].classList.remove(&#x27;exit&#x27;); } }, 800));
-                currentScene++; scenes[currentScene].classList.add(&#x27;active&#x27;);
+                scenes[previousScene].classList.remove('active'); scenes[previousScene].classList.add('exit');
+                sceneTimeouts.push(setTimeout(() =&gt; { if (scenes[previousScene]) { scenes[previousScene].classList.remove('exit'); } }, 800));
+                currentScene++; scenes[currentScene].classList.add('active');
             }
-            ctx.fillStyle = &#x27;rgba(255, 255, 255, 0.72)&#x27;; ctx.fillRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.72)'; ctx.fillRect(0, 0, width, height);
             particles.forEach(p =&gt; { p.update(); p.draw(); });
             animationFrameId = requestAnimationFrame(animate);
         }
         resetToStart();
     &lt;/script&gt;
 &lt;/body&gt;
-&lt;/html&gt;"
-            class="w-full h-full border-0 absolute inset-0"
-            allow="autoplay">
-        </iframe>
-    </div>
+&lt;/html&gt;" title="FEED Advert">
+</iframe>
+</div>
 
-    <!-- Right Side: Login Frame -->
-    <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
-        <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
-        <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
 
-        <div class="premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10">
-            <div class="text-center mb-10">
-                <a href="#top" class="inline-block font-display text-4xl font-black tracking-[-0.06em]">
+ Right Side: Login Frame 
+
+
+<div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
+<div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
+<div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
+<div class="premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10">
+<div class="text-center mb-10">
+<a class="inline-block font-display text-4xl font-black tracking-[-0.06em]" href="#top">
                     F<span class="text-gradient">EE</span>D
                 </a>
-                <h1 class="font-display text-2xl font-bold mt-6 text-gray-900">Sign into FEED</h1>
-                <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+<h1 class="font-display text-2xl font-bold mt-6 text-gray-900">Sign into FEED</h1>
+<p class="mt-2 text-sm text-gray-500 leading-relaxed">
                     Access your social network &amp; digital asset dashboard.
                 </p>
-            </div>
-
-            <div id="login-container">
-                <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    <span id="btn-text">Continue with Google</span>
-                    <div id="btn-loader" class="loader ml-2"></div>
-                </button>
-            </div>
-
-            <div id="error-message" class="hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center"></div>
-
-            <div class="mt-8 text-center border-t border-gray-100 pt-6">
-                <p class="text-xs text-gray-400">
-                    By proceeding, you agree to the <a href="#" class="text-violet-600 hover:underline">Terms of Service</a> and <a href="#" class="text-violet-600 hover:underline">Privacy Policy</a>.
+</div>
+<div id="login-container">
+<button class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50" id="googleSignInBtn">
+<svg class="w-5 h-5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span id="btn-text">Continue with Google</span>
+<div class="loader ml-2" id="btn-loader"></div>
+</button>
+</div>
+<div class="hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center" id="error-message"></div>
+<div class="mt-8 text-center border-t border-gray-100 pt-6">
+<p class="text-xs text-gray-400">
+                    By proceeding, you agree to the <a class="text-violet-600 hover:underline" href="#">Terms of Service</a> and <a class="text-violet-600 hover:underline" href="#">Privacy Policy</a>.
                 </p>
-            </div>
-        </div>
-    </div>
+</div>
+</div>
+</div>
 
-    <!-- Firebase v10 SDK Integration (Popup Version with Safety Timeout Fallback) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // --- Clean Developer Console Logging ---
-        function logInfo(message, data = null) {
-            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-            if (data) {
-                console.log(`[${timestamp}] ℹ️ ${message}`, data);
-            } else {
-                console.log(`[${timestamp}] ℹ️ ${message}`);
-            }
-        }
+ Firebase v10 SDK Integration (Popup Version with Safety Timeout Fallback) 
 
-        logInfo("Initializing Firebase System (Popup Mode)...");
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-            authDomain: "feed-65b35.firebaseapp.com",
-            projectId: "feed-65b35",
-            storageBucket: "feed-65b35.firebasestorage.app",
-            messagingSenderId: "1085499159984",
-            appId: "1:1085499159984:web:317e0443941085964a5275",
-            measurementId: "G-FVPRRX9X1M"
-        };
 
-        let app, auth, db, provider;
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            logInfo("Firebase Initialization Complete.");
-        } catch (initErr) {
-            logInfo("Critical Error during Firebase Init", initErr);
-        }
 
-        const signInBtn = document.getElementById('googleSignInBtn');
-        const btnText = document.getElementById('btn-text');
-        const btnLoader = document.getElementById('btn-loader');
-        const errorContainer = document.getElementById('error-message');
-
-        const getForensicDetails = () => {
-            return {
-                userAgent: navigator.userAgent || "Unknown",
-                platform: navigator.platform || "Unknown",
-                language: navigator.language || "Unknown",
-                screenResolution: `${window.screen.width}x${window.screen.height}`
-            };
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                logInfo("Auth Listener: Active session detected.", { uid: user.uid, email: user.email });
-            } else {
-                logInfo("Auth Listener: No active session.");
-            }
-        });
-
-        signInBtn.addEventListener('click', async () => {
-            logInfo("Login button clicked. Triggering signInWithPopup...");
-            signInBtn.disabled = true;
-            btnText.textContent = "Opening Google Sign-In...";
-            btnLoader.style.display = "block";
-            errorContainer.classList.add('hidden');
-            
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                logInfo("Google Popup Sign-In Successful!", { uid: user.uid, email: user.email });
-                
-                btnText.textContent = "Finalizing profile...";
-                logInfo("Attempting Firestore sync (with 3s timeout guard)...");
-
-                const userPayload = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    lastLogin: serverTimestamp(),
-                    authProvider: "Google",
-                    forensics: getForensicDetails()
-                };
-
-                const userRef = doc(db, "users", user.uid);
-                
-                try {
-                    await Promise.race([
-                        setDoc(userRef, userPayload, { merge: true }),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error("Firestore write timed out")), 3000))
-                    ]);
-                    logInfo("FIRESTORE WRITE SUCCESSFUL!");
-                } catch (dbWarn) {
-                    logInfo("Firestore write skipped/timed out. (Check if database is enabled in Firebase Console). Proceeding...", dbWarn);
-                }
-                
-                logInfo("Redirecting to /dashboard.html now...");
-                btnText.textContent = "Redirecting...";
-                
-                setTimeout(() => {
-                    window.location.href = "/dashboard.html";
-                }, 500);
-
-            } catch (error) {
-                logInfo("Popup Sign-In FAILED.", error);
-                errorContainer.textContent = `Authentication failed: ${error.message}`;
-                errorContainer.classList.remove('hidden');
-                
-                signInBtn.disabled = false;
-                btnText.textContent = "Continue with Google";
-                btnLoader.style.display = "none";
-            }
-        });
-    </script>
         </div>
     </section>
 
     <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import {
+            getAuth,
+            signInWithRedirect,
+            getRedirectResult,
+            GoogleAuthProvider,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // --- Clean Developer Console Logging ---
-        function logInfo(message, data = null) {
-            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-            if (data) {
-                console.log(`[${timestamp}] ℹ️ ${message}`, data);
-            } else {
-                console.log(`[${timestamp}] ℹ️ ${message}`);
-            }
-        }
-
-        logInfo("Initializing Firebase System (Popup Mode)...");
-        
         const firebaseConfig = {
-            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-            authDomain: "feed-65b35.firebaseapp.com",
-            projectId: "feed-65b35",
-            storageBucket: "feed-65b35.firebasestorage.app",
-            messagingSenderId: "1085499159984",
-            appId: "1:1085499159984:web:317e0443941085964a5275",
-            measurementId: "G-FVPRRX9X1M"
-        };
+                    apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+                    authDomain: "feed-65b35.firebaseapp.com",
+                    projectId: "feed-65b35",
+                    storageBucket: "feed-65b35.firebasestorage.app",
+                    messagingSenderId: "1085499159984",
+                    appId: "1:1085499159984:web:317e0443941085964a5275",
+                    measurementId: "G-FVPRRX9X1M"
+                };;
 
-        let app, auth, db, provider;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            logInfo("Firebase Initialization Complete.");
-        } catch (initErr) {
-            logInfo("Critical Error during Firebase Init", initErr);
+        const signInBtn = document.getElementById("googleSignInBtn");
+        const btnText = document.getElementById("btn-text");
+        const btnLoader = document.getElementById("btn-loader");
+        const errorContainer = document.getElementById("error-message");
+
+        function showError(error) {
+            console.error("Firebase authentication error:", error);
+            const code = error?.code || "auth/error";
+            const message = error?.message || "Authentication failed.";
+            errorContainer.textContent = `Authentication failed: ${code} — ${message}`;
+            errorContainer.classList.remove("hidden");
+            signInBtn.disabled = false;
+            btnText.textContent = "Continue with Google";
+            btnLoader.style.display = "none";
         }
 
-        const signInBtn = document.getElementById('googleSignInBtn');
-        const btnText = document.getElementById('btn-text');
-        const btnLoader = document.getElementById('btn-loader');
-        const errorContainer = document.getElementById('error-message');
+        function setLoading(message) {
+            signInBtn.disabled = true;
+            btnText.textContent = message;
+            btnLoader.style.display = "block";
+            errorContainer.classList.add("hidden");
+        }
 
-        const getForensicDetails = () => {
-            return {
-                userAgent: navigator.userAgent || "Unknown",
-                platform: navigator.platform || "Unknown",
-                language: navigator.language || "Unknown",
-                screenResolution: `${window.screen.width}x${window.screen.height}`
-            };
-        };
+        async function finishLogin(user) {
+            setLoading("Finalizing profile...");
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                logInfo("Auth Listener: Active session detected.", { uid: user.uid, email: user.email });
-            } else {
-                logInfo("Auth Listener: No active session.");
+            try {
+                const userRef = doc(db, "users", user.uid);
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    email: user.email || "",
+                    displayName: user.displayName || "",
+                    photoURL: user.photoURL || "",
+                    lastLogin: serverTimestamp(),
+                    authProvider: "Google"
+                }, { merge: true });
+            } catch (dbError) {
+                // Authentication succeeded; Firestore should not prevent the user from entering the app.
+                console.warn("Firestore profile write skipped:", dbError);
+            }
+
+            window.location.assign("/dashboard.html");
+        }
+
+        signInBtn.addEventListener("click", async (event) => {
+            // This click immediately starts the Firebase redirect flow. No popup is created.
+            event.preventDefault();
+            setLoading("Redirecting to Google...");
+
+            try {
+                await signInWithRedirect(auth, provider);
+            } catch (error) {
+                showError(error);
             }
         });
 
-        signInBtn.addEventListener('click', async () => {
-            logInfo("Login button clicked. Triggering signInWithPopup...");
-            signInBtn.disabled = true;
-            btnText.textContent = "Opening Google Sign-In...";
-            btnLoader.style.display = "block";
-            errorContainer.classList.add('hidden');
-            
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                logInfo("Google Popup Sign-In Successful!", { uid: user.uid, email: user.email });
-                
-                btnText.textContent = "Finalizing profile...";
-                logInfo("Attempting Firestore sync (with 3s timeout guard)...");
+        getRedirectResult(auth)
+            .then(result => {
+                if (result?.user) return finishLogin(result.user);
+            })
+            .catch(showError);
 
-                const userPayload = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    lastLogin: serverTimestamp(),
-                    authProvider: "Google",
-                    forensics: getForensicDetails()
-                };
-
-                const userRef = doc(db, "users", user.uid);
-                
-                try {
-                    await Promise.race([
-                        setDoc(userRef, userPayload, { merge: true }),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error("Firestore write timed out")), 3000))
-                    ]);
-                    logInfo("FIRESTORE WRITE SUCCESSFUL!");
-                } catch (dbWarn) {
-                    logInfo("Firestore write skipped/timed out. (Check if database is enabled in Firebase Console). Proceeding...", dbWarn);
-                }
-                
-                logInfo("Redirecting to /dashboard.html now...");
-                btnText.textContent = "Redirecting...";
-                
-                setTimeout(() => {
-                    window.location.href = "/dashboard.html";
-                }, 500);
-
-            } catch (error) {
-                logInfo("Popup Sign-In FAILED.", error);
-                errorContainer.textContent = error.code === 'auth/unauthorized-domain' ? 'This site is not authorized in Firebase Authentication. Add feed-azure.vercel.app in Firebase Console > Authentication > Settings > Authorized domains, then redeploy.' : `Authentication failed: ${error.message}`;
-                errorContainer.classList.remove('hidden');
-                
-                signInBtn.disabled = false;
-                btnText.textContent = "Continue with Google";
-                btnLoader.style.display = "none";
+        onAuthStateChanged(auth, user => {
+            if (user && !location.pathname.endsWith("/dashboard.html")) {
+                // Redirect result is handled above; this listener only confirms session state.
+                console.log("Firebase session active for", user.email || user.uid);
             }
         });
     </script>
 
     <script>
         (() => {
-            const loginView = document.getElementById('login-view');
+            const loginView = document.getElementById("login-view");
+
             function showLogin() {
-                document.body.classList.add('login-active');
+                document.body.classList.add("login-active");
                 loginView.hidden = false;
                 window.scrollTo(0, 0);
             }
+
             function showLanding() {
-                document.body.classList.remove('login-active');
+                document.body.classList.remove("login-active");
                 loginView.hidden = true;
             }
+
             function syncRoute() {
-                if (location.hash.toLowerCase() === '#login') showLogin();
+                if (location.hash.toLowerCase() === "#login") showLogin();
                 else showLanding();
             }
-            document.querySelectorAll('a[href], button').forEach(el => {
-                const label = (el.textContent || '').trim().toLowerCase();
-                const href = (el.getAttribute('href') || '').toLowerCase();
-                if (/login|log in|sign in|signin|begin|access account|create account|authenticate/.test(label) || /login\.html/.test(href)) {
-                    if (el.tagName === 'A') el.setAttribute('href', '#login');
-                    el.addEventListener('click', event => {
+
+            document.querySelectorAll('a[href]').forEach(el => {
+                const label = (el.textContent || "").trim().toLowerCase();
+                const href = (el.getAttribute("href") || "").toLowerCase();
+                if (
+                    /login|log in|sign in|signin|begin|access account|create account|authenticate/.test(label) ||
+                    /login\.html/.test(href)
+                ) {
+                    el.setAttribute("href", "#login");
+                    el.addEventListener("click", event => {
                         event.preventDefault();
+                        history.pushState({ login: true }, "", "#login");
                         showLogin();
-                        if (location.hash !== '#login') history.pushState({login:true}, '', '#login');
                     });
                 }
             });
-            window.addEventListener('hashchange', syncRoute);
-            window.addEventListener('popstate', syncRoute);
+
+            window.addEventListener("hashchange", syncRoute);
+            window.addEventListener("popstate", syncRoute);
             syncRoute();
         })();
     </script>
