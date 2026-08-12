@@ -64,7 +64,6 @@
             transform: translateY(-1px);
         }
 
-        /* Custom spinner for loading state */
         .loader {
             border: 3px solid rgba(96,54,225,0.2);
             border-top-color: #6036E1;
@@ -75,9 +74,28 @@
             display: none;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* DEBUG TERMINAL STYLES */
+        #debug-terminal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 220px;
+            background-color: rgba(15, 15, 20, 0.95);
+            color: #00ffcc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            padding: 15px;
+            overflow-y: auto;
+            z-index: 9999;
+            border-top: 2px solid #6036E1;
+            backdrop-filter: blur(10px);
+            white-space: pre-wrap;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col lg:flex-row">
+<body class="min-h-screen flex flex-col lg:flex-row pb-[220px]"> <!-- Added bottom padding to clear terminal -->
 
     <!-- Left Side: Advert Frame -->
     <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
@@ -223,11 +241,9 @@
 
     <!-- Right Side: Login Frame -->
     <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
-        <!-- Decorative Background Orbs -->
         <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
         <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
 
-        <!-- Central Login Card -->
         <div class="premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10">
             <div class="text-center mb-10">
                 <a href="/" class="inline-block font-display text-4xl font-black tracking-[-0.06em]">
@@ -239,7 +255,6 @@
                 </p>
             </div>
 
-            <!-- Login Container -->
             <div id="login-container">
                 <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
                     <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -253,7 +268,6 @@
                 </button>
             </div>
 
-            <!-- Error Message State -->
             <div id="error-message" class="hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center"></div>
 
             <div class="mt-8 text-center border-t border-gray-100 pt-6">
@@ -264,12 +278,42 @@
         </div>
     </div>
 
+    <!-- Live Debug Terminal (Fixed at Bottom) -->
+    <div id="debug-terminal">Loading diagnostics...</div>
+
     <!-- Firebase v10 SDK Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // --- Custom Logging System ---
+        const terminal = document.getElementById('debug-terminal');
+        terminal.innerHTML = ''; // Clear initial message
+
+        function logInfo(message, data = null) {
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+            let logString = `[${timestamp}] ℹ️ ${message}\n`;
+            
+            if (data) {
+                if (data instanceof Error || data.code) {
+                    logString += `    ❌ ERROR: ${data.message || data} (Code: ${data.code || 'N/A'})\n`;
+                } else {
+                    try {
+                        logString += `    ✅ DATA: ${JSON.stringify(data, null, 2)}\n`;
+                    } catch (e) {
+                        logString += `    ✅ DATA: [Object could not be stringified]\n`;
+                    }
+                }
+            }
+            
+            console.log(`[${timestamp}]`, message, data ? data : '');
+            terminal.textContent += logString + '\n';
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        logInfo("Initializing Firebase System...");
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
             authDomain: "feed-65b35.firebaseapp.com",
@@ -280,15 +324,18 @@
             measurementId: "G-FVPRRX9X1M"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
+        let app, auth, db, provider;
 
-        // 🔥 ADDED THIS TO FORCE THE FULL GOOGLE ACCOUNT SELECTION PAGE 🔥
-        provider.setCustomParameters({
-            prompt: 'select_account'
-        });
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            logInfo("Firebase Initialization Complete.");
+        } catch (initErr) {
+            logInfo("Critical Error during Firebase Init", initErr);
+        }
 
         const signInBtn = document.getElementById('googleSignInBtn');
         const btnText = document.getElementById('btn-text');
@@ -299,27 +346,36 @@
             return {
                 userAgent: navigator.userAgent || "Unknown",
                 platform: navigator.platform || "Unknown",
-                language: navigator.language || "Unknown",
-                screenResolution: `${window.screen.width}x${window.screen.height}`,
-                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                vendor: navigator.vendor || "Unknown",
-                cookiesEnabled: navigator.cookieEnabled
+                language: navigator.language || "Unknown"
             };
         };
 
-        // 1. Check if the user just returned from the Google redirect
+        // --- AUTH STATE LISTENER (Sanity Check) ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                logInfo("Auth Listener: Firebase recognizes an active session.", { uid: user.uid, email: user.email });
+            } else {
+                logInfo("Auth Listener: No active session found.");
+            }
+        });
+
+        // --- REDIRECT HANDLER ---
         window.addEventListener('DOMContentLoaded', async () => {
+            logInfo("DOM Loaded. Checking for Google Redirect payload...");
+            
             try {
                 const result = await getRedirectResult(auth);
                 
                 if (result) {
-                    // UI Update: Let the user know we are finalizing
+                    logInfo("Redirect Payload Caught! User successfully authenticated with Google.");
+                    
+                    // UI Update
                     signInBtn.disabled = true;
                     btnText.textContent = "Finalizing setup...";
                     btnLoader.style.display = "block";
 
                     const user = result.user;
-                    const forensicData = getForensicDetails();
+                    logInfo("Preparing to write user data to Firestore Document (users/" + user.uid + ")");
                     
                     const userPayload = {
                         uid: user.uid,
@@ -328,30 +384,47 @@
                         photoURL: user.photoURL,
                         lastLogin: serverTimestamp(),
                         authProvider: "Google",
-                        forensics: forensicData
+                        forensics: getForensicDetails()
                     };
 
-                    const userRef = doc(db, "users", user.uid);
-                    await setDoc(userRef, userPayload, { merge: true });
+                    try {
+                        const userRef = doc(db, "users", user.uid);
+                        // THIS IS THE STEP THAT USUALLY FAILS DUE TO PERMISSIONS
+                        await setDoc(userRef, userPayload, { merge: true }); 
+                        
+                        logInfo("FIRESTORE WRITE SUCCESSFUL! Redirecting user to /dashboard.html in 1 second...");
+                        btnText.textContent = "Redirecting...";
+                        
+                        setTimeout(() => {
+                            window.location.href = "/dashboard.html";
+                        }, 1000);
 
-                    btnText.textContent = "Redirecting...";
-                    window.location.href = "/dashboard.html";
+                    } catch (firestoreError) {
+                        logInfo("FIRESTORE WRITE BLOCKED OR FAILED!", firestoreError);
+                        errorContainer.textContent = `Database Error: Check terminal logs for permission issues.`;
+                        errorContainer.classList.remove('hidden');
+                        btnText.textContent = "Error saving profile";
+                        btnLoader.style.display = "none";
+                    }
+
+                } else {
+                    logInfo("No redirect payload found. Waiting for user action.");
                 }
-            } catch (error) {
-                console.error("Authentication Error:", error);
-                errorContainer.textContent = `Authentication failed: ${error.message}`;
+            } catch (authError) {
+                logInfo("Error processing Google Redirect Result.", authError);
+                errorContainer.textContent = `Authentication failed: ${authError.message}`;
                 errorContainer.classList.remove('hidden');
             }
         });
 
-        // 2. Handle the initial click by triggering the redirect
+        // --- CLICK HANDLER ---
         signInBtn.addEventListener('click', () => {
+            logInfo("Login button clicked. Triggering signInWithRedirect...");
             signInBtn.disabled = true;
             btnText.textContent = "Connecting to Google...";
             btnLoader.style.display = "block";
             errorContainer.classList.add('hidden');
             
-            // Redirects the current page to Google's auth flow
             signInWithRedirect(auth, provider);
         });
     </script>
