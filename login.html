@@ -268,18 +268,18 @@
     <!-- Firebase v10 SDK Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-  apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-  authDomain: "feed-65b35.firebaseapp.com",
-  projectId: "feed-65b35",
-  storageBucket: "feed-65b35.firebasestorage.app",
-  messagingSenderId: "1085499159984",
-  appId: "1:1085499159984:web:317e0443941085964a5275",
-  measurementId: "G-FVPRRX9X1M"
-};
+            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+            authDomain: "feed-65b35.firebaseapp.com",
+            projectId: "feed-65b35",
+            storageBucket: "feed-65b35.firebasestorage.app",
+            messagingSenderId: "1085499159984",
+            appId: "1:1085499159984:web:317e0443941085964a5275",
+            measurementId: "G-FVPRRX9X1M"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -311,12 +311,13 @@
 
         const showError = (message) => {
             errorContainer.textContent = message;
-            errorContainer.classList.remove("hidden");
+            errorContainer.classList.remove('hidden');
         };
 
-        const finishGoogleLogin = async (user) => {
-            const forensicData = getForensicDetails();
+        const finishLogin = async (user) => {
+            setLoading(true, "Finalizing setup...");
 
+            const forensicData = getForensicDetails();
             const userPayload = {
                 uid: user.uid,
                 email: user.email,
@@ -329,30 +330,64 @@
 
             await setDoc(doc(db, "users", user.uid), userPayload, { merge: true });
             btnText.textContent = "Redirecting...";
-            window.location.assign("/dashboard.html");
+            window.location.replace("/dashboard.html");
         };
 
-        signInBtn.addEventListener("click", async () => {
-            setLoading(true);
-            errorContainer.classList.add("hidden");
-
+        // Complete a Firebase redirect login after Google sends the browser back.
+        (async () => {
             try {
-                const result = await signInWithPopup(auth, provider);
-                await finishGoogleLogin(result.user);
+                await setPersistence(auth, browserLocalPersistence);
+
+                const result = await getRedirectResult(auth);
+                if (result?.user) {
+                    await finishLogin(result.user);
+                }
             } catch (error) {
-                console.error("Google sign-in error:", error);
+                console.error("Firebase redirect authentication error:", error);
                 setLoading(false, "Continue with Google");
 
-                const messages = {
-                    "auth/popup-closed-by-user": "The Google sign-in window was closed before sign-in finished.",
-                    "auth/popup-blocked": "Your browser blocked the Google sign-in window. Allow pop-ups for this site and try again.",
-                    "auth/cancelled-popup-request": "Another Google sign-in request is already running. Please try again.",
-                    "auth/unauthorized-domain": "This website is not authorized in Firebase. Add this hostname under Firebase Authentication → Settings → Authorized domains.",
-                    "auth/operation-not-allowed": "Google sign-in is not enabled in Firebase Authentication. Enable the Google provider and try again.",
-                    "auth/network-request-failed": "The network request failed. Check your connection and try again."
-                };
+                const code = error?.code || "";
+                let message = "Google sign-in failed. Please try again.";
 
-                showError(messages[error.code] || `Google sign-in failed: ${error.message || "Unknown authentication error."}`);
+                if (code === "auth/unauthorized-domain") {
+                    message = "This domain is not authorized in Firebase Authentication. Add feed-azure.vercel.app under Authentication → Settings → Authorized domains.";
+                } else if (code === "auth/operation-not-allowed") {
+                    message = "Google sign-in is disabled in Firebase. Enable Google under Authentication → Sign-in method.";
+                } else if (code === "auth/network-request-failed") {
+                    message = "Network request failed. Check your connection and try again.";
+                } else if (error?.message) {
+                    message = `Google sign-in failed: ${error.message}`;
+                }
+
+                showError(message);
+            }
+        })();
+
+        signInBtn.addEventListener('click', async () => {
+            if (signInBtn.disabled) return;
+
+            setLoading(true);
+            errorContainer.classList.add('hidden');
+
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                await signInWithRedirect(auth, provider);
+            } catch (error) {
+                console.error("Could not start Google redirect:", error);
+                setLoading(false, "Continue with Google");
+
+                const code = error?.code || "";
+                let message = "Could not start Google sign-in.";
+
+                if (code === "auth/unauthorized-domain") {
+                    message = "Firebase rejected this domain. Verify feed-azure.vercel.app is in Authentication → Settings → Authorized domains.";
+                } else if (code === "auth/operation-not-allowed") {
+                    message = "Google sign-in is not enabled in Firebase Authentication.";
+                } else if (error?.message) {
+                    message = `Could not start Google sign-in: ${error.message}`;
+                }
+
+                showError(message);
             }
         });
     </script>
