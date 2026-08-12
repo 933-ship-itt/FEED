@@ -241,7 +241,7 @@
 
             <!-- Login Container -->
             <div id="login-container">
-                <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                <button type="button" id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
                     <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -268,18 +268,18 @@
     <!-- Firebase v10 SDK Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-            authDomain: "feed-65b35.firebaseapp.com",
-            projectId: "feed-65b35",
-            storageBucket: "feed-65b35.firebasestorage.app",
-            messagingSenderId: "1085499159984",
-            appId: "1:1085499159984:web:317e0443941085964a5275",
-            measurementId: "G-FVPRRX9X1M"
-        };
+  apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+  authDomain: "feed-65b35.firebaseapp.com",
+  projectId: "feed-65b35",
+  storageBucket: "feed-65b35.firebasestorage.app",
+  messagingSenderId: "1085499159984",
+  appId: "1:1085499159984:web:317e0443941085964a5275",
+  measurementId: "G-FVPRRX9X1M"
+};
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -303,52 +303,57 @@
             };
         };
 
-        // 1. Check if the user just returned from the Google redirect
-        window.addEventListener('DOMContentLoaded', async () => {
+        const setLoading = (loading, text = "Connecting to Google...") => {
+            signInBtn.disabled = loading;
+            btnText.textContent = text;
+            btnLoader.style.display = loading ? "block" : "none";
+        };
+
+        const showError = (message) => {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove("hidden");
+        };
+
+        const finishGoogleLogin = async (user) => {
+            const forensicData = getForensicDetails();
+
+            const userPayload = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                lastLogin: serverTimestamp(),
+                authProvider: "Google",
+                forensics: forensicData
+            };
+
+            await setDoc(doc(db, "users", user.uid), userPayload, { merge: true });
+            btnText.textContent = "Redirecting...";
+            window.location.assign("/dashboard.html");
+        };
+
+        signInBtn.addEventListener("click", async () => {
+            setLoading(true);
+            errorContainer.classList.add("hidden");
+
             try {
-                const result = await getRedirectResult(auth);
-                
-                if (result) {
-                    // UI Update: Let the user know we are finalizing
-                    signInBtn.disabled = true;
-                    btnText.textContent = "Finalizing setup...";
-                    btnLoader.style.display = "block";
-
-                    const user = result.user;
-                    const forensicData = getForensicDetails();
-                    
-                    const userPayload = {
-                        uid: user.uid,
-                        email: user.email,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL,
-                        lastLogin: serverTimestamp(),
-                        authProvider: "Google",
-                        forensics: forensicData
-                    };
-
-                    const userRef = doc(db, "users", user.uid);
-                    await setDoc(userRef, userPayload, { merge: true });
-
-                    btnText.textContent = "Redirecting...";
-                    window.location.href = "/dashboard.html";
-                }
+                const result = await signInWithPopup(auth, provider);
+                await finishGoogleLogin(result.user);
             } catch (error) {
-                console.error("Authentication Error:", error);
-                errorContainer.textContent = `Authentication failed: ${error.message}`;
-                errorContainer.classList.remove('hidden');
-            }
-        });
+                console.error("Google sign-in error:", error);
+                setLoading(false, "Continue with Google");
 
-        // 2. Handle the initial click by triggering the redirect
-        signInBtn.addEventListener('click', () => {
-            signInBtn.disabled = true;
-            btnText.textContent = "Connecting to Google...";
-            btnLoader.style.display = "block";
-            errorContainer.classList.add('hidden');
-            
-            // Redirects the current page to Google's auth flow
-            signInWithRedirect(auth, provider);
+                const messages = {
+                    "auth/popup-closed-by-user": "The Google sign-in window was closed before sign-in finished.",
+                    "auth/popup-blocked": "Your browser blocked the Google sign-in window. Allow pop-ups for this site and try again.",
+                    "auth/cancelled-popup-request": "Another Google sign-in request is already running. Please try again.",
+                    "auth/unauthorized-domain": "This website is not authorized in Firebase. Add this hostname under Firebase Authentication → Settings → Authorized domains.",
+                    "auth/operation-not-allowed": "Google sign-in is not enabled in Firebase Authentication. Enable the Google provider and try again.",
+                    "auth/network-request-failed": "The network request failed. Check your connection and try again."
+                };
+
+                showError(messages[error.code] || `Google sign-in failed: ${error.message || "Unknown authentication error."}`);
+            }
         });
     </script>
 </body>
