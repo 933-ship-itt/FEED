@@ -268,7 +268,7 @@
     <!-- Firebase v10 SDK Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -333,33 +333,14 @@
             window.location.replace("/dashboard.html");
         };
 
-        // Complete a Firebase redirect login after Google sends the browser back.
+        // Vercel is not Firebase Hosting, so use popup auth rather than redirect auth.
+        // This avoids Firebase redirect helper storage being blocked cross-origin.
         (async () => {
             try {
                 await setPersistence(auth, browserLocalPersistence);
-
-                const result = await getRedirectResult(auth);
-                if (result?.user) {
-                    await finishLogin(result.user);
-                }
             } catch (error) {
-                console.error("Firebase redirect authentication error:", error);
-                setLoading(false, "Continue with Google");
-
-                const code = error?.code || "";
-                let message = "Google sign-in failed. Please try again.";
-
-                if (code === "auth/unauthorized-domain") {
-                    message = "This domain is not authorized in Firebase Authentication. Add feed-azure.vercel.app under Authentication → Settings → Authorized domains.";
-                } else if (code === "auth/operation-not-allowed") {
-                    message = "Google sign-in is disabled in Firebase. Enable Google under Authentication → Sign-in method.";
-                } else if (code === "auth/network-request-failed") {
-                    message = "Network request failed. Check your connection and try again.";
-                } else if (error?.message) {
-                    message = `Google sign-in failed: ${error.message}`;
-                }
-
-                showError(message);
+                console.error("Firebase persistence setup error:", error);
+                showError(`Authentication setup failed: ${error.message}`);
             }
         })();
 
@@ -371,23 +352,23 @@
 
             try {
                 await setPersistence(auth, browserLocalPersistence);
-                await signInWithRedirect(auth, provider);
+                const result = await signInWithPopup(auth, provider);
+                await finishLogin(result.user);
             } catch (error) {
-                console.error("Could not start Google redirect:", error);
+                console.error("Google sign-in error:", error);
                 setLoading(false, "Continue with Google");
 
-                const code = error?.code || "";
-                let message = "Could not start Google sign-in.";
+                const messages = {
+                    "auth/popup-blocked": "Your browser blocked the Google sign-in window. Allow pop-ups for feed-azure.vercel.app and try again.",
+                    "auth/popup-closed-by-user": "The Google sign-in window closed before authentication completed.",
+                    "auth/cancelled-popup-request": "A Google sign-in request is already running. Please try again.",
+                    "auth/unauthorized-domain": "Firebase does not authorize feed-azure.vercel.app. Add it under Authentication → Settings → Authorized domains.",
+                    "auth/operation-not-allowed": "Google sign-in is not enabled in Firebase Authentication.",
+                    "auth/network-request-failed": "The network request failed. Check your connection and try again.",
+                    "auth/internal-error": "Firebase returned an internal authentication error. Check the browser console for the underlying error."
+                };
 
-                if (code === "auth/unauthorized-domain") {
-                    message = "Firebase rejected this domain. Verify feed-azure.vercel.app is in Authentication → Settings → Authorized domains.";
-                } else if (code === "auth/operation-not-allowed") {
-                    message = "Google sign-in is not enabled in Firebase Authentication.";
-                } else if (error?.message) {
-                    message = `Could not start Google sign-in: ${error.message}`;
-                }
-
-                showError(message);
+                showError(messages[error?.code] || `Google sign-in failed: ${error?.message || error?.code || "Unknown error"}`);
             }
         });
     </script>
