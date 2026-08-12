@@ -241,7 +241,7 @@
 
             <!-- Login Container -->
             <div id="login-container">
-                <button type="button" id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
                     <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -268,7 +268,7 @@
     <!-- Firebase v10 SDK Integration -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -303,73 +303,52 @@
             };
         };
 
-        const setLoading = (loading, text = "Connecting to Google...") => {
-            signInBtn.disabled = loading;
-            btnText.textContent = text;
-            btnLoader.style.display = loading ? "block" : "none";
-        };
-
-        const showError = (message) => {
-            errorContainer.textContent = message;
-            errorContainer.classList.remove('hidden');
-        };
-
-        const finishLogin = async (user) => {
-            setLoading(true, "Finalizing setup...");
-
-            const forensicData = getForensicDetails();
-            const userPayload = {
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-                lastLogin: serverTimestamp(),
-                authProvider: "Google",
-                forensics: forensicData
-            };
-
-            await setDoc(doc(db, "users", user.uid), userPayload, { merge: true });
-            btnText.textContent = "Redirecting...";
-            window.location.replace("/dashboard.html");
-        };
-
-        // Vercel is not Firebase Hosting, so use popup auth rather than redirect auth.
-        // This avoids Firebase redirect helper storage being blocked cross-origin.
-        (async () => {
+        // 1. Check if the user just returned from the Google redirect
+        window.addEventListener('DOMContentLoaded', async () => {
             try {
-                await setPersistence(auth, browserLocalPersistence);
+                const result = await getRedirectResult(auth);
+                
+                if (result) {
+                    // UI Update: Let the user know we are finalizing
+                    signInBtn.disabled = true;
+                    btnText.textContent = "Finalizing setup...";
+                    btnLoader.style.display = "block";
+
+                    const user = result.user;
+                    const forensicData = getForensicDetails();
+                    
+                    const userPayload = {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        lastLogin: serverTimestamp(),
+                        authProvider: "Google",
+                        forensics: forensicData
+                    };
+
+                    const userRef = doc(db, "users", user.uid);
+                    await setDoc(userRef, userPayload, { merge: true });
+
+                    btnText.textContent = "Redirecting...";
+                    window.location.href = "/dashboard.html";
+                }
             } catch (error) {
-                console.error("Firebase persistence setup error:", error);
-                showError(`Authentication setup failed: ${error.message}`);
+                console.error("Authentication Error:", error);
+                errorContainer.textContent = `Authentication failed: ${error.message}`;
+                errorContainer.classList.remove('hidden');
             }
-        })();
+        });
 
-        signInBtn.addEventListener('click', async () => {
-            if (signInBtn.disabled) return;
-
-            setLoading(true);
+        // 2. Handle the initial click by triggering the redirect
+        signInBtn.addEventListener('click', () => {
+            signInBtn.disabled = true;
+            btnText.textContent = "Connecting to Google...";
+            btnLoader.style.display = "block";
             errorContainer.classList.add('hidden');
-
-            try {
-                await setPersistence(auth, browserLocalPersistence);
-                const result = await signInWithPopup(auth, provider);
-                await finishLogin(result.user);
-            } catch (error) {
-                console.error("Google sign-in error:", error);
-                setLoading(false, "Continue with Google");
-
-                const messages = {
-                    "auth/popup-blocked": "Your browser blocked the Google sign-in window. Allow pop-ups for feed-azure.vercel.app and try again.",
-                    "auth/popup-closed-by-user": "The Google sign-in window closed before authentication completed.",
-                    "auth/cancelled-popup-request": "A Google sign-in request is already running. Please try again.",
-                    "auth/unauthorized-domain": "Firebase does not authorize feed-azure.vercel.app. Add it under Authentication → Settings → Authorized domains.",
-                    "auth/operation-not-allowed": "Google sign-in is not enabled in Firebase Authentication.",
-                    "auth/network-request-failed": "The network request failed. Check your connection and try again.",
-                    "auth/internal-error": "Firebase returned an internal authentication error. Check the browser console for the underlying error."
-                };
-
-                showError(messages[error?.code] || `Google sign-in failed: ${error?.message || error?.code || "Unknown error"}`);
-            }
+            
+            // Redirects the current page to Google's auth flow
+            signInWithRedirect(auth, provider);
         });
     </script>
 </body>
