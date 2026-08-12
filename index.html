@@ -7,7 +7,6 @@
     <link rel="icon" type="image/png" href="https://i.postimg.cc/PxzBtXjz/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-
         @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
@@ -22,9 +21,7 @@
         }
 
         * { box-sizing: border-box; }
-
         html { scroll-behavior: smooth; }
-
         body {
             font-family: 'Inter', sans-serif;
             background:
@@ -35,7 +32,6 @@
         }
 
         .font-display { font-family: 'Archivo', sans-serif; }
-
         .text-gradient {
             background: var(--gradient);
             -webkit-background-clip: text;
@@ -43,12 +39,10 @@
             background-clip: text;
             color: transparent;
         }
-
         .bg-gradient-custom {
             background: var(--gradient);
             transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
         }
-
         .bg-gradient-custom:hover {
             opacity: 0.95;
             transform: translateY(-1px);
@@ -61,7 +55,6 @@
             border-radius: 9999px;
             background: var(--gradient);
         }
-
         .border-gradient > div {
             background: #fff;
             border-radius: 9999px;
@@ -94,7 +87,6 @@
             background: rgba(255,255,255,0.88);
             box-shadow: 0 18px 60px rgba(23, 18, 43, 0.06);
         }
-
         .premium-card:hover {
             box-shadow: var(--shadow);
             transform: translateY(-3px);
@@ -131,15 +123,12 @@
             border-top: 1px solid var(--line);
             padding: 22px 0;
         }
-
         .faq details:last-child { border-bottom: 1px solid var(--line); }
-
         .faq summary {
             cursor: pointer;
             list-style: none;
             font-weight: 600;
         }
-
         .faq summary::-webkit-details-marker { display: none; }
 
         .gradient-orbit {
@@ -164,7 +153,6 @@
             position: relative;
             transition: transform .25s ease, opacity .25s ease;
         }
-
         .trust-item::after {
             content: "";
             position: absolute;
@@ -175,7 +163,6 @@
             transform: translateY(-50%);
             background: #e8e8ef;
         }
-
         .trust-item:last-child::after { display: none; }
 
         .architecture-card {
@@ -186,13 +173,11 @@
             box-shadow: 0 18px 60px rgba(34, 22, 70, .07);
             transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
         }
-
         .architecture-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 28px 90px rgba(34, 22, 70, .12);
             border-color: rgba(96,54,225,.22);
         }
-
         .architecture-card::before {
             content: "";
             position: absolute;
@@ -201,7 +186,6 @@
             transform: translateX(-120%);
             transition: transform .9s ease;
         }
-
         .architecture-card:hover::before { transform: translateX(120%); }
 
         .flow-connector {
@@ -212,7 +196,6 @@
             height: 28px;
             background: linear-gradient(to bottom, rgba(96,54,225,.35), rgba(216,61,194,.2));
         }
-
         .flow-dot {
             position: absolute;
             left: -3px;
@@ -224,7 +207,6 @@
             box-shadow: 0 0 0 5px rgba(96,54,225,.08);
             animation: flowPulse 2.2s ease-in-out infinite;
         }
-
         @keyframes flowPulse {
             0%, 100% { transform: translateY(0); opacity: .65; }
             50% { transform: translateY(18px); opacity: 1; }
@@ -233,7 +215,6 @@
         .compare-table > div {
             transition: background .2s ease;
         }
-
         .compare-table > div:hover { background: #faf9ff; }
 
         .social-window {
@@ -242,11 +223,9 @@
             background: rgba(255,255,255,.035);
             backdrop-filter: blur(20px);
         }
-
         .social-channel {
             transition: transform .2s ease, background .2s ease;
         }
-
         .social-channel:hover {
             transform: translateX(3px);
             background: rgba(255,255,255,.06);
@@ -260,7 +239,6 @@
             box-shadow: 0 0 0 5px rgba(216,61,194,.12);
             animation: livePulse 1.6s ease-in-out infinite;
         }
-
         @keyframes livePulse {
             0%, 100% { opacity: .6; }
             50% { opacity: 1; box-shadow: 0 0 0 9px rgba(216,61,194,0); }
@@ -271,7 +249,6 @@
             background: #fff;
             transition: transform .28s ease, box-shadow .28s ease;
         }
-
         .security-node:hover {
             transform: translateY(-4px);
             box-shadow: 0 22px 70px rgba(35, 23, 72, .09);
@@ -282,7 +259,6 @@
             background: linear-gradient(to right, rgba(96,54,225,.18), rgba(216,61,194,.28));
             position: relative;
         }
-
         .security-line::after {
             content: "";
             position: absolute;
@@ -294,7 +270,6 @@
             background: #6036E1;
             animation: lineTravel 2.8s linear infinite;
         }
-
         @keyframes lineTravel {
             0% { left: 0; opacity: .2; }
             12% { opacity: 1; }
@@ -307,7 +282,6 @@
             background: #fff;
             transition: transform .25s ease, box-shadow .25s ease;
         }
-
         .metric-pill:hover {
             transform: translateY(-3px);
             box-shadow: 0 18px 50px rgba(28,20,62,.08);
@@ -318,7 +292,6 @@
             transform: translateY(18px);
             transition: opacity .7s ease, transform .7s ease;
         }
-
         .reveal.is-visible {
             opacity: 1;
             transform: translateY(0);
@@ -337,8 +310,7 @@
                 linear-gradient(to right,#6036E1,#D83DC2) border-box;
         }
 
-    
-        /* Unified page routing: landing remains unchanged; #login swaps in the original login page. */
+        /* Login overlay (moved out of iframe) */
         #login-view {
             position: fixed;
             inset: 0;
@@ -346,6 +318,7 @@
             width: 100vw;
             height: 100vh;
             background: #f8f8fc;
+            overflow-y: auto;
         }
         #login-view[hidden] { display: none !important; }
         body.login-active > :not(#login-view) { display: none !important; }
@@ -354,11 +327,38 @@
             background: #f8f8fc;
         }
 
+        /* Login card loader */
+        .loader {
+            border: 3px solid rgba(96,54,225,0.2);
+            border-top-color: #6036E1;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .google-btn {
+            transition: all 0.2s ease;
+        }
+        .google-btn:hover {
+            background: #faf9ff;
+            border-color: rgba(96,54,225,0.3);
+            box-shadow: 0 8px 20px rgba(32, 18, 80, 0.04);
+            transform: translateY(-1px);
+        }
+        .premium-frame {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid #ececf3;
+            box-shadow: 0 24px 80px rgba(32, 18, 80, 0.08);
+        }
     </style>
 </head>
 
 <body class="bg-white text-gray-900 antialiased overflow-x-hidden selection:bg-[#D83DC2] selection:text-white">
-
 
     <!-- Navigation -->
     <nav class="max-w-7xl mx-auto px-6 py-7 flex items-center justify-between relative z-20">
@@ -426,8 +426,6 @@
                 </div>
             </div>
         </section>
-
-
 
         <!-- FEED Trust Strip -->
         <section class="trust-strip">
@@ -881,7 +879,6 @@ p {
             </div>
         </section>
 
-
         <!-- FEED Architecture -->
         <section id="architecture" class="max-w-7xl mx-auto px-6 py-24 md:py-32">
             <div class="max-w-4xl reveal">
@@ -1030,7 +1027,6 @@ p {
                 </div>
             </div>
         </section>
-
 
         <!-- Why FEED -->
         <section class="bg-[#fafaff] border-y border-gray-100">
@@ -1225,7 +1221,6 @@ p {
             </div>
         </section>
 
-
         <!-- Social Network Showcase -->
         <section class="bg-[#0c0b12] text-white">
             <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
@@ -1345,7 +1340,6 @@ p {
                 </div>
             </div>
         </section>
-
 
         <!-- Security Architecture Visualization -->
         <section class="max-w-7xl mx-auto px-6 py-24 md:py-32">
@@ -1469,7 +1463,6 @@ p {
             </div>
         </section>
 
-
         <!-- Protocol Signals -->
         <section class="bg-[#fafaff] border-y border-gray-100">
             <div class="max-w-7xl mx-auto px-6 py-18 md:py-20">
@@ -1532,7 +1525,6 @@ p {
         </div>
     </footer>
 
-
     <!-- Premium Footer -->
     <footer class="border-t border-gray-200 bg-[#0c0b12] text-white">
         <div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
@@ -1593,7 +1585,7 @@ p {
         </div>
     </footer>
 
-
+    <!-- Reveal animation -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const nodes = document.querySelectorAll('.reveal');
@@ -1615,400 +1607,582 @@ p {
         });
     </script>
 
-
-    <!-- Unified Login View: original login.html preserved inside an isolated frame -->
+    <!-- Login Overlay (Direct, no iframe) -->
     <section id="login-view" aria-label="FEED Login" hidden>
-        <iframe
-            id="login-frame"
-            title="Sign into FEED"
-            srcdoc="&lt;!DOCTYPE html&gt;
+        <div class="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+            <!-- Left: FEED Advert (same as main) -->
+            <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
+                <iframe
+                    title="FEED Advert"
+                    srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
     &lt;meta charset=&quot;UTF-8&quot;&gt;
     &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
-    &lt;title&gt;Sign into FEED&lt;/title&gt;
-    &lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; href=&quot;https://i.postimg.cc/PxzBtXjz/logo.png&quot;&gt;
-    &lt;script src=&quot;https://cdn.tailwindcss.com&quot;&gt;&lt;/script&gt;
+    &lt;title&gt;FEED | Social Network &amp; Digital Asset Platform&lt;/title&gt;
+    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js&quot;&gt;&lt;/script&gt;
     &lt;style&gt;
-        @import url(&#x27;https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap&#x27;);
-
+        @import url(&#x27;https://fonts.googleapis.com/css2?family=Archivo:wght@900&amp;family=Inter:wght@400;700;900&amp;display=swap&#x27;);
+        
         :root {
-            --violet: #6036E1;
-            --magenta: #D83DC2;
-            --ink: #0b0b12;
-            --gradient: linear-gradient(to right, #6036E1, #D83DC2);
+            --pure-white: #ffffff;
+            /* FEED visual theme */
+            --main-gradient: linear-gradient(to right, #6036E1, #D83DC2);
+            --text-main: #1e1b4b;
         }
 
-        body {
-            font-family: &#x27;Inter&#x27;, sans-serif;
-            color: var(--ink);
-            background-color: #f8f8fc;
-            margin: 0;
-            overflow-x: hidden;
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--pure-white);
+            overflow: hidden; font-family: &#x27;Inter&#x27;, sans-serif; 
         }
 
-        .font-display { font-family: &#x27;Archivo&#x27;, sans-serif; }
+        #mainContent { position: relative; width: 100%; height: 100%; z-index: 10; }
 
-        .text-gradient {
-            background: var(--gradient);
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; }
+        
+        .app-logo-watermark {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6; width: clamp(300px, 50vw, 600px);
+            opacity: 0.12; pointer-events: none;
+        }
+
+        .director-ui {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; pointer-events: none;
+        }
+
+        .scene-content {
+            position: absolute; text-align: center;
+            opacity: 0; transform: translateY(15px);
+            filter: blur(8px);
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            width: 90%; visibility: hidden;
+        }
+
+        .scene-content.active { opacity: 1; transform: translateY(0); filter: blur(0px); visibility: visible; }
+        .scene-content.exit { opacity: 0; transform: scale(1.05); filter: blur(15px); visibility: visible; }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 6.5rem); margin: 0;
+            background: linear-gradient(to right, #6036E1, #D83DC2);
             -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
             background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1; font-weight: 900;
+            font-family: &#x27;Archivo&#x27;, sans-serif;
+            letter-spacing: -0.05em;
+        }
+
+        .feed-wordmark {
+            font-family: &#x27;Archivo&#x27;, sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .feed-wordmark .feed-black {
+            color: #000;
+            -webkit-text-fill-color: #000;
+        }
+
+        .feed-wordmark .feed-ee {
+            background: linear-gradient(to right, #6036E1, #D83DC2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             color: transparent;
         }
 
-        .bg-gradient-custom {
-            background: var(--gradient);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+p { 
+            font-size: clamp(0.9rem, 2vw, 1.3rem); color: var(--text-main); 
+            margin-top: 15px; font-weight: 700; letter-spacing: 0.4em; 
+            text-transform: uppercase;
         }
 
-        .bg-gradient-custom:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
+        /* --- Finale Animation Styles --- */
+        #finaleStage {
+            position: absolute; inset: 0;
+            z-index: 2000; background: var(--pure-white);
+            display: none; justify-content: center; align-items: center;
+            perspective: 2000px;
         }
 
-        .premium-frame {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid #ececf3;
-            box-shadow: 0 24px 80px rgba(32, 18, 80, 0.08);
+        .intro-frame {
+            position: relative; display: flex; justify-content: center; align-items: center;
         }
 
-        .google-btn {
-            transition: all 0.2s ease;
-        }
-        
-        .google-btn:hover {
-            background: #faf9ff;
-            border-color: rgba(96,54,225,0.3);
-            box-shadow: 0 8px 20px rgba(32, 18, 80, 0.04);
-            transform: translateY(-1px);
+        .intro-svg { width: min(900px, 92vw); height: 300px; overflow: visible; }
+
+        .final-feed-text {
+            font-size: 110px;
+            font-weight: 900;
+            font-family: &#x27;Archivo&#x27;, sans-serif;
         }
 
-        .loader {
-            border: 3px solid rgba(96,54,225,0.2);
-            border-top-color: #6036E1;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
+.sub-url-path {
+            font-size: 28px; font-weight: 700;
+            fill: #7c3aed;
+            letter-spacing: 0.3em;
+            opacity: 0;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .logo-final-container {
+            position: absolute; width: 350px; height: 350px;
+            opacity: 0; transform: scale(0.8);
+            display: flex; justify-content: center; align-items: center;
+        }
     &lt;/style&gt;
 &lt;/head&gt;
-&lt;body class=&quot;min-h-screen flex flex-col lg:flex-row&quot;&gt;
+&lt;body&gt;
 
-    &lt;!-- Left Side: Advert Frame --&gt;
-    &lt;div class=&quot;relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block&quot;&gt;
-        &lt;iframe
-            title=&quot;FEED Advert&quot;
-            srcdoc=&quot;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-&amp;lt;head&amp;gt;
-    &amp;lt;meta charset=&amp;quot;UTF-8&amp;quot;&amp;gt;
-    &amp;lt;meta name=&amp;quot;viewport&amp;quot; content=&amp;quot;width=device-width, initial-scale=1.0&amp;quot;&amp;gt;
-    &amp;lt;title&amp;gt;FEED | Social Network &amp;amp; Digital Asset Platform&amp;lt;/title&amp;gt;
-    &amp;lt;script src=&amp;quot;https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-    &amp;lt;style&amp;gt;
-        @import url(&amp;#x27;https://fonts.googleapis.com/css2?family=Archivo:wght@900&amp;amp;family=Inter:wght@400;700;900&amp;amp;display=swap&amp;#x27;);
-        :root { --pure-white: #ffffff; --main-gradient: linear-gradient(to right, #6036E1, #D83DC2); --text-main: #1e1b4b; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--pure-white); overflow: hidden; font-family: &amp;#x27;Inter&amp;#x27;, sans-serif; }
-        #mainContent { position: relative; width: 100%; height: 100%; z-index: 10; }
-        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; }
-        .app-logo-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 6; width: clamp(300px, 50vw, 600px); opacity: 0.12; pointer-events: none; }
-        .director-ui { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10; pointer-events: none; }
-        .scene-content { position: absolute; text-align: center; opacity: 0; transform: translateY(15px); filter: blur(8px); transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); width: 90%; visibility: hidden; }
-        .scene-content.active { opacity: 1; transform: translateY(0); filter: blur(0px); visibility: visible; }
-        .scene-content.exit { opacity: 0; transform: scale(1.05); filter: blur(15px); visibility: visible; }
-        h1 { font-size: clamp(2.5rem, 8vw, 6.5rem); margin: 0; background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1; font-weight: 900; font-family: &amp;#x27;Archivo&amp;#x27;, sans-serif; letter-spacing: -0.05em; }
-        .feed-wordmark { font-family: &amp;#x27;Archivo&amp;#x27;, sans-serif; font-weight: 900; letter-spacing: -0.05em; }
-        .feed-wordmark .feed-black { color: #000; -webkit-text-fill-color: #000; }
-        .feed-wordmark .feed-ee { background: linear-gradient(to right, #6036E1, #D83DC2); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
-        p { font-size: clamp(0.9rem, 2vw, 1.3rem); color: var(--text-main); margin-top: 15px; font-weight: 700; letter-spacing: 0.4em; text-transform: uppercase; }
-        #finaleStage { position: absolute; inset: 0; z-index: 2000; background: var(--pure-white); display: none; justify-content: center; align-items: center; perspective: 2000px; }
-        .intro-frame { position: relative; display: flex; justify-content: center; align-items: center; }
-        .intro-svg { width: min(900px, 92vw); height: 300px; overflow: visible; }
-        .final-feed-text { font-size: 110px; font-weight: 900; font-family: &amp;#x27;Archivo&amp;#x27;, sans-serif; }
-        .sub-url-path { font-size: 28px; font-weight: 700; fill: #7c3aed; letter-spacing: 0.3em; opacity: 0; }
-        .logo-final-container { position: absolute; width: 350px; height: 350px; opacity: 0; transform: scale(0.8); display: flex; justify-content: center; align-items: center; }
-    &amp;lt;/style&amp;gt;
-&amp;lt;/head&amp;gt;
-&amp;lt;body&amp;gt;
-    &amp;lt;div id=&amp;quot;mainContent&amp;quot;&amp;gt;
-        &amp;lt;img src=&amp;quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&amp;quot; class=&amp;quot;app-logo-watermark&amp;quot; alt=&amp;quot;FEED Logo&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;director-ui&amp;quot;&amp;gt;
-            &amp;lt;div class=&amp;quot;scene-content active&amp;quot;&amp;gt;&amp;lt;h1 class=&amp;quot;feed-wordmark&amp;quot;&amp;gt;&amp;lt;span class=&amp;quot;feed-black&amp;quot;&amp;gt;F&amp;lt;/span&amp;gt;&amp;lt;span class=&amp;quot;feed-ee&amp;quot;&amp;gt;EE&amp;lt;/span&amp;gt;&amp;lt;span class=&amp;quot;feed-black&amp;quot;&amp;gt;D&amp;lt;/span&amp;gt;&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Social Network &amp;amp;amp; Digital Asset&amp;lt;/p&amp;gt;&amp;lt;/div&amp;gt;
-            &amp;lt;div class=&amp;quot;scene-content&amp;quot;&amp;gt;&amp;lt;h1&amp;gt;USDC Paired.&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Designed for Direct Trading&amp;lt;/p&amp;gt;&amp;lt;/div&amp;gt;
-            &amp;lt;div class=&amp;quot;scene-content&amp;quot;&amp;gt;&amp;lt;h1&amp;gt;Live Community.&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Chat, Streams &amp;amp;amp; Networking&amp;lt;/p&amp;gt;&amp;lt;/div&amp;gt;
-            &amp;lt;div class=&amp;quot;scene-content&amp;quot;&amp;gt;&amp;lt;h1&amp;gt;FEED Access.&amp;lt;/h1&amp;gt;&amp;lt;p&amp;gt;Explore the Platform&amp;lt;/p&amp;gt;&amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;canvas id=&amp;quot;canvas&amp;quot;&amp;gt;&amp;lt;/canvas&amp;gt;
-    &amp;lt;/div&amp;gt;
-    &amp;lt;div id=&amp;quot;finaleStage&amp;quot;&amp;gt;
-        &amp;lt;div class=&amp;quot;intro-frame&amp;quot; id=&amp;quot;introFrame&amp;quot;&amp;gt;
-            &amp;lt;svg class=&amp;quot;intro-svg&amp;quot; viewBox=&amp;quot;0 0 900 250&amp;quot;&amp;gt;
-                &amp;lt;defs&amp;gt;
-                    &amp;lt;linearGradient id=&amp;quot;svgGrad&amp;quot; x1=&amp;quot;0%&amp;quot; y1=&amp;quot;0%&amp;quot; x2=&amp;quot;100%&amp;quot; y2=&amp;quot;0%&amp;quot;&amp;gt;
-                        &amp;lt;stop offset=&amp;quot;0%&amp;quot; style=&amp;quot;stop-color:#6036E1;stop-opacity:1&amp;quot; /&amp;gt;
-                        &amp;lt;stop offset=&amp;quot;100%&amp;quot; style=&amp;quot;stop-color:#D83DC2;stop-opacity:1&amp;quot; /&amp;gt;
-                    &amp;lt;/linearGradient&amp;gt;
-                &amp;lt;/defs&amp;gt;
-                &amp;lt;text x=&amp;quot;50%&amp;quot; y=&amp;quot;45%&amp;quot; text-anchor=&amp;quot;middle&amp;quot; dominant-baseline=&amp;quot;middle&amp;quot; class=&amp;quot;final-feed-text&amp;quot; id=&amp;quot;feedFinalText&amp;quot; clip-path=&amp;quot;inset(100% 0% 0% 0%)&amp;quot;&amp;gt;
-                    &amp;lt;tspan fill=&amp;quot;#000&amp;quot;&amp;gt;F&amp;lt;/tspan&amp;gt;&amp;lt;tspan fill=&amp;quot;url(#svgGrad)&amp;quot;&amp;gt;EE&amp;lt;/tspan&amp;gt;&amp;lt;tspan fill=&amp;quot;#000&amp;quot;&amp;gt;D&amp;lt;/tspan&amp;gt;
-                &amp;lt;/text&amp;gt;
-                &amp;lt;text x=&amp;quot;50%&amp;quot; y=&amp;quot;85%&amp;quot; text-anchor=&amp;quot;middle&amp;quot; class=&amp;quot;sub-url-path&amp;quot; id=&amp;quot;urlLayer&amp;quot;&amp;gt;SOCIAL • CHAT • ASSET ACCESS&amp;lt;/text&amp;gt;
-            &amp;lt;/svg&amp;gt;
-        &amp;lt;/div&amp;gt;
-        &amp;lt;div class=&amp;quot;logo-final-container&amp;quot; id=&amp;quot;logoFinal&amp;quot;&amp;gt;
-            &amp;lt;img src=&amp;quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&amp;quot; style=&amp;quot;width:100%&amp;quot; alt=&amp;quot;FEED Logo&amp;quot;&amp;gt;
-        &amp;lt;/div&amp;gt;
-    &amp;lt;/div&amp;gt;
-    &amp;lt;script&amp;gt;
-        const canvas = document.getElementById(&amp;#x27;canvas&amp;#x27;); const ctx = canvas.getContext(&amp;#x27;2d&amp;#x27;);
-        const scenes = document.querySelectorAll(&amp;#x27;.scene-content&amp;#x27;);
-        let width, height, currentScene = 0, frame = 0, loopActive = true;
-        const SPEED = 14; const SCENE_DURATION = 140; 
-        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
-        window.addEventListener(&amp;#x27;resize&amp;#x27;, resize); resize();
-        class Particle {
-            constructor(preWarm = false) { this.reset(preWarm); }
-            reset(preWarm = false) {
-                this.x = (Math.random() - 0.5) * 4500; this.y = (Math.random() - 0.5) * 4500;
-                this.z = preWarm ? Math.random() * 2000 : 2000; this.pz = this.z;
-                this.size = Math.random() * 1.5 + 1; this.color = Math.random() &amp;gt; 0.5 ? &amp;#x27;#6366f1&amp;#x27; : &amp;#x27;#a855f7&amp;#x27;;
-            }
-            update() { this.pz = this.z; this.z -= SPEED; if (this.z &amp;lt; 1) this.reset(); }
-            draw() {
-                const s = 800 / this.z; const ps = 800 / this.pz;
-                const x = this.x * s + width/2; const y = this.y * s + height/2;
-                const px = this.x * ps + width/2; const py = this.y * ps + height/2;
-                ctx.globalAlpha = Math.min(0.4, (1600 - this.z) / 1000);
-                ctx.strokeStyle = this.color; ctx.lineWidth = this.size * s; ctx.lineCap = &amp;#x27;round&amp;#x27;;
-                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(px, py); ctx.stroke();
-            }
-        }
-        const particles = Array.from({length: 600}, () =&amp;gt; new Particle(true));
-        let finaleTimeline = null; let animationFrameId = null; let sceneTimeouts = [];
-        function clearSceneTimeouts() { sceneTimeouts.forEach(id =&amp;gt; clearTimeout(id)); sceneTimeouts = []; }
-        function resetToStart() {
-            clearSceneTimeouts();
-            if (finaleTimeline) { finaleTimeline.kill(); finaleTimeline = null; }
-            const finaleStage = document.getElementById(&amp;#x27;finaleStage&amp;#x27;);
-            const mainContent = document.getElementById(&amp;#x27;mainContent&amp;#x27;);
-            gsap.set(finaleStage, { display: &amp;#x27;none&amp;#x27;, opacity: 1 }); gsap.set(mainContent, { display: &amp;#x27;block&amp;#x27;, opacity: 1 });
-            gsap.set(&amp;quot;#feedFinalText&amp;quot;, { clipPath: &amp;quot;inset(100% 0% 0% 0%)&amp;quot;, opacity: 1 });
-            gsap.set(&amp;quot;#urlLayer&amp;quot;, { opacity: 0, y: 0 }); gsap.set(&amp;quot;#introFrame&amp;quot;, { scale: 1, x: 0, opacity: 1 });
-            gsap.set(&amp;quot;#logoFinal&amp;quot;, { opacity: 0, scale: 0.8 });
-            currentScene = 0; frame = 0; loopActive = true;
-            scenes.forEach(s =&amp;gt; s.classList.remove(&amp;#x27;active&amp;#x27;, &amp;#x27;exit&amp;#x27;)); scenes[0].classList.add(&amp;#x27;active&amp;#x27;);
-            animationFrameId = requestAnimationFrame(animate);
-        }
-        function runFinale() {
-            const mainContent = document.getElementById(&amp;#x27;mainContent&amp;#x27;);
-            const finaleStage = document.getElementById(&amp;#x27;finaleStage&amp;#x27;);
-            gsap.to(mainContent, { opacity: 0, duration: 0.45, ease: &amp;quot;power1.out&amp;quot;, onComplete: () =&amp;gt; { mainContent.style.display = &amp;#x27;none&amp;#x27;; finaleStage.style.display = &amp;#x27;flex&amp;#x27;; finaleStage.style.opacity = &amp;#x27;1&amp;#x27;; startGSAPFinale(); } });
-        }
-        function startGSAPFinale() {
-            finaleTimeline = gsap.timeline({ onComplete: () =&amp;gt; { resetToStart(); } });
-            finaleTimeline.to(&amp;quot;#feedFinalText&amp;quot;, { clipPath: &amp;quot;inset(0% 0% 0% 0%)&amp;quot;, duration: 1.05, ease: &amp;quot;power3.out&amp;quot; })
-                .to(&amp;quot;#urlLayer&amp;quot;, { opacity: 1, y: -10, duration: 0.55, ease: &amp;quot;power2.out&amp;quot; }, &amp;quot;-=0.15&amp;quot;)
-                .to({}, { duration: 1.0 })
-                .to(&amp;quot;#introFrame&amp;quot;, { scale: 24, x: &amp;quot;10%&amp;quot;, opacity: 0, duration: 1.1, ease: &amp;quot;expo.in&amp;quot; })
-                .to(&amp;quot;#logoFinal&amp;quot;, { opacity: 1, scale: 1, duration: 0.75, ease: &amp;quot;power2.out&amp;quot; }, &amp;quot;-=0.85&amp;quot;)
-                .to({}, { duration: 1.25 });
-        }
-        function animate() {
-            if (!loopActive) return; frame++;
-            if (frame &amp;gt;= SCENE_DURATION) {
-                frame = 0;
-                if (currentScene === scenes.length - 1) { loopActive = false; runFinale(); return; }
-                const previousScene = currentScene;
-                scenes[previousScene].classList.remove(&amp;#x27;active&amp;#x27;); scenes[previousScene].classList.add(&amp;#x27;exit&amp;#x27;);
-                sceneTimeouts.push(setTimeout(() =&amp;gt; { if (scenes[previousScene]) { scenes[previousScene].classList.remove(&amp;#x27;exit&amp;#x27;); } }, 800));
-                currentScene++; scenes[currentScene].classList.add(&amp;#x27;active&amp;#x27;);
-            }
-            ctx.fillStyle = &amp;#x27;rgba(255, 255, 255, 0.72)&amp;#x27;; ctx.fillRect(0, 0, width, height);
-            particles.forEach(p =&amp;gt; { p.update(); p.draw(); });
-            animationFrameId = requestAnimationFrame(animate);
-        }
-        resetToStart();
-    &amp;lt;/script&amp;gt;
-&amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;&quot;
-            class=&quot;w-full h-full border-0 absolute inset-0&quot;
-            allow=&quot;autoplay&quot;&gt;
-        &lt;/iframe&gt;
+    &lt;div id=&quot;mainContent&quot;&gt;
+        &lt;img src=&quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&quot; class=&quot;app-logo-watermark&quot; alt=&quot;FEED Logo&quot;&gt;
+        &lt;div class=&quot;director-ui&quot;&gt;
+            &lt;div class=&quot;scene-content active&quot;&gt;&lt;h1 class=&quot;feed-wordmark&quot;&gt;&lt;span class=&quot;feed-black&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;feed-ee&quot;&gt;EE&lt;/span&gt;&lt;span class=&quot;feed-black&quot;&gt;D&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;Social Network &amp;amp; Digital Asset&lt;/p&gt;&lt;/div&gt;
+            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;USDC Paired.&lt;/h1&gt;&lt;p&gt;Designed for Direct Trading&lt;/p&gt;&lt;/div&gt;
+            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;Live Community.&lt;/h1&gt;&lt;p&gt;Chat, Streams &amp;amp; Networking&lt;/p&gt;&lt;/div&gt;
+            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;FEED Access.&lt;/h1&gt;&lt;p&gt;Explore the Platform&lt;/p&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
     &lt;/div&gt;
 
-    &lt;!-- Right Side: Login Frame --&gt;
-    &lt;div class=&quot;w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative&quot;&gt;
-        &lt;div class=&quot;absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none&quot;&gt;&lt;/div&gt;
-        &lt;div class=&quot;absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none&quot;&gt;&lt;/div&gt;
-
-        &lt;div class=&quot;premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10&quot;&gt;
-            &lt;div class=&quot;text-center mb-10&quot;&gt;
-                &lt;a href=&quot;/&quot; class=&quot;inline-block font-display text-4xl font-black tracking-[-0.06em]&quot;&gt;
-                    F&lt;span class=&quot;text-gradient&quot;&gt;EE&lt;/span&gt;D
-                &lt;/a&gt;
-                &lt;h1 class=&quot;font-display text-2xl font-bold mt-6 text-gray-900&quot;&gt;Sign into FEED&lt;/h1&gt;
-                &lt;p class=&quot;mt-2 text-sm text-gray-500 leading-relaxed&quot;&gt;
-                    Access your social network &amp;amp; digital asset dashboard.
-                &lt;/p&gt;
-            &lt;/div&gt;
-
-            &lt;div id=&quot;login-container&quot;&gt;
-                &lt;button id=&quot;googleSignInBtn&quot; class=&quot;google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50&quot;&gt;
-                    &lt;svg class=&quot;w-5 h-5&quot; viewBox=&quot;0 0 24 24&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
-                        &lt;path d=&quot;M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z&quot; fill=&quot;#4285F4&quot;/&gt;
-                        &lt;path d=&quot;M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z&quot; fill=&quot;#34A853&quot;/&gt;
-                        &lt;path d=&quot;M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z&quot; fill=&quot;#FBBC05&quot;/&gt;
-                        &lt;path d=&quot;M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z&quot; fill=&quot;#EA4335&quot;/&gt;
-                    &lt;/svg&gt;
-                    &lt;span id=&quot;btn-text&quot;&gt;Continue with Google&lt;/span&gt;
-                    &lt;div id=&quot;btn-loader&quot; class=&quot;loader ml-2&quot;&gt;&lt;/div&gt;
-                &lt;/button&gt;
-            &lt;/div&gt;
-
-            &lt;div id=&quot;error-message&quot; class=&quot;hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center&quot;&gt;&lt;/div&gt;
-
-            &lt;div class=&quot;mt-8 text-center border-t border-gray-100 pt-6&quot;&gt;
-                &lt;p class=&quot;text-xs text-gray-400&quot;&gt;
-                    By proceeding, you agree to the &lt;a href=&quot;#&quot; class=&quot;text-violet-600 hover:underline&quot;&gt;Terms of Service&lt;/a&gt; and &lt;a href=&quot;#&quot; class=&quot;text-violet-600 hover:underline&quot;&gt;Privacy Policy&lt;/a&gt;.
-                &lt;/p&gt;
-            &lt;/div&gt;
+    &lt;div id=&quot;finaleStage&quot;&gt;
+        &lt;div class=&quot;intro-frame&quot; id=&quot;introFrame&quot;&gt;
+            &lt;svg class=&quot;intro-svg&quot; viewBox=&quot;0 0 900 250&quot;&gt;
+                &lt;defs&gt;
+                    &lt;linearGradient id=&quot;svgGrad&quot; x1=&quot;0%&quot; y1=&quot;0%&quot; x2=&quot;100%&quot; y2=&quot;0%&quot;&gt;
+                        &lt;stop offset=&quot;0%&quot; style=&quot;stop-color:#6036E1;stop-opacity:1&quot; /&gt;
+                        &lt;stop offset=&quot;100%&quot; style=&quot;stop-color:#D83DC2;stop-opacity:1&quot; /&gt;
+                    &lt;/linearGradient&gt;
+                &lt;/defs&gt;
+                &lt;text x=&quot;50%&quot; y=&quot;45%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot;
+                      class=&quot;final-feed-text&quot; id=&quot;feedFinalText&quot;
+                      clip-path=&quot;inset(100% 0% 0% 0%)&quot;&gt;
+                    &lt;tspan fill=&quot;#000&quot;&gt;F&lt;/tspan&gt;&lt;tspan fill=&quot;url(#svgGrad)&quot;&gt;EE&lt;/tspan&gt;&lt;tspan fill=&quot;#000&quot;&gt;D&lt;/tspan&gt;
+                &lt;/text&gt;
+                &lt;text x=&quot;50%&quot; y=&quot;85%&quot; text-anchor=&quot;middle&quot; class=&quot;sub-url-path&quot; id=&quot;urlLayer&quot;&gt;SOCIAL • CHAT • ASSET ACCESS&lt;/text&gt;
+            &lt;/svg&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;logo-final-container&quot; id=&quot;logoFinal&quot;&gt;
+            &lt;img src=&quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&quot; style=&quot;width:100%&quot; alt=&quot;FEED Logo&quot;&gt;
         &lt;/div&gt;
     &lt;/div&gt;
 
-    &lt;!-- Firebase v10 SDK Integration (Popup Version with Safety Timeout Fallback) --&gt;
-    &lt;script type=&quot;module&quot;&gt;
-        import { initializeApp } from &quot;https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js&quot;;
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from &quot;https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js&quot;;
-        import { getFirestore, doc, setDoc, serverTimestamp } from &quot;https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js&quot;;
-
-        // --- Clean Developer Console Logging ---
-        function logInfo(message, data = null) {
-            const timestamp = new Date().toISOString().split(&#x27;T&#x27;)[1].slice(0, -1);
-            if (data) {
-                console.log(`[${timestamp}] ℹ️ ${message}`, data);
-            } else {
-                console.log(`[${timestamp}] ℹ️ ${message}`);
-            }
-        }
-
-        logInfo(&quot;Initializing Firebase System (Popup Mode)...&quot;);
+    &lt;script&gt;
+        const canvas = document.getElementById(&#x27;canvas&#x27;);
+        const ctx = canvas.getContext(&#x27;2d&#x27;);
+        const scenes = document.querySelectorAll(&#x27;.scene-content&#x27;);
+        let width, height, currentScene = 0, frame = 0, loopActive = true;
         
-        const firebaseConfig = {
-            apiKey: &quot;AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU&quot;,
-            authDomain: &quot;feed-65b35.firebaseapp.com&quot;,
-            projectId: &quot;feed-65b35&quot;,
-            storageBucket: &quot;feed-65b35.firebasestorage.app&quot;,
-            messagingSenderId: &quot;1085499159984&quot;,
-            appId: &quot;1:1085499159984:web:317e0443941085964a5275&quot;,
-            measurementId: &quot;G-FVPRRX9X1M&quot;
-        };
+        const SPEED = 14; 
+        const SCENE_DURATION = 140; 
 
-        let app, auth, db, provider;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener(&#x27;resize&#x27;, resize);
+        resize();
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            provider = new GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: &#x27;select_account&#x27; });
-            logInfo(&quot;Firebase Initialization Complete.&quot;);
-        } catch (initErr) {
-            logInfo(&quot;Critical Error during Firebase Init&quot;, initErr);
+        class Particle {
+            constructor(preWarm = false) { this.reset(preWarm); }
+            reset(preWarm = false) {
+                this.x = (Math.random() - 0.5) * 4500;
+                this.y = (Math.random() - 0.5) * 4500;
+                this.z = preWarm ? Math.random() * 2000 : 2000;
+                this.pz = this.z;
+                this.size = Math.random() * 1.5 + 1;
+                // Particles match the purple/indigo theme
+                this.color = Math.random() &gt; 0.5 ? &#x27;#6366f1&#x27; : &#x27;#a855f7&#x27;;
+            }
+            update() {
+                this.pz = this.z;
+                this.z -= SPEED; 
+                if (this.z &lt; 1) this.reset();
+            }
+            draw() {
+                const s = 800 / this.z;
+                const ps = 800 / this.pz;
+                const x = this.x * s + width/2;
+                const y = this.y * s + height/2;
+                const px = this.x * ps + width/2;
+                const py = this.y * ps + height/2;
+                ctx.globalAlpha = Math.min(0.4, (1600 - this.z) / 1000);
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.size * s;
+                ctx.lineCap = &#x27;round&#x27;;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(px, py);
+                ctx.stroke();
+            }
         }
 
-        const signInBtn = document.getElementById(&#x27;googleSignInBtn&#x27;);
-        const btnText = document.getElementById(&#x27;btn-text&#x27;);
-        const btnLoader = document.getElementById(&#x27;btn-loader&#x27;);
-        const errorContainer = document.getElementById(&#x27;error-message&#x27;);
+        const particles = Array.from({length: 600}, () =&gt; new Particle(true));
 
-        const getForensicDetails = () =&gt; {
-            return {
-                userAgent: navigator.userAgent || &quot;Unknown&quot;,
-                platform: navigator.platform || &quot;Unknown&quot;,
-                language: navigator.language || &quot;Unknown&quot;,
-                screenResolution: `${window.screen.width}x${window.screen.height}`
-            };
-        };
+        let finaleTimeline = null;
+        let animationFrameId = null;
+        let sceneTimeouts = [];
 
-        onAuthStateChanged(auth, (user) =&gt; {
-            if (user) {
-                logInfo(&quot;Auth Listener: Active session detected.&quot;, { uid: user.uid, email: user.email });
-            } else {
-                logInfo(&quot;Auth Listener: No active session.&quot;);
+        function clearSceneTimeouts() {
+            sceneTimeouts.forEach(id =&gt; clearTimeout(id));
+            sceneTimeouts = [];
+        }
+
+        function resetToStart() {
+            clearSceneTimeouts();
+
+            if (finaleTimeline) {
+                finaleTimeline.kill();
+                finaleTimeline = null;
             }
-        });
 
-        signInBtn.addEventListener(&#x27;click&#x27;, async () =&gt; {
-            logInfo(&quot;Login button clicked. Triggering signInWithPopup...&quot;);
-            signInBtn.disabled = true;
-            btnText.textContent = &quot;Opening Google Sign-In...&quot;;
-            btnLoader.style.display = &quot;block&quot;;
-            errorContainer.classList.add(&#x27;hidden&#x27;);
-            
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                
-                logInfo(&quot;Google Popup Sign-In Successful!&quot;, { uid: user.uid, email: user.email });
-                
-                btnText.textContent = &quot;Finalizing profile...&quot;;
-                logInfo(&quot;Attempting Firestore sync (with 3s timeout guard)...&quot;);
+            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
+            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
 
-                const userPayload = {
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    lastLogin: serverTimestamp(),
-                    authProvider: &quot;Google&quot;,
-                    forensics: getForensicDetails()
-                };
+            // Reset finale immediately, with no fade-out frame that can stall the loop.
+            gsap.set(finaleStage, { display: &#x27;none&#x27;, opacity: 1 });
+            gsap.set(mainContent, { display: &#x27;block&#x27;, opacity: 1 });
 
-                const userRef = doc(db, &quot;users&quot;, user.uid);
-                
-                try {
-                    await Promise.race([
-                        setDoc(userRef, userPayload, { merge: true }),
-                        new Promise((_, reject) =&gt; setTimeout(() =&gt; reject(new Error(&quot;Firestore write timed out&quot;)), 3000))
-                    ]);
-                    logInfo(&quot;FIRESTORE WRITE SUCCESSFUL!&quot;);
-                } catch (dbWarn) {
-                    logInfo(&quot;Firestore write skipped/timed out. (Check if database is enabled in Firebase Console). Proceeding...&quot;, dbWarn);
+            gsap.set(&quot;#feedFinalText&quot;, { clipPath: &quot;inset(100% 0% 0% 0%)&quot;, opacity: 1 });
+            gsap.set(&quot;#urlLayer&quot;, { opacity: 0, y: 0 });
+            gsap.set(&quot;#introFrame&quot;, { scale: 1, x: 0, opacity: 1 });
+            gsap.set(&quot;#logoFinal&quot;, { opacity: 0, scale: 0.8 });
+
+            currentScene = 0;
+            frame = 0;
+            loopActive = true;
+
+            scenes.forEach(s =&gt; s.classList.remove(&#x27;active&#x27;, &#x27;exit&#x27;));
+            scenes[0].classList.add(&#x27;active&#x27;);
+
+            // Restart the animation loop on the next browser paint.
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function runFinale() {
+            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
+            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
+
+            gsap.to(mainContent, {
+                opacity: 0,
+                duration: 0.45,
+                ease: &quot;power1.out&quot;,
+                onComplete: () =&gt; {
+                    mainContent.style.display = &#x27;none&#x27;;
+                    finaleStage.style.display = &#x27;flex&#x27;;
+                    finaleStage.style.opacity = &#x27;1&#x27;;
+                    startGSAPFinale();
                 }
-                
-                logInfo(&quot;Redirecting to /dashboard.html now...&quot;);
-                btnText.textContent = &quot;Redirecting...&quot;;
-                
-                setTimeout(() =&gt; {
-                    window.location.href = &quot;/dashboard.html&quot;;
-                }, 500);
+            });
+        }
 
-            } catch (error) {
-                logInfo(&quot;Popup Sign-In FAILED.&quot;, error);
-                errorContainer.textContent = `Authentication failed: ${error.message}`;
-                errorContainer.classList.remove(&#x27;hidden&#x27;);
-                
-                signInBtn.disabled = false;
-                btnText.textContent = &quot;Continue with Google&quot;;
-                btnLoader.style.display = &quot;none&quot;;
+        function startGSAPFinale() {
+            finaleTimeline = gsap.timeline({
+                onComplete: () =&gt; {
+                    resetToStart();
+                }
+            });
+
+            finaleTimeline
+                .to(&quot;#feedFinalText&quot;, {
+                    clipPath: &quot;inset(0% 0% 0% 0%)&quot;,
+                    duration: 1.05,
+                    ease: &quot;power3.out&quot;
+                })
+                .to(&quot;#urlLayer&quot;, {
+                    opacity: 1,
+                    y: -10,
+                    duration: 0.55,
+                    ease: &quot;power2.out&quot;
+                }, &quot;-=0.15&quot;)
+                .to({}, { duration: 1.0 })
+                .to(&quot;#introFrame&quot;, {
+                    scale: 24,
+                    x: &quot;10%&quot;,
+                    opacity: 0,
+                    duration: 1.1,
+                    ease: &quot;expo.in&quot;
+                })
+                .to(&quot;#logoFinal&quot;, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.75,
+                    ease: &quot;power2.out&quot;
+                }, &quot;-=0.85&quot;)
+                .to({}, { duration: 1.25 });
+        }
+
+        function animate() {
+            if (!loopActive) return;
+
+            frame++;
+
+            if (frame &gt;= SCENE_DURATION) {
+                frame = 0;
+
+                if (currentScene === scenes.length - 1) {
+                    loopActive = false;
+                    runFinale();
+                    return;
+                }
+
+                const previousScene = currentScene;
+                scenes[previousScene].classList.remove(&#x27;active&#x27;);
+                scenes[previousScene].classList.add(&#x27;exit&#x27;);
+
+                sceneTimeouts.push(setTimeout(() =&gt; {
+                    if (scenes[previousScene]) {
+                        scenes[previousScene].classList.remove(&#x27;exit&#x27;);
+                    }
+                }, 800));
+
+                currentScene++;
+                scenes[currentScene].classList.add(&#x27;active&#x27;);
             }
-        });
+
+            ctx.fillStyle = &#x27;rgba(255, 255, 255, 0.72)&#x27;;
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach(p =&gt; {
+                p.update();
+                p.draw();
+            });
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // One clean startup; subsequent runs are restarted by resetToStart().
+        resetToStart();
     &lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;"
-            class="w-full h-screen border-0"
-            loading="eager">
-        </iframe>
+                    class="w-full h-full border-0 absolute inset-0"
+                    allow="autoplay">
+                </iframe>
+            </div>
+
+            <!-- Right: Login Panel -->
+            <div class="w-full lg:w-1/2 min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-white to-gray-50 relative">
+                <div class="absolute top-[10%] left-[15%] w-[300px] h-[300px] rounded-full bg-violet-400/10 blur-[80px] pointer-events-none"></div>
+                <div class="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full bg-fuchsia-400/10 blur-[100px] pointer-events-none"></div>
+
+                <div class="premium-frame rounded-3xl p-10 md:p-14 w-full max-w-[480px] relative z-10">
+                    <div class="text-center mb-10">
+                        <a href="#top" class="inline-block font-display text-4xl font-black tracking-[-0.06em]">
+                            F<span class="text-gradient">EE</span>D
+                        </a>
+                        <h1 class="font-display text-2xl font-bold mt-6 text-gray-900">Sign into FEED</h1>
+                        <p class="mt-2 text-sm text-gray-500 leading-relaxed">
+                            Access your social network &amp; digital asset dashboard.
+                        </p>
+                    </div>
+
+                    <div id="login-container">
+                        <button id="googleSignInBtn" class="google-btn w-full flex items-center justify-center gap-3 border border-gray-200 bg-white text-gray-800 font-semibold py-3.5 px-6 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            <span id="btn-text">Continue with Google</span>
+                            <div id="btn-loader" class="loader ml-2"></div>
+                        </button>
+                    </div>
+
+                    <div id="error-message" class="hidden mt-4 p-4 text-sm text-red-600 bg-red-50 rounded-xl border border-red-100 text-center"></div>
+
+                    <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                        <p class="text-xs text-gray-400">
+                            By proceeding, you agree to the <a href="#" class="text-violet-600 hover:underline">Terms of Service</a> and <a href="#" class="text-violet-600 hover:underline">Privacy Policy</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
+    <!-- Firebase Authentication (Redirect Flow) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import {
+            getAuth,
+            GoogleAuthProvider,
+            signInWithRedirect,
+            getRedirectResult,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // Firebase config – unchanged
+        const firebaseConfig = {
+            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+            authDomain: "feed-65b35.firebaseapp.com",
+            projectId: "feed-65b35",
+            storageBucket: "feed-65b35.firebasestorage.app",
+            messagingSenderId: "1085499159984",
+            appId: "1:1085499159984:web:317e0443941085964a5275",
+            measurementId: "G-FVPRRX9X1M"
+        };
+
+        // Single Firebase initialization
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+
+        // DOM references
+        const signInBtn = document.getElementById('googleSignInBtn');
+        const btnText = document.getElementById('btn-text');
+        const btnLoader = document.getElementById('btn-loader');
+        const errorContainer = document.getElementById('error-message');
+
+        // Helper: show error in UI
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
+        }
+
+        // Helper: reset button state
+        function resetButton() {
+            if (signInBtn) {
+                signInBtn.disabled = false;
+                btnText.textContent = 'Continue with Google';
+                btnLoader.style.display = 'none';
+            }
+        }
+
+        // Helper: set loading state
+        function setLoading(text) {
+            if (signInBtn) {
+                signInBtn.disabled = true;
+                btnText.textContent = text || 'Connecting...';
+                btnLoader.style.display = 'block';
+            }
+        }
+
+        // Process redirect result (called on page load)
+        async function handleRedirectResult() {
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    // User signed in via redirect
+                    const user = result.user;
+                    await handleAuthenticatedUser(user);
+                }
+                // else: no redirect result, continue normally
+            } catch (error) {
+                console.error('Redirect result error:', error);
+                // Only display if we are on the login view (visible)
+                if (!document.getElementById('login-view').hidden) {
+                    showError(`Authentication failed: ${error.message}`);
+                    resetButton();
+                }
+            }
+        }
+
+        // Process authenticated user (Firestore write + redirect)
+        async function handleAuthenticatedUser(user) {
+            // Disable button and show status
+            setLoading('Finalizing profile...');
+
+            // Get forensic info
+            const forensics = {
+                userAgent: navigator.userAgent || 'Unknown',
+                platform: navigator.platform || 'Unknown',
+                language: navigator.language || 'Unknown',
+                screenResolution: `${window.screen.width}x${window.screen.height}`
+            };
+
+            const userPayload = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                lastLogin: serverTimestamp(),
+                authProvider: 'Google',
+                forensics: forensics
+            };
+
+            const userRef = doc(db, 'users', user.uid);
+
+            // Write to Firestore with timeout guard
+            try {
+                await Promise.race([
+                    setDoc(userRef, userPayload, { merge: true }),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Firestore write timed out')), 3000)
+                    )
+                ]);
+                console.log('Firestore write successful');
+            } catch (dbError) {
+                console.warn('Firestore write skipped/timed out:', dbError);
+                // Continue anyway
+            }
+
+            // Redirect to dashboard
+            btnText.textContent = 'Redirecting...';
+            setTimeout(() => {
+                window.location.href = '/dashboard.html';
+            }, 500);
+        }
+
+        // Auth state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Already authenticated – optionally handle
+                console.log('User already authenticated:', user.uid);
+                // If the login view is visible, we can redirect immediately
+                if (!document.getElementById('login-view').hidden) {
+                    handleAuthenticatedUser(user);
+                }
+            } else {
+                // No user, ensure button is enabled if login view is visible
+                if (!document.getElementById('login-view').hidden) {
+                    resetButton();
+                }
+            }
+        });
+
+        // Sign-in button handler – initiate redirect
+        if (signInBtn) {
+            signInBtn.addEventListener('click', async () => {
+                // Prevent multiple clicks
+                if (signInBtn.disabled) return;
+
+                // Hide previous errors
+                errorContainer.classList.add('hidden');
+                setLoading('Connecting to Google...');
+
+                try {
+                    await signInWithRedirect(auth, provider);
+                    // After redirect, the page will reload and handleRedirectResult will fire.
+                    // The button remains disabled while redirect occurs.
+                } catch (error) {
+                    console.error('Sign-in redirect error:', error);
+                    showError(`Authentication failed: ${error.message}`);
+                    resetButton();
+                }
+            });
+        }
+
+        // Process redirect result on load
+        handleRedirectResult();
+
+        // Also handle the case when the login view becomes visible while a user is already signed in.
+        // The observer above will handle it.
+    </script>
+
+    <!-- Routing / Hash handling (preserved) -->
     <script>
         (() => {
             const loginView = document.getElementById('login-view');
@@ -2032,8 +2206,7 @@ p {
                 else showLanding();
             }
 
-            // Any existing landing-page control explicitly related to login/access/authentication
-            // is routed to the unified #login view without touching unrelated navigation.
+            // Intercept login links/buttons (the top nav already points to #login)
             document.querySelectorAll('a[href], button').forEach(el => {
                 const label = (el.textContent || '').trim().toLowerCase();
                 const href = (el.getAttribute('href') || '').toLowerCase();
@@ -2051,27 +2224,18 @@ p {
                 }
             });
 
-            // Hash navigation is the only route change. #login shows the exact isolated login page.
+            // The login view's FEED logo should return to landing
+            const loginLogo = document.querySelector('#login-view a[href="#top"]');
+            if (loginLogo) {
+                loginLogo.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    history.pushState({}, '', '#top');
+                    syncRoute();
+                });
+            }
+
             window.addEventListener('hashchange', syncRoute);
             window.addEventListener('popstate', syncRoute);
-
-            // The login document's own logo can return to the landing page by navigating to #top
-            // without modifying the original login markup.
-            const frame = document.getElementById('login-frame');
-            frame.addEventListener('load', () => {
-                try {
-                    const doc = frame.contentDocument;
-                    const logo = doc && doc.querySelector('a[href="/"]');
-                    if (logo) {
-                        logo.setAttribute('href', '#top');
-                        logo.addEventListener('click', event => {
-                            event.preventDefault();
-                            history.pushState({}, '', '#top');
-                            syncRoute();
-                        });
-                    }
-                } catch (_) {}
-            });
 
             syncRoute();
         })();
