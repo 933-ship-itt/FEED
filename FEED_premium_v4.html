@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEED | Social Network + Digital Asset Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --violet: #6036E1;
+            --magenta: #D83DC2;
+            --ink: #0b0b12;
+            --muted: #666675;
+            --line: #ececf3;
+            --soft: #f8f8fc;
+            --gradient: linear-gradient(to right, #6036E1, #D83DC2);
+            --shadow: 0 24px 80px rgba(32, 18, 80, 0.10);
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 80% 5%, rgba(216,61,194,0.09), transparent 26%),
+                radial-gradient(circle at 10% 12%, rgba(96,54,225,0.09), transparent 24%),
+                #fff;
+            color: var(--ink);
+        }
+
+        .font-display { font-family: 'Archivo', sans-serif; }
+
+        .text-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .bg-gradient-custom {
+            background: var(--gradient);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+        }
+
+        .bg-gradient-custom:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
+        }
+
+        .border-gradient {
+            position: relative;
+            padding: 1px;
+            border-radius: 9999px;
+            background: var(--gradient);
+        }
+
+        .border-gradient > div {
+            background: #fff;
+            border-radius: 9999px;
+        }
+
+        .glass {
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .soft-grid {
+            background-image:
+                linear-gradient(rgba(96,54,225,0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(96,54,225,0.045) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .section-kicker {
+            font-size: 11px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #7b7890;
+        }
+
+        .premium-card {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.88);
+            box-shadow: 0 18px 60px rgba(23, 18, 43, 0.06);
+        }
+
+        .premium-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-3px);
+        }
+
+        .number-chip {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            background: #f4f1ff;
+            color: var(--violet);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 19px;
+            top: 50px;
+            bottom: -25px;
+            width: 1px;
+            background: linear-gradient(to bottom, rgba(96,54,225,.3), rgba(216,61,194,.08));
+        }
+
+        .metric {
+            border-top: 1px solid var(--line);
+            padding-top: 16px;
+        }
+
+        .faq details {
+            border-top: 1px solid var(--line);
+            padding: 22px 0;
+        }
+
+        .faq details:last-child { border-bottom: 1px solid var(--line); }
+
+        .faq summary {
+            cursor: pointer;
+            list-style: none;
+            font-weight: 600;
+        }
+
+        .faq summary::-webkit-details-marker { display: none; }
+
+        .gradient-orbit {
+            box-shadow:
+                0 0 0 1px rgba(96,54,225,0.12),
+                0 25px 80px rgba(96,54,225,0.12),
+                inset 0 0 60px rgba(216,61,194,0.06);
+        }
+
+        @media (max-width: 900px) {
+            .hero-ring { width: 560px; height: 560px; }
+        }
+
+        .trust-strip {
+            border-top: 1px solid #ececf3;
+            border-bottom: 1px solid #ececf3;
+            background: rgba(255,255,255,.78);
+            backdrop-filter: blur(18px);
+        }
+
+        .trust-item {
+            position: relative;
+            transition: transform .25s ease, opacity .25s ease;
+        }
+
+        .trust-item::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 1px;
+            height: 20px;
+            transform: translateY(-50%);
+            background: #e8e8ef;
+        }
+
+        .trust-item:last-child::after { display: none; }
+
+        .architecture-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e9e8f1;
+            background: linear-gradient(180deg, #fff, #fbfbfe);
+            box-shadow: 0 18px 60px rgba(34, 22, 70, .07);
+            transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+        }
+
+        .architecture-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 28px 90px rgba(34, 22, 70, .12);
+            border-color: rgba(96,54,225,.22);
+        }
+
+        .architecture-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 18%, rgba(96,54,225,.06) 48%, rgba(216,61,194,.06) 62%, transparent 82%);
+            transform: translateX(-120%);
+            transition: transform .9s ease;
+        }
+
+        .architecture-card:hover::before { transform: translateX(120%); }
+
+        .flow-connector {
+            position: absolute;
+            left: 50%;
+            bottom: -26px;
+            width: 1px;
+            height: 28px;
+            background: linear-gradient(to bottom, rgba(96,54,225,.35), rgba(216,61,194,.2));
+        }
+
+        .flow-dot {
+            position: absolute;
+            left: -3px;
+            top: 0;
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #6036E1;
+            box-shadow: 0 0 0 5px rgba(96,54,225,.08);
+            animation: flowPulse 2.2s ease-in-out infinite;
+        }
+
+        @keyframes flowPulse {
+            0%, 100% { transform: translateY(0); opacity: .65; }
+            50% { transform: translateY(18px); opacity: 1; }
+        }
+
+        .compare-table > div {
+            transition: background .2s ease;
+        }
+
+        .compare-table > div:hover { background: #faf9ff; }
+
+        .social-window {
+            border: 1px solid rgba(255,255,255,.09);
+            box-shadow: 0 30px 100px rgba(0,0,0,.28);
+            background: rgba(255,255,255,.035);
+            backdrop-filter: blur(20px);
+        }
+
+        .social-channel {
+            transition: transform .2s ease, background .2s ease;
+        }
+
+        .social-channel:hover {
+            transform: translateX(3px);
+            background: rgba(255,255,255,.06);
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #D83DC2;
+            box-shadow: 0 0 0 5px rgba(216,61,194,.12);
+            animation: livePulse 1.6s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: .6; }
+            50% { opacity: 1; box-shadow: 0 0 0 9px rgba(216,61,194,0); }
+        }
+
+        .security-node {
+            border: 1px solid #e7e6ef;
+            background: #fff;
+            transition: transform .28s ease, box-shadow .28s ease;
+        }
+
+        .security-node:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 22px 70px rgba(35, 23, 72, .09);
+        }
+
+        .security-line {
+            height: 1px;
+            background: linear-gradient(to right, rgba(96,54,225,.18), rgba(216,61,194,.28));
+            position: relative;
+        }
+
+        .security-line::after {
+            content: "";
+            position: absolute;
+            top: -3px;
+            left: 0;
+            width: 7px;
+            height: 7px;
+            border-radius: 99px;
+            background: #6036E1;
+            animation: lineTravel 2.8s linear infinite;
+        }
+
+        @keyframes lineTravel {
+            0% { left: 0; opacity: .2; }
+            12% { opacity: 1; }
+            88% { opacity: 1; }
+            100% { left: calc(100% - 7px); opacity: .2; }
+        }
+
+        .metric-pill {
+            border: 1px solid #e6e5ee;
+            background: #fff;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .metric-pill:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 50px rgba(28,20,62,.08);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: .08s; }
+        .reveal-delay-2 { transition-delay: .16s; }
+        .reveal-delay-3 { transition-delay: .24s; }
+        .reveal-delay-4 { transition-delay: .32s; }
+
+        .gradient-border {
+            position: relative;
+            border: 1px solid transparent;
+            background:
+                linear-gradient(#fff,#fff) padding-box,
+                linear-gradient(to right,#6036E1,#D83DC2) border-box;
+        }
+
+    </style>
+</head>
+
+<body class="bg-white text-gray-900 antialiased overflow-x-hidden selection:bg-[#D83DC2] selection:text-white">
+
+
+    <!-- Navigation -->
+    <nav class="max-w-7xl mx-auto px-6 py-7 flex items-center justify-between relative z-20">
+        <a href="#top" class="font-display text-2xl md:text-3xl font-black tracking-[-0.06em]">
+            F<span class="text-gradient">EE</span>D
+        </a>
+
+        <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
+            <a href="#overview" class="hover:text-gray-900 transition">Overview</a>
+            <a href="#advert" class="hover:text-gray-900 transition">Advert</a>
+            <a href="#exchange" class="hover:text-gray-900 transition">USDC Flow</a>
+            <a href="#social" class="hover:text-gray-900 transition">Social</a>
+            <a href="#security" class="hover:text-gray-900 transition">Security</a>
+            <a href="#faq" class="hover:text-gray-900 transition">FAQ</a>
+        </div>
+
+        <a href="#overview" class="bg-gradient-custom text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-violet-200/30">
+            Explore FEED
+        </a>
+    </nav>
+
+    <main id="top">
+
+        <!-- Hero -->
+        <section class="relative max-w-7xl mx-auto px-6 pt-16 md:pt-28 pb-24 md:pb-32 overflow-hidden">
+
+            <div class="relative z-10 max-w-5xl mx-auto text-center">
+                <div class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/80 px-4 py-2 shadow-sm mb-8 glass">
+                    <span class="flex h-2 w-2 rounded-full bg-[#D83DC2]"></span>
+                    <span class="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-600">
+                        Premium social + digital asset platform
+                    </span>
+                </div>
+
+                <h1 class="font-display text-5xl sm:text-6xl md:text-8xl font-black tracking-[-0.075em] leading-[0.94]">
+                    Meet the network<br>
+                    <span class="text-gradient">built around FEED.</span>
+                </h1>
+<p class="mt-8 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed" style="color: #3A76C4;">
+                    FEED is presented as a high-trust decentralized capital asset and premium web application
+                    that brings real-time social networking together with an on-chain asset experience.
+                    The platform concept combines a community layer, wallet-native access, and an exchange
+                    mechanism designed around USDC.
+                </p>
+
+                <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="#overview" class="bg-gradient-custom text-white px-8 py-4 rounded-full text-base font-semibold shadow-xl shadow-violet-200/40">
+                        Discover the architecture
+                    </a>
+                    <a href="#security" class="border border-gray-200 bg-white px-8 py-4 rounded-full text-base font-semibold text-gray-900 hover:border-gray-300 transition shadow-sm">
+                        Explore the security model
+                    </a>
+                </div>
+
+                <div class="mt-14 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto text-left">
+                    <div class="premium-card rounded-2xl p-5">
+                        <div class="section-kicker mb-2">Core pair</div>
+                        <div class="font-display font-bold text-xl">USDC + FEED</div>
+                        <p class="mt-2 text-sm text-gray-500">A platform architecture centered on a USDC trading pair.</p>
+                    </div>
+                    <div class="premium-card rounded-2xl p-5">
+                        <div class="section-kicker mb-2">Social layer</div>
+                        <div class="font-display font-bold text-xl">Chat + Live</div>
+                        <p class="mt-2 text-sm text-gray-500">Community features designed to sit alongside the asset experience.</p>
+                    </div>
+                    <div class="premium-card rounded-2xl p-5">
+                        <div class="section-kicker mb-2">Wallet layer</div>
+                        <div class="font-display font-bold text-xl">Direct control</div>
+                        <p class="mt-2 text-sm text-gray-500">The supplied concept keeps asset custody in the user's wallet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- FEED Trust Strip -->
+        <section class="trust-strip">
+            <div class="max-w-7xl mx-auto px-6 py-4 grid grid-cols-2 md:grid-cols-4">
+                <a href="#exchange" class="trust-item px-4 md:px-7 py-2 text-center">
+                    <div class="text-[10px] uppercase tracking-[0.18em] font-bold text-gray-400">Core Pair</div>
+                    <div class="mt-1 font-display font-bold">USDC + FEED</div>
+                </a>
+                <a href="#exchange" class="trust-item px-4 md:px-7 py-2 text-center">
+                    <div class="text-[10px] uppercase tracking-[0.18em] font-bold text-gray-400">Interaction</div>
+                    <div class="mt-1 font-display font-bold">Wallet Native</div>
+                </a>
+                <a href="#social" class="trust-item px-4 md:px-7 py-2 text-center">
+                    <div class="text-[10px] uppercase tracking-[0.18em] font-bold text-gray-400">Community</div>
+                    <div class="mt-1 font-display font-bold">Real-Time</div>
+                </a>
+                <a href="#security" class="trust-item px-4 md:px-7 py-2 text-center">
+                    <div class="text-[10px] uppercase tracking-[0.18em] font-bold text-gray-400">Access</div>
+                    <div class="mt-1 font-display font-bold">Token-Gated</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Embedded FEED Advert -->
+        <section id="advert" class="border-y border-gray-100 bg-white">
+            <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+                <div class="max-w-3xl">
+                    <div class="section-kicker">Live FEED Advert</div>
+                    <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                        See FEED in motion.
+                    </h2>
+                    <p class="mt-5 text-gray-500 leading-relaxed">
+                        The interactive FEED brand advert below is the supplied advert experience, embedded directly
+                        into the landing page so the product story and the visual campaign sit together.
+                    </p>
+                </div>
+
+                <div class="mt-12 overflow-hidden rounded-[32px] border border-gray-200 bg-white shadow-[0_24px_80px_rgba(23,18,43,0.08)]">
+                    <iframe
+                        title="FEED Advert"
+                        srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset=&quot;UTF-8&quot;&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+    &lt;title&gt;FEED | Social Network &amp; Digital Asset Platform&lt;/title&gt;
+    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js&quot;&gt;&lt;/script&gt;
+    &lt;style&gt;
+        @import url(&#x27;https://fonts.googleapis.com/css2?family=Archivo:wght@900&amp;family=Inter:wght@400;700;900&amp;display=swap&#x27;);
+        
+        :root {
+            --pure-white: #ffffff;
+            /* FEED visual theme */
+            --main-gradient: linear-gradient(to right, #6036E1, #D83DC2);
+            --text-main: #1e1b4b;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--pure-white);
+            overflow: hidden; font-family: &#x27;Inter&#x27;, sans-serif; 
+        }
+
+        #mainContent { position: relative; width: 100%; height: 100%; z-index: 10; }
+
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 5; }
+        
+        .app-logo-watermark {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 6; width: clamp(300px, 50vw, 600px);
+            opacity: 0.12; pointer-events: none;
+        }
+
+        .director-ui {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; pointer-events: none;
+        }
+
+        .scene-content {
+            position: absolute; text-align: center;
+            opacity: 0; transform: translateY(15px);
+            filter: blur(8px);
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            width: 90%; visibility: hidden;
+        }
+
+        .scene-content.active { opacity: 1; transform: translateY(0); filter: blur(0px); visibility: visible; }
+        .scene-content.exit { opacity: 0; transform: scale(1.05); filter: blur(15px); visibility: visible; }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 6.5rem); margin: 0;
+            background: linear-gradient(to right, #6036E1, #D83DC2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1; font-weight: 900;
+            font-family: &#x27;Archivo&#x27;, sans-serif;
+            letter-spacing: -0.05em;
+        }
+
+        .feed-wordmark {
+            font-family: &#x27;Archivo&#x27;, sans-serif;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .feed-wordmark .feed-black {
+            color: #000;
+            -webkit-text-fill-color: #000;
+        }
+
+        .feed-wordmark .feed-ee {
+            background: linear-gradient(to right, #6036E1, #D83DC2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+p { 
+            font-size: clamp(0.9rem, 2vw, 1.3rem); color: var(--text-main); 
+            margin-top: 15px; font-weight: 700; letter-spacing: 0.4em; 
+            text-transform: uppercase;
+        }
+
+        /* --- Finale Animation Styles --- */
+        #finaleStage {
+            position: absolute; inset: 0;
+            z-index: 2000; background: var(--pure-white);
+            display: none; justify-content: center; align-items: center;
+            perspective: 2000px;
+        }
+
+        .intro-frame {
+            position: relative; display: flex; justify-content: center; align-items: center;
+        }
+
+        .intro-svg { width: min(900px, 92vw); height: 300px; overflow: visible; }
+
+        .final-feed-text {
+            font-size: 110px;
+            font-weight: 900;
+            font-family: &#x27;Archivo&#x27;, sans-serif;
+        }
+
+.sub-url-path {
+            font-size: 28px; font-weight: 700;
+            fill: #7c3aed;
+            letter-spacing: 0.3em;
+            opacity: 0;
+        }
+
+        .logo-final-container {
+            position: absolute; width: 350px; height: 350px;
+            opacity: 0; transform: scale(0.8);
+            display: flex; justify-content: center; align-items: center;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+    &lt;div id=&quot;mainContent&quot;&gt;
+        &lt;img src=&quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&quot; class=&quot;app-logo-watermark&quot; alt=&quot;FEED Logo&quot;&gt;
+        &lt;div class=&quot;director-ui&quot;&gt;
+            &lt;div class=&quot;scene-content active&quot;&gt;&lt;h1 class=&quot;feed-wordmark&quot;&gt;&lt;span class=&quot;feed-black&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;feed-ee&quot;&gt;EE&lt;/span&gt;&lt;span class=&quot;feed-black&quot;&gt;D&lt;/span&gt;&lt;/h1&gt;&lt;p&gt;Social Network &amp;amp; Digital Asset&lt;/p&gt;&lt;/div&gt;
+            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;USDC Paired.&lt;/h1&gt;&lt;p&gt;Designed for Direct Trading&lt;/p&gt;&lt;/div&gt;
+            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;Live Community.&lt;/h1&gt;&lt;p&gt;Chat, Streams &amp;amp; Networking&lt;/p&gt;&lt;/div&gt;
+            &lt;div class=&quot;scene-content&quot;&gt;&lt;h1&gt;FEED Access.&lt;/h1&gt;&lt;p&gt;Explore the Platform&lt;/p&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;canvas id=&quot;canvas&quot;&gt;&lt;/canvas&gt;
+    &lt;/div&gt;
+
+    &lt;div id=&quot;finaleStage&quot;&gt;
+        &lt;div class=&quot;intro-frame&quot; id=&quot;introFrame&quot;&gt;
+            &lt;svg class=&quot;intro-svg&quot; viewBox=&quot;0 0 900 250&quot;&gt;
+                &lt;defs&gt;
+                    &lt;linearGradient id=&quot;svgGrad&quot; x1=&quot;0%&quot; y1=&quot;0%&quot; x2=&quot;100%&quot; y2=&quot;0%&quot;&gt;
+                        &lt;stop offset=&quot;0%&quot; style=&quot;stop-color:#6036E1;stop-opacity:1&quot; /&gt;
+                        &lt;stop offset=&quot;100%&quot; style=&quot;stop-color:#D83DC2;stop-opacity:1&quot; /&gt;
+                    &lt;/linearGradient&gt;
+                &lt;/defs&gt;
+                &lt;text x=&quot;50%&quot; y=&quot;45%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot;
+                      class=&quot;final-feed-text&quot; id=&quot;feedFinalText&quot;
+                      clip-path=&quot;inset(100% 0% 0% 0%)&quot;&gt;
+                    &lt;tspan fill=&quot;#000&quot;&gt;F&lt;/tspan&gt;&lt;tspan fill=&quot;url(#svgGrad)&quot;&gt;EE&lt;/tspan&gt;&lt;tspan fill=&quot;#000&quot;&gt;D&lt;/tspan&gt;
+                &lt;/text&gt;
+                &lt;text x=&quot;50%&quot; y=&quot;85%&quot; text-anchor=&quot;middle&quot; class=&quot;sub-url-path&quot; id=&quot;urlLayer&quot;&gt;SOCIAL • CHAT • ASSET ACCESS&lt;/text&gt;
+            &lt;/svg&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;logo-final-container&quot; id=&quot;logoFinal&quot;&gt;
+            &lt;img src=&quot;https://i.postimg.cc/VvQmc5M4/Gemini-Generated-Image-lngq6slngq6slngq.png&quot; style=&quot;width:100%&quot; alt=&quot;FEED Logo&quot;&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        const canvas = document.getElementById(&#x27;canvas&#x27;);
+        const ctx = canvas.getContext(&#x27;2d&#x27;);
+        const scenes = document.querySelectorAll(&#x27;.scene-content&#x27;);
+        let width, height, currentScene = 0, frame = 0, loopActive = true;
+        
+        const SPEED = 14; 
+        const SCENE_DURATION = 140; 
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener(&#x27;resize&#x27;, resize);
+        resize();
+
+        class Particle {
+            constructor(preWarm = false) { this.reset(preWarm); }
+            reset(preWarm = false) {
+                this.x = (Math.random() - 0.5) * 4500;
+                this.y = (Math.random() - 0.5) * 4500;
+                this.z = preWarm ? Math.random() * 2000 : 2000;
+                this.pz = this.z;
+                this.size = Math.random() * 1.5 + 1;
+                // Particles match the purple/indigo theme
+                this.color = Math.random() &gt; 0.5 ? &#x27;#6366f1&#x27; : &#x27;#a855f7&#x27;;
+            }
+            update() {
+                this.pz = this.z;
+                this.z -= SPEED; 
+                if (this.z &lt; 1) this.reset();
+            }
+            draw() {
+                const s = 800 / this.z;
+                const ps = 800 / this.pz;
+                const x = this.x * s + width/2;
+                const y = this.y * s + height/2;
+                const px = this.x * ps + width/2;
+                const py = this.y * ps + height/2;
+                ctx.globalAlpha = Math.min(0.4, (1600 - this.z) / 1000);
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.size * s;
+                ctx.lineCap = &#x27;round&#x27;;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(px, py);
+                ctx.stroke();
+            }
+        }
+
+        const particles = Array.from({length: 600}, () =&gt; new Particle(true));
+
+        let finaleTimeline = null;
+        let animationFrameId = null;
+        let sceneTimeouts = [];
+
+        function clearSceneTimeouts() {
+            sceneTimeouts.forEach(id =&gt; clearTimeout(id));
+            sceneTimeouts = [];
+        }
+
+        function resetToStart() {
+            clearSceneTimeouts();
+
+            if (finaleTimeline) {
+                finaleTimeline.kill();
+                finaleTimeline = null;
+            }
+
+            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
+            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
+
+            // Reset finale immediately, with no fade-out frame that can stall the loop.
+            gsap.set(finaleStage, { display: &#x27;none&#x27;, opacity: 1 });
+            gsap.set(mainContent, { display: &#x27;block&#x27;, opacity: 1 });
+
+            gsap.set(&quot;#feedFinalText&quot;, { clipPath: &quot;inset(100% 0% 0% 0%)&quot;, opacity: 1 });
+            gsap.set(&quot;#urlLayer&quot;, { opacity: 0, y: 0 });
+            gsap.set(&quot;#introFrame&quot;, { scale: 1, x: 0, opacity: 1 });
+            gsap.set(&quot;#logoFinal&quot;, { opacity: 0, scale: 0.8 });
+
+            currentScene = 0;
+            frame = 0;
+            loopActive = true;
+
+            scenes.forEach(s =&gt; s.classList.remove(&#x27;active&#x27;, &#x27;exit&#x27;));
+            scenes[0].classList.add(&#x27;active&#x27;);
+
+            // Restart the animation loop on the next browser paint.
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function runFinale() {
+            const mainContent = document.getElementById(&#x27;mainContent&#x27;);
+            const finaleStage = document.getElementById(&#x27;finaleStage&#x27;);
+
+            gsap.to(mainContent, {
+                opacity: 0,
+                duration: 0.45,
+                ease: &quot;power1.out&quot;,
+                onComplete: () =&gt; {
+                    mainContent.style.display = &#x27;none&#x27;;
+                    finaleStage.style.display = &#x27;flex&#x27;;
+                    finaleStage.style.opacity = &#x27;1&#x27;;
+                    startGSAPFinale();
+                }
+            });
+        }
+
+        function startGSAPFinale() {
+            finaleTimeline = gsap.timeline({
+                onComplete: () =&gt; {
+                    resetToStart();
+                }
+            });
+
+            finaleTimeline
+                .to(&quot;#feedFinalText&quot;, {
+                    clipPath: &quot;inset(0% 0% 0% 0%)&quot;,
+                    duration: 1.05,
+                    ease: &quot;power3.out&quot;
+                })
+                .to(&quot;#urlLayer&quot;, {
+                    opacity: 1,
+                    y: -10,
+                    duration: 0.55,
+                    ease: &quot;power2.out&quot;
+                }, &quot;-=0.15&quot;)
+                .to({}, { duration: 1.0 })
+                .to(&quot;#introFrame&quot;, {
+                    scale: 24,
+                    x: &quot;10%&quot;,
+                    opacity: 0,
+                    duration: 1.1,
+                    ease: &quot;expo.in&quot;
+                })
+                .to(&quot;#logoFinal&quot;, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.75,
+                    ease: &quot;power2.out&quot;
+                }, &quot;-=0.85&quot;)
+                .to({}, { duration: 1.25 });
+        }
+
+        function animate() {
+            if (!loopActive) return;
+
+            frame++;
+
+            if (frame &gt;= SCENE_DURATION) {
+                frame = 0;
+
+                if (currentScene === scenes.length - 1) {
+                    loopActive = false;
+                    runFinale();
+                    return;
+                }
+
+                const previousScene = currentScene;
+                scenes[previousScene].classList.remove(&#x27;active&#x27;);
+                scenes[previousScene].classList.add(&#x27;exit&#x27;);
+
+                sceneTimeouts.push(setTimeout(() =&gt; {
+                    if (scenes[previousScene]) {
+                        scenes[previousScene].classList.remove(&#x27;exit&#x27;);
+                    }
+                }, 800));
+
+                currentScene++;
+                scenes[currentScene].classList.add(&#x27;active&#x27;);
+            }
+
+            ctx.fillStyle = &#x27;rgba(255, 255, 255, 0.72)&#x27;;
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach(p =&gt; {
+                p.update();
+                p.draw();
+            });
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // One clean startup; subsequent runs are restarted by resetToStart().
+        resetToStart();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;"
+                        loading="lazy"
+                        class="w-full border-0"
+                        style="height: min(760px, 78vh); min-height: 620px; display:block;"
+                        allow="autoplay">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- What is FEED -->
+        <section id="overview" class="bg-[#fafaff] border-y border-gray-100">
+            <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+                <div class="max-w-3xl">
+                    <div class="section-kicker">01 / What is FEED?</div>
+                    <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                        An asset layer with a <span class="text-gradient">social identity.</span>
+                    </h2>
+                    <p class="mt-6 text-lg  leading-relaxed" style="color: #3A76C4;">
+                        The supplied FEED description positions the product as more than a token held in a wallet.
+                        It describes a standalone premium application where digital asset access, social interaction,
+                        real-time chat, creator content, and community membership are designed as parts of one experience.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid lg:grid-cols-2 gap-6">
+                    <article class="premium-card rounded-3xl p-8 md:p-10">
+                        <span class="number-chip">01</span>
+                        <h3 class="font-display text-2xl md:text-3xl font-bold mt-7">The asset side</h3>
+                        <p class="mt-4 text-gray-500 leading-relaxed">
+                            In the supplied model, FEED is paired with USDC and is intended to be traded through
+                            a wallet-native interface. The emphasis is on direct interaction with an automated
+                            ledger rather than a conventional custodial account.
+                        </p>
+                        <div class="mt-7 grid grid-cols-2 gap-4">
+                            <div class="metric">
+                                <div class="text-sm font-semibold">USDC pair</div>
+                                <div class="text-xs text-gray-500 mt-1">Primary exchange mechanism</div>
+                            </div>
+                            <div class="metric">
+                                <div class="text-sm font-semibold">Wallet-native</div>
+                                <div class="text-xs text-gray-500 mt-1">User-held wallet model</div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="premium-card rounded-3xl p-8 md:p-10">
+                        <span class="number-chip">02</span>
+                        <h3 class="font-display text-2xl md:text-3xl font-bold mt-7">The social side</h3>
+                        <p class="mt-4 text-gray-500 leading-relaxed">
+                            FEED is also described as a social dashboard. Profiles, group chat, live streams,
+                            premium data boards, token-gated communities, and peer-to-peer tipping are framed as
+                            native product features rather than separate destinations.
+                        </p>
+                        <div class="mt-7 grid grid-cols-2 gap-4">
+                            <div class="metric">
+                                <div class="text-sm font-semibold">Global chat</div>
+                                <div class="text-xs text-gray-500 mt-1">Real-time community channels</div>
+                            </div>
+                            <div class="metric">
+                                <div class="text-sm font-semibold">Token-gated</div>
+                                <div class="text-xs text-gray-500 mt-1">Premium access model</div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- FEED Architecture -->
+        <section id="architecture" class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="max-w-4xl reveal">
+                <div class="section-kicker">02 / FEED Architecture</div>
+                <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                    One ecosystem. <span class="text-gradient">Five connected layers.</span>
+                </h2>
+                <p class="mt-6 text-lg leading-relaxed" style="color:#3A76C4;">
+                    The FEED concept becomes easier to understand when its moving parts are seen as one connected system:
+                    capital, wallet control, application access, community participation, and premium membership.
+                </p>
+            </div>
+
+            <div class="mt-14 grid md:grid-cols-5 gap-4 items-stretch">
+                <div class="architecture-card rounded-3xl p-6 reveal">
+                    <div class="text-gradient font-display text-4xl font-black">01</div>
+                    <div class="mt-6 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Capital</div>
+                    <h3 class="font-display text-xl font-bold mt-2">USDC</h3>
+                    <p class="mt-3 text-sm text-gray-500 leading-relaxed">The described base exchange asset for entering and exiting the FEED market.</p>
+                    <div class="flow-connector hidden md:block"><span class="flow-dot"></span></div>
+                </div>
+
+                <div class="architecture-card rounded-3xl p-6 reveal reveal-delay-1">
+                    <div class="text-gradient font-display text-4xl font-black">02</div>
+                    <div class="mt-6 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Asset</div>
+                    <h3 class="font-display text-xl font-bold mt-2">FEED</h3>
+                    <p class="mt-3 text-sm text-gray-500 leading-relaxed">The token layer described as both an asset and a participation key.</p>
+                    <div class="flow-connector hidden md:block"><span class="flow-dot"></span></div>
+                </div>
+
+                <div class="architecture-card rounded-3xl p-6 reveal reveal-delay-2">
+                    <div class="text-gradient font-display text-4xl font-black">03</div>
+                    <div class="mt-6 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Identity</div>
+                    <h3 class="font-display text-xl font-bold mt-2">Wallet</h3>
+                    <p class="mt-3 text-sm text-gray-500 leading-relaxed">The supplied model keeps the user's wallet central to asset ownership and transactions.</p>
+                    <div class="flow-connector hidden md:block"><span class="flow-dot"></span></div>
+                </div>
+
+                <div class="architecture-card rounded-3xl p-6 reveal reveal-delay-3">
+                    <div class="text-gradient font-display text-4xl font-black">04</div>
+                    <div class="mt-6 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Experience</div>
+                    <h3 class="font-display text-xl font-bold mt-2">Platform</h3>
+                    <p class="mt-3 text-sm text-gray-500 leading-relaxed">Profiles, live channels, streams, data boards, and the broader FEED application.</p>
+                    <div class="flow-connector hidden md:block"><span class="flow-dot"></span></div>
+                </div>
+
+                <div class="architecture-card rounded-3xl p-6 reveal reveal-delay-4">
+                    <div class="text-gradient font-display text-4xl font-black">05</div>
+                    <div class="mt-6 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Membership</div>
+                    <h3 class="font-display text-xl font-bold mt-2">Access</h3>
+                    <p class="mt-3 text-sm text-gray-500 leading-relaxed">Token holdings are described as the gate for selected premium experiences.</p>
+                </div>
+            </div>
+
+            <div class="mt-12 rounded-[30px] gradient-border reveal">
+                <div class="rounded-[30px] p-7 md:p-9">
+                    <div class="grid md:grid-cols-5 items-center gap-5 text-center md:text-left">
+                        <div class="md:col-span-2">
+                            <div class="text-xs uppercase tracking-[0.18em] font-bold text-gray-400">System relationship</div>
+                            <div class="font-display text-2xl font-bold mt-2">USDC → FEED → Wallet → Platform → Community</div>
+                        </div>
+                        <div class="md:col-span-3 text-sm leading-relaxed" style="color:#3A76C4;">
+                            Every layer reinforces the next: the exchange gives the asset context, the wallet provides ownership,
+                            the application provides utility, and the community provides an environment for participation.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- USDC exchange mechanism -->
+        <section id="exchange" class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="grid lg:grid-cols-[0.85fr_1.15fr] gap-16 items-start">
+                <div class="lg:sticky lg:top-24">
+                    <div class="section-kicker">02 / USDC Exchange Mechanism</div>
+                    <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                        Designed to feel as simple as a <span class="text-gradient">vending machine.</span>
+                    </h2>
+                    <p class="mt-6 text-gray-500 leading-relaxed">
+                        In the supplied concept, the exchange path is deliberately direct:
+                        a user connects a supported digital wallet, uses USDC, and interacts with the
+                        FEED market through automated on-chain logic.
+                    </p>
+
+                    <div class="mt-8 rounded-3xl p-7 bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-white shadow-sm">
+                        <div class="text-xs uppercase tracking-[0.18em] font-bold text-gray-500">Important distinction</div>
+                        <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                            The architecture described here is product copy supplied for the page. Actual reserve,
+                            liquidity, contract, custody, and governance claims should be verified against live
+                            on-chain data and the project's published contracts before being treated as facts.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative pl-2 md:pl-8">
+                    <div class="absolute left-[20px] top-6 bottom-12 w-px bg-gradient-to-b from-[#6036E1]/30 via-[#D83DC2]/20 to-transparent"></div>
+
+                    <div class="relative flex gap-5 pb-14">
+                        <div class="number-chip shrink-0 bg-violet-50 z-10">1</div>
+                        <div>
+                            <div class="section-kicker">Connect</div>
+                            <h3 class="font-display text-2xl font-bold mt-2">Open the FEED interface</h3>
+                            <p class="mt-3 text-gray-500 leading-relaxed">
+                                The supplied flow starts with a supported Web3 wallet such as MetaMask or Trust Wallet.
+                                The wallet remains the user's identity and transaction endpoint in the described model.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative flex gap-5 pb-14">
+                        <div class="number-chip shrink-0 bg-violet-50 z-10">2</div>
+                        <div>
+                            <div class="section-kicker">Swap</div>
+                            <h3 class="font-display text-2xl font-bold mt-2">Exchange USDC for FEED</h3>
+                            <p class="mt-3 text-gray-500 leading-relaxed">
+                                FEED is described as being paired exclusively with USDC. The intended experience is
+                                a direct wallet transaction rather than sending funds into a traditional custodial balance.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative flex gap-5 pb-14">
+                        <div class="number-chip shrink-0 bg-violet-50 z-10">3</div>
+                        <div>
+                            <div class="section-kicker">Participate</div>
+                            <h3 class="font-display text-2xl font-bold mt-2">Use FEED inside the ecosystem</h3>
+                            <p class="mt-3 text-gray-500 leading-relaxed">
+                                The product description connects token ownership with access to premium social
+                                spaces, community features, creator content, and a peer-to-peer tipping economy.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative flex gap-5">
+                        <div class="number-chip shrink-0 bg-violet-50 z-10">4</div>
+                        <div>
+                            <div class="section-kicker">Exit</div>
+                            <h3 class="font-display text-2xl font-bold mt-2">Reverse the path</h3>
+                            <p class="mt-3 text-gray-500 leading-relaxed">
+                                In the supplied description, users can perform the reverse swap to move from FEED
+                                back into USDC in their connected wallet. The actual execution, slippage, liquidity,
+                                fees, and settlement conditions depend on the deployed contracts and market state.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Why FEED -->
+        <section class="bg-[#fafaff] border-y border-gray-100">
+            <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+                <div class="max-w-4xl reveal">
+                    <div class="section-kicker">03 / Why FEED?</div>
+                    <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                        Move from isolated assets to a <span class="text-gradient">participation network.</span>
+                    </h2>
+                    <p class="mt-6 text-lg leading-relaxed" style="color:#3A76C4;">
+                        The supplied product idea is differentiated by putting the asset experience and the community experience
+                        in the same environment rather than treating them as unrelated products.
+                    </p>
+                </div>
+
+                <div class="mt-14 overflow-hidden rounded-[30px] border border-gray-200 bg-white shadow-[0_20px_70px_rgba(26,19,51,.06)] compare-table reveal">
+                    <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[1fr_1fr_1fr] border-b border-gray-100">
+                        <div class="hidden md:block px-7 py-5 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Dimension</div>
+                        <div class="px-7 py-5 text-xs uppercase tracking-[0.16em] font-bold text-gray-400 border-l border-gray-100">Traditional model</div>
+                        <div class="px-7 py-5 text-xs uppercase tracking-[0.16em] font-bold text-gray-400 border-l border-gray-100">FEED concept</div>
+                    </div>
+
+                    <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[1fr_1fr_1fr] border-b border-gray-100">
+                        <div class="hidden md:block px-7 py-6 font-semibold">Asset experience</div>
+                        <div class="px-7 py-6 text-sm text-gray-500 md:border-l border-gray-100">Separate from community</div>
+                        <div class="px-7 py-6 text-sm font-semibold border-l border-gray-100">Integrated with community</div>
+                    </div>
+                    <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[1fr_1fr_1fr] border-b border-gray-100">
+                        <div class="hidden md:block px-7 py-6 font-semibold">Identity</div>
+                        <div class="px-7 py-6 text-sm text-gray-500 md:border-l border-gray-100">Platform account first</div>
+                        <div class="px-7 py-6 text-sm font-semibold border-l border-gray-100">Wallet-centric model</div>
+                    </div>
+                    <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[1fr_1fr_1fr] border-b border-gray-100">
+                        <div class="hidden md:block px-7 py-6 font-semibold">Community</div>
+                        <div class="px-7 py-6 text-sm text-gray-500 md:border-l border-gray-100">External destination</div>
+                        <div class="px-7 py-6 text-sm font-semibold border-l border-gray-100">Native FEED layer</div>
+                    </div>
+                    <div class="grid grid-cols-[1fr_1fr] md:grid-cols-[1fr_1fr_1fr]">
+                        <div class="hidden md:block px-7 py-6 font-semibold">Premium access</div>
+                        <div class="px-7 py-6 text-sm text-gray-500 md:border-l border-gray-100">Subscription / account based</div>
+                        <div class="px-7 py-6 text-sm font-semibold border-l border-gray-100">Token-gated experiences</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social dashboard -->
+        <section id="social" class="bg-[#0c0b12] text-white soft-grid">
+            <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+                <div class="max-w-4xl">
+                    <div class="section-kicker text-white/50">03 / Social Dashboard</div>
+                    <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                        FEED is built to be <span class="text-gradient">used, not just held.</span>
+                    </h2>
+                    <p class="mt-6 text-lg leading-relaxed text-white/60" style="color: #3A76C4;">
+                        The social layer in the supplied concept turns wallet ownership into a way to participate
+                        in a live digital community. It combines identity, conversation, content, and token-based access.
+                    </p>
+                </div>
+
+                <div class="mt-16 grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-7 hover:bg-white/[0.07] transition">
+                        <div class="text-gradient font-display text-3xl font-black">01</div>
+                        <h3 class="font-display text-xl font-bold mt-6">Google-authenticated profiles</h3>
+                        <p class="mt-3 text-sm leading-relaxed text-white/50">
+                            The supplied model links a conventional Google sign-in experience to a Web3 wallet identity.
+                        </p>
+                    </div>
+
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-7 hover:bg-white/[0.07] transition">
+                        <div class="text-gradient font-display text-3xl font-black">02</div>
+                        <h3 class="font-display text-xl font-bold mt-6">Real-time global chat</h3>
+                        <p class="mt-3 text-sm leading-relaxed text-white/50">
+                            Live text channels create a place for holders and community members to communicate in real time.
+                        </p>
+                    </div>
+
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-7 hover:bg-white/[0.07] transition">
+                        <div class="text-gradient font-display text-3xl font-black">03</div>
+                        <h3 class="font-display text-xl font-bold mt-6">Token-gated communities</h3>
+                        <p class="mt-3 text-sm leading-relaxed text-white/50">
+                            Premium rooms, data boards, and creator live streams are described as unlockable through FEED holdings.
+                        </p>
+                    </div>
+
+                    <div class="rounded-3xl border border-white/10 bg-white/5 p-7 hover:bg-white/[0.07] transition">
+                        <div class="text-gradient font-display text-3xl font-black">04</div>
+                        <h3 class="font-display text-xl font-bold mt-6">Peer-to-peer tipping</h3>
+                        <p class="mt-3 text-sm leading-relaxed text-white/50">
+                            Community members can reward useful insights or entertaining content directly inside the network.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-16 rounded-[32px] border border-white/10 bg-white/[0.04] p-6 md:p-10">
+                    <div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-10 items-center">
+                        <div>
+                            <div class="section-kicker text-white/50">A unified dashboard</div>
+                            <h3 class="font-display text-3xl md:text-4xl font-bold mt-4">
+                                One identity across wallet, community, and content.
+                            </h3>
+                            <p class="mt-4 text-white/55 leading-relaxed">
+                                The product story is intentionally cohesive: the wallet controls the asset layer,
+                                while the application controls the social experience around it. That creates a single
+                                destination for communication, access, and community discovery.
+                            </p>
+                        </div>
+
+                        <div class="gradient-orbit rounded-[28px] bg-[#101018] p-6">
+                            <div class="flex items-center justify-between pb-5 border-b border-white/10">
+                                <div>
+                                    <div class="text-xs uppercase tracking-[0.18em] text-white/40">FEED Dashboard</div>
+                                    <div class="font-display text-lg font-bold mt-1">Community / Markets / Live</div>
+                                </div>
+                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-[#6036E1] to-[#D83DC2]"></div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3 py-5">
+                                <div class="rounded-2xl bg-white/5 p-3"><div class="text-[10px] text-white/30 uppercase">Chats</div><div class="font-bold mt-1">Live</div></div>
+                                <div class="rounded-2xl bg-white/5 p-3"><div class="text-[10px] text-white/30 uppercase">Access</div><div class="font-bold mt-1">Token</div></div>
+                                <div class="rounded-2xl bg-white/5 p-3"><div class="text-[10px] text-white/30 uppercase">Asset</div><div class="font-bold mt-1">FEED</div></div>
+                            </div>
+                            <div class="rounded-2xl bg-gradient-to-r from-[#6036E1]/20 to-[#D83DC2]/20 border border-white/10 p-4">
+                                <div class="text-xs text-white/40">Community signal</div>
+                                <div class="font-display text-2xl font-bold mt-1">Connect. Discover. Participate.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security -->
+        <section id="security" class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="max-w-4xl">
+                <div class="section-kicker">04 / Security &amp; Fraud Prevention</div>
+                <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                    The security story is part of the <span class="text-gradient">product story.</span>
+                </h2>
+                <p class="mt-6 text-lg  leading-relaxed" style="color: #3A76C4;">
+                    The supplied FEED description highlights three architectural ideas: permanent rules,
+                    locked liquidity, and direct wallet-based transactions. These are presented below as the
+                    project's stated design goals—not as independently verified guarantees.
+                </p>
+            </div>
+
+            <div class="mt-14 grid lg:grid-cols-3 gap-6">
+                <article class="premium-card rounded-3xl p-8">
+                    <div class="text-gradient font-display text-4xl font-black">01</div>
+                    <h3 class="font-display text-2xl font-bold mt-6">Renounced ownership</h3>
+                    <p class="mt-3 text-gray-500 leading-relaxed">
+                        The supplied copy says administrative control is permanently removed at launch so the original
+                        developer cannot later alter balances, freeze funds, or expand supply.
+                    </p>
+                    <div class="mt-7 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">
+                        Verify on-chain before relying on this claim
+                    </div>
+                </article>
+
+                <article class="premium-card rounded-3xl p-8">
+                    <div class="text-gradient font-display text-4xl font-black">02</div>
+                    <h3 class="font-display text-2xl font-bold mt-6">Locked liquidity</h3>
+                    <p class="mt-3 text-gray-500 leading-relaxed">
+                        The description states that the USDC trading pool is intended to sit inside a time-locked
+                        smart-contract vault, reducing the project's ability to remove liquidity.
+                    </p>
+                    <div class="mt-7 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">
+                        Verify the actual lock contract and expiry
+                    </div>
+                </article>
+
+                <article class="premium-card rounded-3xl p-8">
+                    <div class="text-gradient font-display text-4xl font-black">03</div>
+                    <h3 class="font-display text-2xl font-bold mt-6">Direct wallet settlement</h3>
+                    <p class="mt-3 text-gray-500 leading-relaxed">
+                        The supplied model describes transactions as peer-to-peer on-chain interactions, keeping
+                        funds in the user's wallet until they intentionally initiate a transaction.
+                    </p>
+                    <div class="mt-7 text-xs uppercase tracking-[0.16em] font-bold text-gray-400">
+                        Verify deployed contracts and permissions
+                    </div>
+                </article>
+            </div>
+
+            <div class="mt-10 rounded-3xl border border-amber-200 bg-amber-50 p-7 md:p-8">
+                <div class="text-xs uppercase tracking-[0.16em] font-bold text-amber-700">Verification note</div>
+                <p class="mt-3 text-sm leading-relaxed text-amber-900/80">
+                    Terms such as “rug-pull proof,” “guaranteed withdrawals,” and “zero-counterparty risk”
+                    describe intended properties in the supplied copy. They should not be presented as established
+                    guarantees unless the deployed contracts, permissions, liquidity locks, reserves, and audits
+                    substantiate them.
+                </p>
+            </div>
+        </section>
+
+
+        <!-- Social Network Showcase -->
+        <section class="bg-[#0c0b12] text-white">
+            <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+                <div class="grid lg:grid-cols-[0.82fr_1.18fr] gap-14 items-center">
+                    <div class="reveal">
+                        <div class="section-kicker text-white/40">05 / Community Showcase</div>
+                        <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                            A live network built around <span class="text-gradient">participation.</span>
+                        </h2>
+                        <p class="mt-6 text-lg leading-relaxed text-white/55">
+                            The supplied FEED concept is deliberately social: real-time chat, global channels, creator streams,
+                            premium rooms, and tipping are designed to make the asset layer active rather than static.
+                        </p>
+                        <div class="mt-8 flex flex-wrap gap-3">
+                            <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/60">Global chat</span>
+                            <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/60">Creator Live</span>
+                            <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/60">VIP rooms</span>
+                            <span class="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-white/60">Peer tipping</span>
+                        </div>
+                    </div>
+
+                    <div class="social-window rounded-[32px] overflow-hidden reveal reveal-delay-2">
+                        <div class="px-6 py-5 border-b border-white/10 flex items-center justify-between">
+                            <div>
+                                <div class="text-[10px] uppercase tracking-[0.18em] text-white/35">FEED Community</div>
+                                <div class="font-display text-xl font-bold mt-1">Global Network</div>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs text-white/50"><span class="live-dot"></span> 2,401 online</div>
+                        </div>
+
+                        <div class="grid md:grid-cols-[180px_1fr]">
+                            <div class="border-r border-white/10 p-4 space-y-2">
+                                <div class="text-[10px] uppercase tracking-[0.18em] text-white/30 px-3 pb-2">Channels</div>
+                                <div class="social-channel rounded-xl bg-white/7 px-3 py-2 text-sm"># General</div>
+                                <div class="social-channel rounded-xl px-3 py-2 text-sm text-white/55"># Markets</div>
+                                <div class="social-channel rounded-xl px-3 py-2 text-sm text-white/55"># Creators</div>
+                                <div class="social-channel rounded-xl px-3 py-2 text-sm text-white/55"># VIP Network</div>
+
+                                <div class="pt-5 text-[10px] uppercase tracking-[0.18em] text-white/30 px-3">Access</div>
+                                <div class="rounded-xl bg-gradient-to-r from-[#6036E1]/15 to-[#D83DC2]/15 border border-white/10 px-3 py-3 text-xs text-white/55">
+                                    FEED balance detected
+                                </div>
+                            </div>
+
+                            <div class="p-5 md:p-7">
+                                <div class="flex gap-4">
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-[#6036E1] to-[#D83DC2] shrink-0"></div>
+                                    <div>
+                                        <div class="text-sm font-semibold">@community_member <span class="text-white/25 ml-2">just now</span></div>
+                                        <p class="mt-2 text-sm leading-relaxed text-white/55">
+                                            Watching the new FEED market update. The combination of live community
+                                            and wallet-native access is the interesting part.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 rounded-2xl border border-white/10 bg-white/[0.025] p-5">
+                                    <div class="flex items-center gap-2 text-xs text-white/40">
+                                        <span class="live-dot"></span> LIVE CREATOR SESSION
+                                    </div>
+                                    <div class="font-display text-lg font-bold mt-2">Community Intelligence — 127 watching</div>
+                                    <div class="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
+                                        <div class="h-full w-[72%] bg-gradient-to-r from-[#6036E1] to-[#D83DC2]"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 grid grid-cols-2 gap-3">
+                                    <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+                                        <div class="text-[10px] uppercase tracking-[0.18em] text-white/30">Premium room</div>
+                                        <div class="font-semibold mt-2">Unlocked</div>
+                                    </div>
+                                    <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+                                        <div class="text-[10px] uppercase tracking-[0.18em] text-white/30">Tipping</div>
+                                        <div class="font-semibold mt-2">FEED enabled</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience map -->
+        <section class="bg-[#fafaff] border-y border-gray-100">
+            <div class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <div class="section-kicker">05 / Product Experience</div>
+                        <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                            From first login to <span class="text-gradient">full participation.</span>
+                        </h2>
+                        <p class="mt-6  leading-relaxed" style="color: #3A76C4;">
+                            The broader FEED concept can be understood as a sequence: identity first, wallet second,
+                            community third, and premium access as the network becomes more valuable to participate in.
+                        </p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="premium-card rounded-2xl p-6 flex gap-5">
+                            <div class="number-chip shrink-0">01</div>
+                            <div><div class="font-semibold">Create your profile</div><p class="text-sm text-gray-500 mt-1">Use the described Google-authenticated experience to establish your application identity.</p></div>
+                        </div>
+                        <div class="premium-card rounded-2xl p-6 flex gap-5">
+                            <div class="number-chip shrink-0">02</div>
+                            <div><div class="font-semibold">Connect your wallet</div><p class="text-sm text-gray-500 mt-1">Link the wallet you intend to use for the on-chain asset layer.</p></div>
+                        </div>
+                        <div class="premium-card rounded-2xl p-6 flex gap-5">
+                            <div class="number-chip shrink-0">03</div>
+                            <div><div class="font-semibold">Enter the community</div><p class="text-sm text-gray-500 mt-1">Join live channels, discover people, explore creator content, and participate in the social layer.</p></div>
+                        </div>
+                        <div class="premium-card rounded-2xl p-6 flex gap-5">
+                            <div class="number-chip shrink-0">04</div>
+                            <div><div class="font-semibold">Unlock premium access</div><p class="text-sm text-gray-500 mt-1">The supplied model uses FEED holdings as the gate for higher-tier spaces and features.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Security Architecture Visualization -->
+        <section class="max-w-7xl mx-auto px-6 py-24 md:py-32">
+            <div class="max-w-4xl reveal">
+                <div class="section-kicker">07 / Security Architecture</div>
+                <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                    Security as a <span class="text-gradient">connected system.</span>
+                </h2>
+                <p class="mt-6 text-lg leading-relaxed" style="color:#3A76C4;">
+                    Rather than presenting security as a list of slogans, this visual model connects the controls
+                    the supplied FEED description says should protect the user experience.
+                </p>
+            </div>
+
+            <div class="mt-14 grid lg:grid-cols-5 gap-4 items-center reveal">
+                <div class="security-node rounded-3xl p-6 text-center">
+                    <div class="number-chip mx-auto">01</div>
+                    <div class="font-display text-lg font-bold mt-4">Ownership</div>
+                    <p class="text-xs text-gray-500 mt-2">Permanent rules</p>
+                </div>
+                <div class="security-line hidden lg:block"></div>
+                <div class="security-node rounded-3xl p-6 text-center">
+                    <div class="number-chip mx-auto">02</div>
+                    <div class="font-display text-lg font-bold mt-4">Liquidity</div>
+                    <p class="text-xs text-gray-500 mt-2">Lock structure</p>
+                </div>
+                <div class="security-line hidden lg:block"></div>
+                <div class="security-node rounded-3xl p-6 text-center">
+                    <div class="number-chip mx-auto">03</div>
+                    <div class="font-display text-lg font-bold mt-4">Execution</div>
+                    <p class="text-xs text-gray-500 mt-2">On-chain settlement</p>
+                </div>
+            </div>
+
+            <div class="mt-10 grid md:grid-cols-2 gap-5 reveal reveal-delay-1">
+                <div class="premium-card rounded-3xl p-7">
+                    <div class="text-xs uppercase tracking-[0.16em] font-bold text-gray-400">What to verify</div>
+                    <ul class="mt-5 space-y-3 text-sm text-gray-500 leading-relaxed">
+                        <li>• Administrative ownership and permissions on the deployed contracts</li>
+                        <li>• Liquidity lock contract, lock duration, and withdrawal authority</li>
+                        <li>• Token supply and minting permissions</li>
+                        <li>• Actual transaction routing, fees, and slippage behavior</li>
+                    </ul>
+                </div>
+                <div class="premium-card rounded-3xl p-7">
+                    <div class="text-xs uppercase tracking-[0.16em] font-bold text-gray-400">Why it matters</div>
+                    <p class="mt-5 text-sm text-gray-500 leading-relaxed">
+                        Strong product design is not only about how secure the interface looks. It is about making
+                        the underlying control boundaries understandable, observable, and independently verifiable.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="max-w-5xl mx-auto px-6 py-24 md:py-32 faq">
+            <div class="text-center">
+                <div class="section-kicker">06 / FAQ</div>
+                <h2 class="font-display text-4xl md:text-6xl font-black tracking-[-0.05em] mt-4">
+                    The FEED <span class="text-gradient">explainer.</span>
+                </h2>
+            </div>
+
+            <div class="mt-14">
+                <details open>
+                    <summary class="flex items-center justify-between gap-6">
+                        <span>What is FEED?</span>
+                        <span class="text-gradient text-xl">+</span>
+                    </summary>
+                    <p class="mt-4 max-w-3xl text-gray-500 leading-relaxed">
+                        Based on the supplied description, FEED is a decentralized digital asset paired with USDC
+                        and integrated into a premium web application with social networking, community, and
+                        token-gated features.
+                    </p>
+                </details>
+
+                <details>
+                    <summary class="flex items-center justify-between gap-6">
+                        <span>What does USDC do inside the FEED model?</span>
+                        <span class="text-gradient text-xl">+</span>
+                    </summary>
+                    <p class="mt-4 max-w-3xl text-gray-500 leading-relaxed">
+                        USDC is described as the exclusive pairing asset for FEED. The supplied exchange model
+                        describes using USDC to enter and exit the FEED market through a connected wallet.
+                    </p>
+                </details>
+
+                <details>
+                    <summary class="flex items-center justify-between gap-6">
+                        <span>Why does FEED need a social dashboard?</span>
+                        <span class="text-gradient text-xl">+</span>
+                    </summary>
+                    <p class="mt-4 max-w-3xl text-gray-500 leading-relaxed">
+                        The concept treats FEED as a participation network rather than a simple token balance.
+                        Chat rooms, creator streams, data boards, tipping, and token-gated communities are meant to
+                        give the asset an active social context.
+                    </p>
+                </details>
+
+                <details>
+                    <summary class="flex items-center justify-between gap-6">
+                        <span>What is token-gated access?</span>
+                        <span class="text-gradient text-xl">+</span>
+                    </summary>
+                    <p class="mt-4 max-w-3xl text-gray-500 leading-relaxed">
+                        In the supplied model, certain rooms, premium boards, and live creator experiences become
+                        available only when the connected wallet holds a specified FEED balance.
+                    </p>
+                </details>
+
+                <details>
+                    <summary class="flex items-center justify-between gap-6">
+                        <span>Does the supplied description prove FEED is “rug-pull proof”?</span>
+                        <span class="text-gradient text-xl">+</span>
+                    </summary>
+                    <p class="mt-4 max-w-3xl text-gray-500 leading-relaxed">
+                        No. That phrase is part of the supplied marketing description. It should be treated as a
+                        project claim until the relevant ownership, liquidity-lock, contract, and audit evidence is verified.
+                    </p>
+                </details>
+            </div>
+        </section>
+
+
+        <!-- Protocol Signals -->
+        <section class="bg-[#fafaff] border-y border-gray-100">
+            <div class="max-w-7xl mx-auto px-6 py-18 md:py-20">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="metric-pill rounded-2xl p-5 reveal">
+                        <div class="text-[10px] uppercase tracking-[0.16em] font-bold text-gray-400">Market model</div>
+                        <div class="font-display text-xl font-bold mt-2">USDC / FEED</div>
+                    </div>
+                    <div class="metric-pill rounded-2xl p-5 reveal reveal-delay-1">
+                        <div class="text-[10px] uppercase tracking-[0.16em] font-bold text-gray-400">Identity</div>
+                        <div class="font-display text-xl font-bold mt-2">Wallet-native</div>
+                    </div>
+                    <div class="metric-pill rounded-2xl p-5 reveal reveal-delay-2">
+                        <div class="text-[10px] uppercase tracking-[0.16em] font-bold text-gray-400">Community</div>
+                        <div class="font-display text-xl font-bold mt-2">Real-time</div>
+                    </div>
+                    <div class="metric-pill rounded-2xl p-5 reveal reveal-delay-3">
+                        <div class="text-[10px] uppercase tracking-[0.16em] font-bold text-gray-400">Access model</div>
+                        <div class="font-display text-xl font-bold mt-2">Token-gated</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Closing CTA -->
+        <section class="max-w-7xl mx-auto px-6 pb-24 md:pb-32">
+            <div class="relative overflow-hidden rounded-[36px] bg-[#0d0c14] px-8 py-14 md:px-16 md:py-20 text-center">
+                <div class="absolute inset-0 opacity-20" style="background: radial-gradient(circle at 50% 10%, rgba(216,61,194,.8), transparent 45%), radial-gradient(circle at 50% 100%, rgba(96,54,225,.8), transparent 50%);"></div>
+                <div class="relative z-10">
+                    <div class="font-display text-3xl md:text-6xl font-black text-white tracking-[-0.05em]">
+                        The next layer of digital participation starts with <span class="text-gradient">FEED.</span>
+                    </div>
+                    <p class="mt-5 max-w-2xl mx-auto text-white/55 leading-relaxed">
+                        A single environment for the asset story, the community story, and the product story.
+                        Explore the architecture, understand the model, and verify the underlying contracts before relying on any financial claim.
+                    </p>
+                    <div class="mt-8 flex flex-col sm:flex-row justify-center gap-3">
+                        <a href="#architecture" class="bg-gradient-custom text-white px-8 py-4 rounded-full text-sm font-semibold">
+                            Explore Architecture
+                        </a>
+                        <a href="#advert" class="border border-white/15 bg-white/5 text-white px-8 py-4 rounded-full text-sm font-semibold hover:bg-white/10 transition">
+                            Watch the FEED Advert
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col md:flex-row gap-5 items-center justify-between">
+            <div class="font-display text-2xl font-black tracking-[-0.05em]">
+                F<span class="text-gradient">EE</span>D
+            </div>
+            <div class="text-sm text-gray-400">
+                &copy; 2026 FEED. Product and advert content based on the supplied FEED materials.
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Premium Footer -->
+    <footer class="border-t border-gray-200 bg-[#0c0b12] text-white">
+        <div class="max-w-7xl mx-auto px-6 py-16 md:py-20">
+            <div class="grid md:grid-cols-[1.4fr_1fr_1fr_1fr] gap-12">
+                <div>
+                    <a href="#top" class="font-display text-3xl font-black tracking-[-0.06em]">
+                        F<span class="text-gradient">EE</span>D
+                    </a>
+                    <p class="mt-5 max-w-sm text-sm leading-relaxed" style="color: #3A76C4;">
+                        A premium FEED experience bringing together digital asset access,
+                        community interaction, and a wallet-native product layer.
+                    </p>
+                </div>
+
+                <div>
+                    <div class="text-xs uppercase tracking-[0.18em] font-bold text-white/40">Explore</div>
+                    <div class="mt-5 space-y-3 text-sm text-white/65">
+                        <a href="#overview" class="block hover:text-white transition">Overview</a>
+                        <a href="#advert" class="block hover:text-white transition">Advert</a>
+                        <a href="#exchange" class="block hover:text-white transition">USDC Flow</a>
+                        <a href="#social" class="block hover:text-white transition">Social</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-xs uppercase tracking-[0.18em] font-bold text-white/40">Trust</div>
+                    <div class="mt-5 space-y-3 text-sm text-white/65">
+                        <a href="#security" class="block hover:text-white transition">Security Model</a>
+                        <a href="#faq" class="block hover:text-white transition">FAQ</a>
+                        <a href="#top" class="block hover:text-white transition">Back to Top</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-xs uppercase tracking-[0.18em] font-bold text-white/40">FEED</div>
+                    <div class="mt-5">
+                        <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+                            <div class="text-xs text-white/40">Brand system</div>
+                            <div class="font-display text-lg font-bold mt-1">
+                                <span class="text-gradient">#6036E1 → #D83DC2</span>
+                            </div>
+                            <p class="mt-2 text-xs text-white/40">
+                                Slate Blue support text: #3A76C4
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-14 pt-7 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-xs text-white/35">
+                    &copy; 2026 FEED. Product and advert content based on the supplied FEED materials.
+                </p>
+                <p class="text-xs" style="color: #3A76C4;">
+                    Built for a premium digital experience.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nodes = document.querySelectorAll('.reveal');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+                nodes.forEach(node => observer.observe(node));
+            } else {
+                nodes.forEach(node => node.classList.add('is-visible'));
+            }
+        });
+    </script>
+
+</body>
+
+</html>
