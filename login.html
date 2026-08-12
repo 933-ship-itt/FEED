@@ -74,28 +74,9 @@
             display: none;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* DEBUG TERMINAL STYLES */
-        #debug-terminal {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 200px;
-            background-color: rgba(15, 15, 20, 0.95);
-            color: #00ffcc;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            padding: 12px;
-            overflow-y: auto;
-            z-index: 9999;
-            border-top: 2px solid #6036E1;
-            backdrop-filter: blur(10px);
-            white-space: pre-wrap;
-        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col lg:flex-row pb-[200px]">
+<body class="min-h-screen flex flex-col lg:flex-row">
 
     <!-- Left Side: Advert Frame -->
     <div class="relative w-full lg:w-1/2 h-[50vh] lg:h-screen bg-white border-r border-gray-200 overflow-hidden hidden md:block">
@@ -278,38 +259,20 @@
         </div>
     </div>
 
-    <!-- Live Debug Terminal (Fixed at Bottom) -->
-    <div id="debug-terminal">Initializing Popup System Diagnostics...</div>
-
     <!-- Firebase v10 SDK Integration (Popup Version with Safety Timeout Fallback) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // --- Custom Logging System ---
-        const terminal = document.getElementById('debug-terminal');
-        terminal.innerHTML = '';
-
+        // --- Clean Developer Console Logging ---
         function logInfo(message, data = null) {
             const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-            let logString = `[${timestamp}] ℹ️ ${message}\n`;
-            
             if (data) {
-                if (data instanceof Error || data.code) {
-                    logString += `    ❌ ERROR: ${data.message || data} (Code: ${data.code || 'N/A'})\n`;
-                } else {
-                    try {
-                        logString += `    ✅ DATA: ${JSON.stringify(data, null, 2)}\n`;
-                    } catch (e) {
-                        logString += `    ✅ DATA: [Object stringify error]\n`;
-                    }
-                }
+                console.log(`[${timestamp}] ℹ️ ${message}`, data);
+            } else {
+                console.log(`[${timestamp}] ℹ️ ${message}`);
             }
-            
-            console.log(`[${timestamp}]`, message, data ? data : '');
-            terminal.textContent += logString + '\n';
-            terminal.scrollTop = terminal.scrollHeight;
         }
 
         logInfo("Initializing Firebase System (Popup Mode)...");
