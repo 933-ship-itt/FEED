@@ -2005,7 +2005,7 @@ p {
         </div>
     </section>
 
-    <!-- Firebase Authentication (Redirect Flow with sessionStorage awareness) -->
+    <!-- Firebase Authentication (Redirect Flow – reliable) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import {
@@ -2047,13 +2047,12 @@ p {
         const errorContainer = document.getElementById('error-message');
         const loginView = document.getElementById('login-view');
 
-        // Helper: show error in UI
+        // Helpers
         function showError(message) {
             errorContainer.textContent = message;
             errorContainer.classList.remove('hidden');
         }
 
-        // Helper: reset button state
         function resetButton() {
             if (signInBtn) {
                 signInBtn.disabled = false;
@@ -2062,7 +2061,6 @@ p {
             }
         }
 
-        // Helper: set loading state
         function setLoading(text) {
             if (signInBtn) {
                 signInBtn.disabled = true;
@@ -2071,7 +2069,6 @@ p {
             }
         }
 
-        // Show login view forcibly (regardless of hash)
         function forceShowLogin() {
             document.body.classList.add('login-active');
             loginView.hidden = false;
@@ -2080,48 +2077,10 @@ p {
             }
         }
 
-        // Process redirect result (called on page load)
-        async function handleRedirectResult() {
-            // Check if we are returning from a redirect
-            const redirectPending = sessionStorage.getItem('feed_redirect_pending') === 'true';
-            if (redirectPending) {
-                // We are coming back from Google, ensure login view is visible
-                forceShowLogin();
-                // Clear the pending flag after processing
-                sessionStorage.removeItem('feed_redirect_pending');
-                // Disable button and show loading (it might still be disabled from before)
-                setLoading('Finalizing...');
-            }
-
-            try {
-                const result = await getRedirectResult(auth);
-                if (result) {
-                    // User signed in via redirect
-                    const user = result.user;
-                    await handleAuthenticatedUser(user);
-                } else {
-                    // No redirect result; if we had a pending flag but no result, something went wrong
-                    if (redirectPending) {
-                        showError('Sign‑in was cancelled or failed. Please try again.');
-                        resetButton();
-                    }
-                }
-            } catch (error) {
-                console.error('Redirect result error:', error);
-                // Show error only if login view is visible
-                if (!loginView.hidden) {
-                    showError(`Authentication failed: ${error.message}`);
-                    resetButton();
-                }
-            }
-        }
-
-        // Process authenticated user (Firestore write + redirect)
+        // ─── Handle authenticated user ─────────────────────────
         async function handleAuthenticatedUser(user) {
-            // Disable button and show status
             setLoading('Finalizing profile...');
 
-            // Get forensic info
             const forensics = {
                 userAgent: navigator.userAgent || 'Unknown',
                 platform: navigator.platform || 'Unknown',
@@ -2141,7 +2100,6 @@ p {
 
             const userRef = doc(db, 'users', user.uid);
 
-            // Write to Firestore with timeout guard
             try {
                 await Promise.race([
                     setDoc(userRef, userPayload, { merge: true }),
@@ -2152,52 +2110,111 @@ p {
                 console.log('Firestore write successful');
             } catch (dbError) {
                 console.warn('Firestore write skipped/timed out:', dbError);
-                // Continue anyway
             }
 
-            // Redirect to dashboard
             btnText.textContent = 'Redirecting...';
             setTimeout(() => {
                 window.location.href = '/dashboard.html';
             }, 500);
         }
 
-        // Auth state observer
+        // ─── Redirect result processing ─────────────────────────
+        let redirectProcessed = false;
+
+        async function handleRedirect() {
+            if (redirectProcessed) return;
+            redirectProcessed = true;
+
+            const redirectPending = sessionStorage.getItem('feed_redirect_pending') === 'true';
+            if (redirectPending) {
+                // We are returning from Google – ensure login view is visible
+                forceShowLogin();
+                setLoading('Finalizing...');
+            }
+
+            try {
+                const result = await getRedirectResult(auth);
+                if (result) {
+                    // Successful sign-in
+                    sessionStorage.removeItem('feed_redirect_pending');
+                    await handleAuthenticatedUser(result.user);
+                    return;
+                }
+            } catch (error) {
+                console.error('Redirect result error:', error);
+                if (redirectPending) {
+                    showError(`Authentication failed: ${error.message}`);
+                }
+                resetButton();
+                return;
+            }
+
+            // If we get here, no redirect result was processed.
+            // If a redirect was pending, we wait for onAuthStateChanged to fire.
+            // If no user appears within 5 seconds, show a timeout error.
+            if (redirectPending) {
+                let authTimeout = setTimeout(() => {
+                    // If after 5 seconds we still have no user and the button is still in loading state,
+                    // show a generic error.
+                    if (signInBtn && signInBtn.disabled) {
+                        showError('Sign‑in took too long or was cancelled. Please try again.');
+                        resetButton();
+                    }
+                }, 5000);
+
+                // Clear the timeout if we get a user via onAuthStateChanged
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        clearTimeout(authTimeout);
+                        unsubscribe();
+                        // The observer below will handle the authenticated user,
+                        // but we also want to clean up the pending flag.
+                        sessionStorage.removeItem('feed_redirect_pending');
+                    }
+                });
+            } else {
+                // No redirect pending – just reset button state (if login view visible)
+                if (!loginView.hidden) {
+                    resetButton();
+                }
+            }
+        }
+
+        // ─── Auth state observer ────────────────────────────────
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log('User already authenticated:', user.uid);
-                // If the login view is visible, we can redirect immediately
+                console.log('Auth state: user signed in', user.uid);
+                // If login view is visible, we can proceed immediately
                 if (!loginView.hidden) {
+                    // Clear any pending flag
+                    sessionStorage.removeItem('feed_redirect_pending');
                     handleAuthenticatedUser(user);
                 }
             } else {
-                // No user, ensure button is enabled if login view is visible
-                if (!loginView.hidden) {
+                console.log('Auth state: no user');
+                // Only reset button if login view is visible and no redirect pending
+                if (!loginView.hidden && !sessionStorage.getItem('feed_redirect_pending')) {
                     resetButton();
                 }
             }
         });
 
-        // Sign-in button handler – initiate redirect with pending flag
+        // ─── Sign‑in button ─────────────────────────────────────
         if (signInBtn) {
             signInBtn.addEventListener('click', async () => {
-                // Prevent multiple clicks
                 if (signInBtn.disabled) return;
 
-                // Hide previous errors
                 errorContainer.classList.add('hidden');
                 setLoading('Connecting to Google...');
 
-                // Store a flag in sessionStorage so we know we initiated a redirect
+                // Set pending flag so we know we initiated a redirect
                 sessionStorage.setItem('feed_redirect_pending', 'true');
 
                 try {
                     await signInWithRedirect(auth, provider);
-                    // After this, the page will unload and redirect to Google.
-                    // The flag will be used when the user returns.
+                    // After redirect, page will unload; pending flag remains.
                 } catch (error) {
-                    console.error('Sign-in redirect error:', error);
-                    // Clear the flag if the redirect failed immediately
+                    console.error('Sign-in redirect initiation error:', error);
                     sessionStorage.removeItem('feed_redirect_pending');
                     showError(`Authentication failed: ${error.message}`);
                     resetButton();
@@ -2205,14 +2222,11 @@ p {
             });
         }
 
-        // Process redirect result on load
-        handleRedirectResult();
-
-        // Also, if the login view is opened while a user is already authenticated,
-        // the observer above will handle it.
+        // ─── Start processing on load ──────────────────────────
+        handleRedirect();
     </script>
 
-    <!-- Routing / Hash handling (preserved and improved) -->
+    <!-- Routing / Hash handling (preserved) -->
     <script>
         (() => {
             const loginView = document.getElementById('login-view');
@@ -2254,7 +2268,6 @@ p {
                 }
             });
 
-            // The login view's FEED logo should return to landing
             const loginLogo = document.querySelector('#login-view a[href="#top"]');
             if (loginLogo) {
                 loginLogo.addEventListener('click', (e) => {
