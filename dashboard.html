@@ -52,23 +52,6 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 18px 60px rgba(32, 18, 80, 0.04);
         }
-
-        /* Satisfying Balance Reveal Animation */
-        @keyframes balanceReveal {
-            0% { 
-                opacity: 0; 
-                transform: translateY(15px) scale(0.97); 
-                filter: blur(8px); 
-            }
-            100% { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-                filter: blur(0); 
-            }
-        }
-        .animate-balance {
-            animation: balanceReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
     </style>
 </head>
 <body class="text-feed-ink font-sans antialiased overflow-x-hidden">
@@ -169,11 +152,12 @@
                         <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-6">
                             <div>
                                 <h3 class="text-white/80 text-sm uppercase tracking-[0.2em] font-bold mb-3 flex items-center gap-2">
-                                    <i class="ph-fill ph-hexagon text-lg"></i> Total $FEED Balance
+                                    <i class="ph-fill ph-hexagon text-lg"></i> Total $FEED Balance 
+                                    <span class="text-[10px] normal-case tracking-normal bg-white/10 px-2 py-0.5 rounded-full text-white/70 ml-2 font-normal">(Click to Pause/Play)</span>
                                 </h3>
                                 
-                                <!-- ANIMATED BALANCE CONTAINER -->
-                                <div class="font-display text-5xl md:text-6xl font-black tracking-tight flex items-baseline gap-2 text-emerald-300 animate-balance">
+                                <!-- CLICKABLE ANIMATED BALANCE CONTAINER -->
+                                <div id="balance-container" class="font-display text-5xl md:text-6xl font-black tracking-tight flex items-baseline gap-2 text-emerald-300 cursor-pointer select-none group w-fit transition-transform active:scale-95" title="Click to pause/resume animation">
                                     <span id="animated-balance">0.00</span> 
                                     <span class="text-3xl font-bold text-emerald-200/80 tracking-normal">$FEED</span>
                                 </div>
@@ -366,48 +350,72 @@
         </div>
     </main>
 
-    <!-- Count-Up Animation Script -->
+    <!-- Continuous Looping & Click-Toggle Animation Script -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const balanceElement = document.getElementById("animated-balance");
+            const balanceContainer = document.getElementById("balance-container");
             const targetValue = 84250.00;
-            const duration = 2500; // Total duration in ms
-            
-            let startTimestamp = null;
+            const duration = 2500; // Duration of count-up in ms
+            const holdTime = 1500; // Pause time at top value before restarting
 
-            // easeOutExpo function for satisfying deceleration at the end of the count
+            let startTime = null;
+            let isPaused = false;
+            let currentProgress = 0;
+            let animationId = null;
+            let cycleTimeout = null;
+
             const easeOutExpo = (x) => {
                 return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
             };
 
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                
-                const easedProgress = easeOutExpo(progress);
+            const runLoop = (timestamp) => {
+                if (isPaused) return;
+
+                if (!startTime) {
+                    startTime = timestamp - (currentProgress * duration);
+                }
+
+                const elapsed = timestamp - startTime;
+                currentProgress = Math.min(elapsed / duration, 1);
+
+                const easedProgress = easeOutExpo(currentProgress);
                 const currentValue = easedProgress * targetValue;
 
-                // Format cleanly with vanilla JS to match native localization
                 balanceElement.innerText = currentValue.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
 
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
+                if (currentProgress < 1) {
+                    animationId = requestAnimationFrame(runLoop);
                 } else {
-                    // Ensure it ends perfectly on the target value
-                    balanceElement.innerText = targetValue.toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    });
+                    // Hold at target value, then reset and loop again
+                    cycleTimeout = setTimeout(() => {
+                        if (!isPaused) {
+                            currentProgress = 0;
+                            startTime = null;
+                            animationId = requestAnimationFrame(runLoop);
+                        }
+                    }, holdTime);
                 }
             };
 
-            // Delay the count slightly so it syncs perfectly with the CSS blur/scale reveal
-            setTimeout(() => {
-                window.requestAnimationFrame(step);
-            }, 300);
+            // Start loop on load
+            animationId = requestAnimationFrame(runLoop);
+
+            // Toggle pause/resume on click
+            balanceContainer.addEventListener("click", () => {
+                isPaused = !isPaused;
+
+                if (isPaused) {
+                    cancelAnimationFrame(animationId);
+                    clearTimeout(cycleTimeout);
+                } else {
+                    startTime = null;
+                    animationId = requestAnimationFrame(runLoop);
+                }
+            });
         });
     </script>
 </body>
