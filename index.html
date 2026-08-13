@@ -2011,8 +2011,7 @@ p {
         import {
             getAuth,
             GoogleAuthProvider,
-            signInWithRedirect,
-            getRedirectResult,
+            signInWithPopup,
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import {
@@ -2065,16 +2064,7 @@ p {
             }
         }
 
-        // Force login view to be visible (used by both module and routing script)
-        window.forceLogin = function() {
-            document.body.classList.add('login-active');
-            loginView.hidden = false;
-            if (location.hash !== '#login') {
-                history.pushState({ login: true }, '', '#login');
-            }
-        };
-
-        // ─── Handle authenticated user ─────────────────────────
+        // ─── Handle authenticated user (unchanged) ─────────────
         async function handleAuthenticatedUser(user) {
             setLoading('Finalizing profile...');
 
@@ -2115,190 +2105,54 @@ p {
             }, 500);
         }
 
-        // ─── Redirect result processing ─────────────────────────
-        let redirectProcessed = false;
-
-        async function handleRedirect() {
-            if (redirectProcessed) return;
-            redirectProcessed = true;
-
-            const redirectPending = sessionStorage.getItem('feed_redirect_pending') === 'true';
-            console.log('[FEED Auth] handleRedirect called, pending:', redirectPending);
-
-            if (redirectPending) {
-                // We are returning from Google – ensure login view is visible
-                window.forceLogin();
-                setLoading('Finalizing...');
-            }
-
-            try {
-                const result = await getRedirectResult(auth);
-                console.log('[FEED Auth] getRedirectResult result:', result ? 'user found' : 'null');
-                if (result) {
-                    sessionStorage.removeItem('feed_redirect_pending');
-                    await handleAuthenticatedUser(result.user);
-                    return;
-                }
-            } catch (error) {
-                console.error('[FEED Auth] Redirect result error:', error);
-                if (redirectPending) {
-                    showError(`Authentication failed: ${error.message}`);
-                }
-                resetButton();
-                sessionStorage.removeItem('feed_redirect_pending');
-                return;
-            }
-
-            // No redirect result – if pending, wait for onAuthStateChanged
-            if (redirectPending) {
-                let authTimeout = setTimeout(() => {
-                    // If after 8 seconds we still have no user and button is still loading, show error.
-                    if (signInBtn && signInBtn.disabled) {
-                        console.warn('[FEED Auth] Timeout fired – no user detected');
-                        showError('Sign‑in took too long or was cancelled. Please try again.');
-                        resetButton();
-                        sessionStorage.removeItem('feed_redirect_pending');
-                    }
-                }, 8000);
-
-                // Clear timeout if we get a user
-                const unsubscribe = onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        clearTimeout(authTimeout);
-                        unsubscribe();
-                        sessionStorage.removeItem('feed_redirect_pending');
-                        console.log('[FEED Auth] User detected via onAuthStateChanged');
-                        // If the login view is visible, handle it (avoid double handling)
-                        if (!loginView.hidden) {
-                            handleAuthenticatedUser(user);
-                        }
-                    }
-                });
-            } else {
-                // No pending redirect – reset button if login view visible
-                if (!loginView.hidden) {
-                    resetButton();
-                }
-            }
-        }
-
-        // ─── Auth state observer (for already signed‑in users) ──
+        // ─── Auth state observer ────────────────────────────────
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log('[FEED Auth] onAuthStateChanged: user signed in', user.uid);
-                sessionStorage.removeItem('feed_redirect_pending');
+                console.log('Auth state: user signed in', user.uid);
                 if (!loginView.hidden) {
                     handleAuthenticatedUser(user);
                 }
             } else {
-                console.log('[FEED Auth] onAuthStateChanged: no user');
-                // Only reset if no pending redirect and login view is visible
-                if (!loginView.hidden && !sessionStorage.getItem('feed_redirect_pending')) {
+                console.log('Auth state: no user');
+                if (!loginView.hidden) {
                     resetButton();
                 }
             }
         });
 
-        // ─── Sign‑in button ─────────────────────────────────────
+        // ─── Sign‑in button: POPUP ──────────────────────────────
         if (signInBtn) {
             signInBtn.addEventListener('click', async () => {
                 if (signInBtn.disabled) return;
 
                 errorContainer.classList.add('hidden');
-                setLoading('Connecting to Google...');
-
-                // Set pending flag so we know we initiated a redirect
-                sessionStorage.setItem('feed_redirect_pending', 'true');
-                // Also ensure login view stays visible (in case routing script runs)
-                window.forceLogin();
+                setLoading('Opening Google…');
 
                 try {
-                    await signInWithRedirect(auth, provider);
-                    // After redirect, page will unload; pending flag remains.
+                    const result = await signInWithPopup(auth, provider);
+                    // Popup succeeded → user is authenticated
+                    console.log('Popup success:', result.user.uid);
+                    // handleAuthenticatedUser will be called by onAuthStateChanged,
+                    // but we can also call it directly here.
+                    await handleAuthenticatedUser(result.user);
                 } catch (error) {
-                    console.error('[FEED Auth] Sign-in redirect initiation error:', error);
-                    sessionStorage.removeItem('feed_redirect_pending');
-                    showError(`Authentication failed: ${error.message}`);
+                    console.error('Popup sign-in error:', error);
+                    // Reset the button and show a user‑friendly message
                     resetButton();
+
+                    if (error.code === 'auth/popup-blocked') {
+                        showError('Google sign‑in popup was blocked. Please allow popups for this site and try again.');
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        showError('Sign‑in cancelled. Please try again.');
+                    } else {
+                        showError(`Authentication failed: ${error.message}`);
+                    }
                 }
             });
         }
 
-        // ─── Start processing on load ──────────────────────────
-        handleRedirect();
-    </script>
-
-    <!-- Routing / Hash handling – updated to respect redirect pending -->
-    <script>
-        (() => {
-            const loginView = document.getElementById('login-view');
-
-            function showLogin() {
-                document.body.classList.add('login-active');
-                loginView.hidden = false;
-                if (location.hash !== '#login') {
-                    history.pushState({ login: true }, '', '#login');
-                }
-                window.scrollTo(0, 0);
-            }
-
-            function showLanding() {
-                document.body.classList.remove('login-active');
-                loginView.hidden = true;
-            }
-
-            function syncRoute() {
-                // If a redirect is pending, keep the login view visible regardless of hash.
-                const redirectPending = sessionStorage.getItem('feed_redirect_pending') === 'true';
-                if (redirectPending) {
-                    // The module script already forces it, but just in case:
-                    if (loginView.hidden) {
-                        document.body.classList.add('login-active');
-                        loginView.hidden = false;
-                        if (location.hash !== '#login') {
-                            history.pushState({ login: true }, '', '#login');
-                        }
-                    }
-                    return;
-                }
-
-                // Normal routing based on hash
-                if (location.hash.toLowerCase() === '#login') showLogin();
-                else showLanding();
-            }
-
-            // Intercept login links/buttons (the top nav already points to #login)
-            document.querySelectorAll('a[href], button').forEach(el => {
-                const label = (el.textContent || '').trim().toLowerCase();
-                const href = (el.getAttribute('href') || '').toLowerCase();
-                if (
-                    /login|log in|sign in|signin|begin|access account|create account|authenticate/.test(label) ||
-                    /login\.html/.test(href)
-                ) {
-                    if (el.tagName === 'A') {
-                        el.setAttribute('href', '#login');
-                    }
-                    el.addEventListener('click', event => {
-                        event.preventDefault();
-                        showLogin();
-                    });
-                }
-            });
-
-            const loginLogo = document.querySelector('#login-view a[href="#top"]');
-            if (loginLogo) {
-                loginLogo.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    history.pushState({}, '', '#top');
-                    syncRoute();
-                });
-            }
-
-            window.addEventListener('hashchange', syncRoute);
-            window.addEventListener('popstate', syncRoute);
-
-            syncRoute();
-        })();
+        // If the login view is opened while a user is already authenticated,
+        // the observer above will handle it.
     </script>
 
 </body>
