@@ -1497,14 +1497,6 @@
             <div id="dashboardProfile" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center"><img id="profileAvatar" class="h-24 w-24 rounded-3xl object-cover shadow-lg" alt="Google profile" hidden><div id="profileAvatarFallback" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-3xl font-black text-white">?</div><div><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Google profile</div><h2 id="profileName" class="mt-2 font-display text-3xl font-black">Authenticated user</h2><p id="profileEmail" class="mt-1 text-gray-500">null</p></div></div><div class="mt-10 grid gap-4 md:grid-cols-2"><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication provider</div><div class="mt-2 font-semibold">Google</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet address</div><div class="mt-2 font-semibold">null</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">FEED balance</div><div class="mt-2 font-semibold">0.00</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Transactions</div><div class="mt-2 font-semibold">0</div></div></div><div class="mt-6 flex justify-start"><button type="button" id="profileWalletConnectBtn" class="wallet-connect-btn inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-sm"><i class="ph-bold ph-wallet"></i><span>Connect Wallet</span></button></div></div></div>
             <div id="dashboardPlaceholder" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-10 text-center"><i class="ph ph-hourglass text-4xl text-[#6036E1]"></i><h2 class="mt-4 font-display text-2xl font-bold">Coming soon</h2><p class="mt-2 text-gray-500">This authenticated FEED module is being prepared.</p></div></div>
         </main>
-        <div id="walletConnectModal" class="wallet-connect-modal-backdrop" hidden aria-hidden="true">
-            <div class="wallet-connect-modal p-8 md:p-10" role="dialog" aria-modal="true" aria-labelledby="walletConnectModalTitle">
-                <div class="flex items-start justify-between gap-6">
-                    <div>
-                        <div class="wallet-connect-icon mb-6 flex items-center justify-center bg-black text-white"><i class="ph-bold ph-wallet"></i></div>
-                        <h2 id="walletConnectModalTitle" class="wallet-connect-title font-display font-black text-gray-900">Wallet Connect</h2>
-                        <p class="wallet-connect-message mt-4 text-gray-500">Wallet connection is currently under development. This feature will be available in a future update.</p>
-                    </div>
                     <button type="button" id="walletConnectModalClose" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close"><i class="ph-bold ph-x text-xl"></i></button>
                 </div>
                 <button type="button" id="walletConnectModalOk" class="wallet-connect-btn wallet-connect-ok mt-8 w-full rounded-2xl px-6 py-4 font-bold">Okay</button>
@@ -1698,8 +1690,8 @@
             walletConnectModal.hidden = false;
             walletConnectModal.setAttribute('aria-hidden', 'false');
         };
-        document.getElementById('overviewWalletConnectBtn')?.addEventListener('click', walletConnectOpen);
-        document.getElementById('profileWalletConnectBtn')?.addEventListener('click', walletConnectOpen);
+        document.getElementById('overviewWalletConnectBtn')?.addEventListener('click', () => document.getElementById('feedWalletQuick')?.click());
+        document.getElementById('profileWalletConnectBtn')?.addEventListener('click', () => document.getElementById('feedWalletQuick')?.click());
         document.getElementById('walletConnectModalClose')?.addEventListener('click', walletConnectClose);
         document.getElementById('walletConnectModalOk')?.addEventListener('click', walletConnectClose);
         walletConnectModal?.addEventListener('click', (event) => {
@@ -1811,6 +1803,9 @@
         @media (min-width: 1024px) { #feedWalletOverviewGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
         @media (min-width: 1280px) { #feedWalletOverviewGrid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
         @media (max-width: 767px) { #feedWalletQuick { right: 16px; bottom: 16px; } }
+        .feed-wallet-spinner { width:34px; height:34px; border:4px solid #e5e7eb; border-top-color:#6036E1; border-right-color:#D83DC2; border-radius:999px; animation:feedWalletSpin .8s linear infinite; }
+        @keyframes feedWalletSpin { to { transform:rotate(360deg); } }
+        .feed-wallet-active { box-shadow:0 0 0 2px #6036E1, 0 12px 30px rgba(96,54,225,.12); }
     </style>
 
     <div id="feedWalletModal" aria-hidden="true">
@@ -1820,40 +1815,70 @@
                     <div>
                         <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6036E1]">Wallet Security</div>
                         <h2 class="mt-2 font-display text-2xl font-black tracking-tight text-gray-900">Connect Base Sepolia wallet</h2>
-                        <p class="mt-1 max-w-md text-sm leading-relaxed text-gray-500">Connect an existing wallet. FEED stores public address metadata only.</p>
+                        <p class="mt-1 max-w-xl text-sm leading-relaxed text-gray-500">Connect up to 3 public wallet addresses. FEED reads balances from Base Sepolia and stores public address metadata under your authenticated Google account.</p>
                     </div>
-                    <button id="feedWalletClose" type="button" class="rounded-xl p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close">
-                        <i class="ph-bold ph-x text-xl"></i>
-                    </button>
+                    <button id="feedWalletClose" type="button" class="rounded-xl p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close"><i class="ph-bold ph-x text-xl"></i></button>
                 </div>
 
                 <div class="p-6 md:p-7">
-                    <div id="feedWalletConnectStage">
-                        <div class="grid gap-3 md:grid-cols-2">
+                    <div id="feedWalletTermsStage">
+                        <div class="rounded-3xl border border-gray-200 bg-gray-50 p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-black text-white"><i class="ph-bold ph-file-text text-2xl"></i></div>
+                                <div>
+                                    <div class="font-display text-xl font-black text-gray-900">Wallet connection terms</div>
+                                    <p class="mt-2 text-sm leading-relaxed text-gray-600">By proceeding, you agree to the Terms of Service and acknowledge that FEED will only read public blockchain information for the addresses you choose to connect.</p>
+                                </div>
+                            </div>
+                            <label class="mt-6 flex cursor-pointer items-start gap-3 rounded-2xl border border-gray-200 bg-white p-4">
+                                <input id="feedWalletTermsAgree" type="checkbox" class="mt-1 h-4 w-4 accent-[#6036E1]">
+                                <span class="text-sm font-semibold text-gray-800">I agree to the Terms of Service.</span>
+                            </label>
+                            <button id="feedWalletProceed" type="button" disabled class="mt-4 w-full rounded-2xl bg-gray-900 px-5 py-4 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-40">Proceed to wallet connection</button>
+                        </div>
+                        <div id="feedWalletMessage" class="mt-4 hidden rounded-2xl px-4 py-3 text-sm"></div>
+                    </div>
+
+                    <div id="feedWalletConnectStage" class="hidden">
+                        <div class="rounded-3xl border border-violet-100 bg-violet-50 p-5">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#6036E1] shadow-sm"><i class="ph-bold ph-check-circle text-xl"></i></div>
+                                <div><div class="text-[10px] font-bold uppercase tracking-[0.18em] text-[#6036E1]">Terms accepted</div><div class="mt-1 font-display font-bold text-gray-900">Choose how to connect</div></div>
+                            </div>
+                        </div>
+                        <div class="mt-5 grid gap-3 md:grid-cols-2">
                             <button id="feedWalletInjected" type="button" class="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#6036E1]/35">
                                 <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6036E1]/10 text-[#6036E1]"><i class="ph-bold ph-browser text-2xl"></i></div>
                                 <div class="mt-4 font-display font-bold text-gray-900">Browser wallet</div>
-                                <div id="feedWalletInjectedCopy" class="mt-1 text-xs leading-relaxed text-gray-500">Detect MetaMask or Trust Wallet and request access.</div>
+                                <div id="feedWalletInjectedCopy" class="mt-1 text-xs leading-relaxed text-gray-500">Request access from an installed EVM wallet.</div>
                             </button>
                             <button id="feedWalletQR" type="button" class="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#D83DC2]/35">
                                 <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D83DC2]/10 text-[#D83DC2]"><i class="ph-bold ph-qr-code text-2xl"></i></div>
-                                <div class="mt-4 font-display font-bold text-gray-900">QR / mobile wallet</div>
-                                <div class="mt-1 text-xs leading-relaxed text-gray-500">Open the Reown / WalletConnect QR flow.</div>
+                                <div class="mt-4 font-display font-bold text-gray-900">Reown / WalletConnect</div>
+                                <div class="mt-1 text-xs leading-relaxed text-gray-500">Initialize Reown with the configured project and open the QR/mobile wallet flow.</div>
                             </button>
                         </div>
-                        <div id="feedWalletMessage" class="mt-4 hidden rounded-2xl px-4 py-3 text-sm"></div>
                     </div>
 
                     <div id="feedWalletCandidatesStage" class="hidden">
                         <div class="flex items-end justify-between gap-3">
                             <div>
                                 <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Account selection</div>
-                                <div class="mt-1 font-display text-lg font-bold">Choose up to 3 wallets</div>
+                                <div class="mt-1 font-display text-lg font-bold">Choose 1–3 wallets</div>
+                                <p class="mt-1 text-xs leading-relaxed text-gray-500">The first five discovered accounts are shown, with non-zero balances indexed first when available.</p>
                             </div>
                             <div id="feedWalletSelectedCount" class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-500">0 selected</div>
                         </div>
-                        <div id="feedWalletCandidateList" class="mt-4 max-h-[320px] space-y-2 overflow-y-auto"></div>
-                        <button id="feedWalletSave" type="button" disabled class="mt-4 w-full rounded-2xl bg-gray-900 px-5 py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Save selected wallets</button>
+                        <div id="feedWalletCandidateList" class="mt-4 max-h-[420px] space-y-2 overflow-y-auto"></div>
+                        <button id="feedWalletSave" type="button" disabled class="mt-4 w-full rounded-2xl bg-gray-900 px-5 py-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Connect selected wallets</button>
+                    </div>
+
+                    <div id="feedWalletSavingStage" class="hidden">
+                        <div class="rounded-3xl border border-gray-200 bg-gray-50 p-8 text-center">
+                            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm"><div class="feed-wallet-spinner" aria-hidden="true"></div></div>
+                            <div class="mt-5 font-display text-2xl font-black text-gray-900">Connecting wallets…</div>
+                            <p id="feedWalletSavingText" class="mt-2 text-sm leading-relaxed text-gray-500">Reading Base Sepolia balances and saving your selected public addresses.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1883,10 +1908,15 @@
             const USDC = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
             const REOWN_PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
             const MAX_SAVED = 3;
-            const MAX_CANDIDATES = 10;
+            const MAX_CANDIDATES = 5;
 
             const modal = document.getElementById('feedWalletModal');
+            const termsStage = document.getElementById('feedWalletTermsStage');
             const connectStage = document.getElementById('feedWalletConnectStage');
+            const savingStage = document.getElementById('feedWalletSavingStage');
+            const termsAgree = document.getElementById('feedWalletTermsAgree');
+            const proceedButton = document.getElementById('feedWalletProceed');
+            const savingText = document.getElementById('feedWalletSavingText');
             const candidatesStage = document.getElementById('feedWalletCandidatesStage');
             const candidateList = document.getElementById('feedWalletCandidateList');
             const selectedCount = document.getElementById('feedWalletSelectedCount');
@@ -1903,14 +1933,19 @@
             let walletConnectProvider = null;
             let currentUid = null;
             let refreshTimer = null;
+            let activeWalletAddress = null;
 
             function showModal() {
                 modal.classList.add('open');
                 modal.setAttribute('aria-hidden', 'false');
-                connectStage.classList.remove('hidden');
+                termsStage.classList.remove('hidden');
+                connectStage.classList.add('hidden');
                 candidatesStage.classList.add('hidden');
+                savingStage.classList.add('hidden');
                 clearMessage();
-                renderCandidates();
+                termsAgree.checked = false;
+                proceedButton.disabled = true;
+                selected = new Set();
             }
 
             function hideModal() {
@@ -1982,29 +2017,20 @@
             async function discoverAccounts(provider) {
                 let accounts = await provider.request({ method: 'eth_accounts' }).catch(() => []);
                 if (!accounts?.length) accounts = await provider.request({ method: 'eth_requestAccounts' });
-                return [...new Map((accounts || []).map(a => [a.toLowerCase(), a])).values()].slice(0, MAX_CANDIDATES);
+                return [...new Map((accounts || []).map(a => [a.toLowerCase(), a])).values()].slice(0, 20);
             }
 
             async function jsonRpcBatch(calls) {
-                const response = await fetch(ALCHEMY_RPC, {
-                    method: 'POST',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify(calls)
-                });
+                const response = await fetch(ALCHEMY_RPC, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(calls) });
                 if (!response.ok) throw new Error(`Alchemy HTTP ${response.status}`);
                 const json = await response.json();
                 return Array.isArray(json) ? json : [json];
             }
 
-            function balanceOfData(address) {
-                return `0x70a08231${address.replace(/^0x/, '').toLowerCase().padStart(64, '0')}`;
-            }
+            function balanceOfData(address) { return `0x70a08231${address.replace(/^0x/, '').toLowerCase().padStart(64, '0')}`; }
 
             async function decimals(contract) {
-                const result = await jsonRpcBatch([{
-                    jsonrpc: '2.0', id: 1, method: 'eth_call',
-                    params: [{ to: contract, data: '0x313ce567' }, 'latest']
-                }]);
+                const result = await jsonRpcBatch([{ jsonrpc:'2.0', id:1, method:'eth_call', params:[{to:contract,data:'0x313ce567'},'latest'] }]);
                 return Number(BigInt(result[0]?.result || '0x12'));
             }
 
@@ -2017,42 +2043,36 @@
                 return `${whole}.${fraction.toString().padStart(decimalsCount, '0').slice(0, 6)}`.replace(/\.0+$/, '');
             }
 
+            function hasPositiveBalance(b) {
+                return BigInt(b.ethRaw || '0x0') > 0n || BigInt(b.feedRaw || '0x0') > 0n || BigInt(b.usdcRaw || '0x0') > 0n;
+            }
+
             async function readBalances(addresses) {
                 const unique = [...new Set(addresses.map(a => a.toLowerCase()))];
                 if (!unique.length) return [];
                 const [feedDecimals, usdcDecimals] = await Promise.all([decimals(FEED), decimals(USDC)]);
-                const calls = [];
-                const map = [];
+                const calls = [], map = [];
                 let id = 1;
-
                 unique.forEach(address => {
-                    const row = { address, eth: id++, feed: id++, usdc: id++ };
-                    calls.push({ jsonrpc: '2.0', id: row.eth, method: 'eth_getBalance', params: [address, 'latest'] });
-                    calls.push({ jsonrpc: '2.0', id: row.feed, method: 'eth_call', params: [{ to: FEED, data: balanceOfData(address) }, 'latest'] });
-                    calls.push({ jsonrpc: '2.0', id: row.usdc, method: 'eth_call', params: [{ to: USDC, data: balanceOfData(address) }, 'latest'] });
+                    const row = { address, eth:id++, feed:id++, usdc:id++ };
+                    calls.push({jsonrpc:'2.0',id:row.eth,method:'eth_getBalance',params:[address,'latest']});
+                    calls.push({jsonrpc:'2.0',id:row.feed,method:'eth_call',params:[{to:FEED,data:balanceOfData(address)},'latest']});
+                    calls.push({jsonrpc:'2.0',id:row.usdc,method:'eth_call',params:[{to:USDC,data:balanceOfData(address)},'latest']});
                     map.push(row);
                 });
-
                 const results = await jsonRpcBatch(calls);
                 const byId = new Map(results.map(r => [r.id, r]));
                 return map.map(row => {
                     const ethRaw = byId.get(row.eth)?.result || '0x0';
                     const feedRaw = byId.get(row.feed)?.result || '0x0';
                     const usdcRaw = byId.get(row.usdc)?.result || '0x0';
-                    return {
-                        eth: formatUnits(ethRaw, 18),
-                        feed: formatUnits(feedRaw, feedDecimals),
-                        usdc: formatUnits(usdcRaw, usdcDecimals),
-                        feedDecimals,
-                        usdcDecimals,
-                        updatedAt: Date.now()
-                    };
+                    return { eth:formatUnits(ethRaw,18), feed:formatUnits(feedRaw,feedDecimals), usdc:formatUnits(usdcRaw,usdcDecimals), ethRaw, feedRaw, usdcRaw, feedDecimals, usdcDecimals, hasBalance:hasPositiveBalance({ethRaw,feedRaw,usdcRaw}), updatedAt:Date.now() };
                 });
             }
 
             async function persist() {
                 if (!currentUid) return;
-                await setDoc(doc(db, 'users', currentUid), { wallets: linkedWallets }, { merge: true });
+                await setDoc(doc(db, 'users', currentUid), { wallets: linkedWallets, activeWalletAddress: activeWalletAddress || null, walletUpdatedAt: Date.now() }, { merge: true });
             }
 
             function renderCandidates() {
@@ -2060,53 +2080,65 @@
                 candidates.forEach((candidate, index) => {
                     const key = candidate.address.toLowerCase();
                     const isSelected = selected.has(key);
+                    const b = candidate.balance || {};
                     const button = document.createElement('button');
                     button.type = 'button';
-                    button.className = `w-full rounded-2xl border px-4 py-3 text-left transition ${isSelected ? 'border-[#6036E1] bg-violet-50' : 'border-gray-200 bg-white hover:border-gray-300'}`;
-                    button.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-[#6036E1] text-white' : 'bg-gray-100 text-gray-500'}"><i class="ph-bold ph-wallet"></i></div>
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-center gap-2"><span class="font-semibold text-gray-900">Account ${index + 1}</span><span class="rounded-full bg-gray-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-500">${candidate.providerName}</span></div>
-                                <div class="mt-1 truncate font-mono text-xs text-gray-500">${candidate.address}</div>
-                            </div>
-                            <div class="flex h-6 w-6 items-center justify-center rounded-full border ${isSelected ? 'border-[#6036E1] bg-[#6036E1] text-white' : 'border-gray-300 text-transparent'}"><i class="ph-bold ph-check text-xs"></i></div>
-                        </div>`;
+                    button.className = `w-full rounded-2xl border px-4 py-4 text-left transition ${isSelected ? 'border-[#6036E1] bg-violet-50' : 'border-gray-200 bg-white hover:border-gray-300'}`;
+                    button.innerHTML = `<div class="flex items-start gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-[#6036E1] text-white' : 'bg-gray-100 text-gray-500'}"><i class="ph-bold ph-wallet"></i></div><div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-2"><span class="font-semibold text-gray-900">Wallet ${index+1}</span>${b.hasBalance ? '<span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-700">Balance found</span>' : ''}<span class="rounded-full bg-gray-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-500">${candidate.providerName}</span></div><div class="mt-1 truncate font-mono text-xs text-gray-500">${candidate.address}</div><div class="mt-3 grid grid-cols-3 gap-2"><span class="rounded-xl bg-gray-50 px-2 py-2 text-[10px] font-semibold text-gray-600">ETH<br><strong class="text-gray-900">${b.eth || '0'}</strong></span><span class="rounded-xl bg-violet-50 px-2 py-2 text-[10px] font-semibold text-violet-600">$FEED<br><strong class="text-gray-900">${b.feed || '0'}</strong></span><span class="rounded-xl bg-blue-50 px-2 py-2 text-[10px] font-semibold text-blue-600">USDC<br><strong class="text-gray-900">${b.usdc || '0'}</strong></span></div></div><div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${isSelected ? 'border-[#6036E1] bg-[#6036E1] text-white' : 'border-gray-300 text-transparent'}"><i class="ph-bold ph-check text-xs"></i></div></div>`;
                     button.addEventListener('click', () => {
-                        if (selected.has(key)) {
-                            selected.delete(key);
-                        } else {
-                            if (selected.size >= MAX_SAVED) {
-                                showMessage('You can save up to 3 wallets under one Google account.', 'error');
-                                return;
-                            }
-                            selected.add(key);
-                        }
+                        if (selected.has(key)) selected.delete(key);
+                        else if (selected.size < MAX_SAVED) selected.add(key);
+                        else { showMessage('You can select up to 3 wallets.', 'error'); return; }
                         renderCandidates();
                     });
                     candidateList.appendChild(button);
                 });
                 selectedCount.textContent = `${selected.size} selected`;
-                saveButton.disabled = selected.size === 0;
+                saveButton.disabled = selected.size < 1 || selected.size > MAX_SAVED;
             }
 
             async function presentCandidates(accounts, provider, sourceName) {
                 const existing = new Set(linkedWallets.map(w => w.address.toLowerCase()));
-                candidates = accounts.filter(a => !existing.has(a.toLowerCase())).slice(0, MAX_CANDIDATES).map(address => ({
-                    address,
-                    providerName: sourceName
-                }));
+                const available = accounts.filter(a => !existing.has(a.toLowerCase()));
+                if (!available.length) { showMessage('No new public accounts are available from the connected wallet.', 'error'); return; }
+                const balances = await readBalances(available);
+                const indexed = available.map((address, i) => ({ address, providerName:sourceName, balance:balances[i] }));
+                indexed.sort((a,b) => Number(Boolean(b.balance?.hasBalance)) - Number(Boolean(a.balance?.hasBalance)));
+                candidates = indexed.slice(0, MAX_CANDIDATES);
                 selected = new Set();
                 currentProvider = provider;
                 currentProviderName = sourceName;
-
-                if (!candidates.length) {
-                    showMessage('No new public accounts are available from the connected wallet. Switch the active account in the wallet and try again.', 'error');
-                    return;
-                }
                 connectStage.classList.add('hidden');
                 candidatesStage.classList.remove('hidden');
+                clearMessage();
                 renderCandidates();
+            }
+
+            termsAgree?.addEventListener('change', () => { proceedButton.disabled = !termsAgree.checked; });
+
+            proceedButton?.addEventListener('click', async () => {
+                if (!termsAgree.checked) return;
+                termsStage.classList.add('hidden');
+                connectStage.classList.remove('hidden');
+                clearMessage();
+                try { await initializeReown(); showMessage('Reown / WalletConnect is ready. Choose a wallet connection method.', 'success'); }
+                catch (error) { console.error(error); connectStage.classList.add('hidden'); termsStage.classList.remove('hidden'); termsAgree.checked = true; proceedButton.disabled = false; showMessage(error?.message || 'Could not initialize the wallet connection service.', 'error'); }
+            });
+
+            async function initializeReown() {
+                if (walletConnectProvider) return walletConnectProvider;
+                const module = await import('https://esm.sh/@walletconnect/ethereum-provider?target=es2022');
+                const EthereumProvider = module.default || module.EthereumProvider;
+                if (!EthereumProvider?.init) throw new Error('Reown WalletConnect provider could not be loaded.');
+                walletConnectProvider = await EthereumProvider.init({
+                    projectId: REOWN_PROJECT_ID,
+                    chains: [CHAIN_ID],
+                    optionalChains: [CHAIN_ID],
+                    showQrModal: true,
+                    rpcMap: { [CHAIN_ID]: ALCHEMY_RPC },
+                    metadata: { name:'FEED', description:'FEED Base Sepolia wallet connection', url:window.location.origin, icons:['https://i.postimg.cc/W18WjK3V/image-(1).png'] }
+                });
+                return walletConnectProvider;
             }
 
             document.getElementById('feedWalletInjected')?.addEventListener('click', async () => {
@@ -2133,25 +2165,7 @@
                 clearMessage();
                 try {
                     showMessage('Opening the Reown / WalletConnect QR flow…');
-                    const module = await import('https://esm.sh/@walletconnect/ethereum-provider?target=es2022');
-                    const EthereumProvider = module.default || module.EthereumProvider;
-
-                    if (!walletConnectProvider) {
-                        walletConnectProvider = await EthereumProvider.init({
-                            projectId: REOWN_PROJECT_ID,
-                            chains: [CHAIN_ID],
-                            optionalChains: [CHAIN_ID],
-                            showQrModal: true,
-                            rpcMap: { [CHAIN_ID]: ALCHEMY_RPC },
-                            metadata: {
-                                name: 'FEED',
-                                description: 'FEED Base Sepolia wallet connection',
-                                url: window.location.origin,
-                                icons: ['https://i.postimg.cc/W18WjK3V/image-(1).png']
-                            }
-                        });
-                    }
-
+                    await initializeReown();
                     await walletConnectProvider.enable();
                     await ensureChain(walletConnectProvider);
                     const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
@@ -2163,33 +2177,28 @@
             });
 
             saveButton?.addEventListener('click', async () => {
-                if (!currentUid || !selected.size) return;
+                if (!currentUid || selected.size < 1 || selected.size > MAX_SAVED) return;
                 try {
+                    savingStage.classList.remove('hidden');
+                    candidatesStage.classList.add('hidden');
                     saveButton.disabled = true;
-                    showMessage('Reading Base Sepolia balances…');
+                    savingText.textContent = 'Reading Base Sepolia balances and saving your selected public addresses…';
                     const chosen = candidates.filter(c => selected.has(c.address.toLowerCase()));
                     const balances = await readBalances(chosen.map(c => c.address));
-
-                    chosen.forEach((candidate, index) => {
-                        linkedWallets.push({
-                            address: candidate.address,
-                            provider: candidate.providerName,
-                            chainId: CHAIN_ID,
-                            connectedAt: Date.now(),
-                            lastUsed: Date.now(),
-                            ...balances[index]
-                        });
-                    });
-
+                    const now = Date.now();
+                    chosen.forEach((candidate, i) => linkedWallets.push({ address:candidate.address, provider:candidate.providerName, chainId:CHAIN_ID, network:'Base Sepolia', connectedAt:now, lastUsed:now, ...balances[i] }));
                     linkedWallets = linkedWallets.slice(0, MAX_SAVED);
+                    if (!activeWalletAddress || !linkedWallets.some(w => w.address.toLowerCase() === activeWalletAddress.toLowerCase())) activeWalletAddress = linkedWallets[0]?.address || null;
                     await persist();
                     await refreshBalances(true);
                     hideModal();
                     renderAllWalletUI();
                 } catch (error) {
                     console.error(error);
+                    savingStage.classList.add('hidden');
+                    candidatesStage.classList.remove('hidden');
                     showMessage(error?.message || 'Could not save the selected wallets.', 'error');
-                    saveButton.disabled = selected.size === 0;
+                    saveButton.disabled = selected.size < 1;
                 }
             });
 
@@ -2210,7 +2219,9 @@
             }
 
             async function removeWallet(address) {
+                const removingActive = activeWalletAddress?.toLowerCase() === address.toLowerCase();
                 linkedWallets = linkedWallets.filter(w => w.address.toLowerCase() !== address.toLowerCase());
+                if (removingActive) activeWalletAddress = linkedWallets[0]?.address || null;
                 await persist();
                 renderAllWalletUI();
             }
@@ -2222,23 +2233,16 @@
 
             function walletCard(wallet, index) {
                 const card = document.createElement('div');
-                card.className = 'rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm';
-                card.innerHTML = `
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                            <div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">${wallet.provider || 'Wallet'} · Base Sepolia</div>
-                            <div class="mt-2 font-display text-lg font-black">Wallet ${index + 1}</div>
-                            <div class="mt-1 truncate font-mono text-xs text-gray-400">${wallet.address}</div>
-                        </div>
-                        <button type="button" data-wallet-delete class="rounded-xl p-2 text-gray-300 hover:bg-red-50 hover:text-red-600" title="Remove wallet"><i class="ph-bold ph-trash"></i></button>
-                    </div>
-                    <div class="mt-5 grid grid-cols-3 gap-3">
-                        <div class="rounded-2xl bg-gray-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">ETH gas</div><div class="mt-2 font-display text-lg font-bold">${wallet.eth || '0'}</div><div class="text-[10px] text-gray-400">ETH</div></div>
-                        <div class="rounded-2xl bg-violet-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-violet-500">$FEED</div><div class="mt-2 font-display text-lg font-bold">${wallet.feed || '0'}</div><div class="text-[10px] text-gray-400">tokens</div></div>
-                        <div class="rounded-2xl bg-blue-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-blue-500">USDC</div><div class="mt-2 font-display text-lg font-bold">${wallet.usdc || '0'}</div><div class="text-[10px] text-gray-400">USDC</div></div>
-                    </div>
-                    <div class="mt-4 flex items-center justify-between text-[10px] text-gray-400"><span>Public address only</span><span>${wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '—'}</span></div>`;
-                card.querySelector('[data-wallet-delete]')?.addEventListener('click', () => removeWallet(wallet.address));
+                const active = activeWalletAddress && wallet.address.toLowerCase() === activeWalletAddress.toLowerCase();
+                card.className = `rounded-[2rem] border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 ${active ? 'feed-wallet-active border-[#6036E1]' : 'border-gray-200'}`;
+                card.innerHTML = `<button type="button" data-wallet-activate class="w-full text-left"><div class="flex items-start justify-between gap-3"><div class="min-w-0"><div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">${wallet.provider || 'Wallet'} · Base Sepolia</div><div class="mt-2 flex items-center gap-2 font-display text-lg font-black">Wallet ${index+1} ${active ? '<span class="rounded-full bg-emerald-100 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-700">Active</span>' : ''}</div><div class="mt-1 truncate font-mono text-xs text-gray-400">${wallet.address}</div></div><i class="ph-bold ${active ? 'ph-check-circle text-[#6036E1]' : 'ph-circle text-gray-300'} text-xl"></i></div></button><div class="mt-5 grid grid-cols-3 gap-3"><div class="rounded-2xl bg-gray-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">ETH gas</div><div class="mt-2 font-display text-lg font-bold">${wallet.eth || '0'}</div><div class="text-[10px] text-gray-400">ETH</div></div><div class="rounded-2xl bg-violet-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-violet-500">$FEED</div><div class="mt-2 font-display text-lg font-bold">${wallet.feed || '0'}</div><div class="text-[10px] text-gray-400">tokens</div></div><div class="rounded-2xl bg-blue-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-blue-500">USDC</div><div class="mt-2 font-display text-lg font-bold">${wallet.usdc || '0'}</div><div class="text-[10px] text-gray-400">USDC</div></div></div><details class="mt-4 rounded-2xl bg-gray-50 px-4 py-3"><summary class="cursor-pointer text-xs font-bold text-gray-600">See address & wallet metadata</summary><div class="mt-3 space-y-2 text-xs text-gray-500"><div class="flex justify-between gap-3"><span>Network</span><strong class="text-gray-800">Base Sepolia</strong></div><div class="flex justify-between gap-3"><span>Chain ID</span><strong class="text-gray-800">84532</strong></div><div class="flex justify-between gap-3"><span>Connected via</span><strong class="text-gray-800">${wallet.provider || 'Wallet'}</strong></div><div class="break-all font-mono text-[10px] text-gray-400">${wallet.address}</div></div></details><div class="mt-4 flex items-center justify-between text-[10px] text-gray-400"><span>${active ? 'Active wallet' : 'Click wallet to activate'}</span><button type="button" data-wallet-delete class="rounded-xl p-2 text-gray-300 hover:bg-red-50 hover:text-red-600" title="Remove wallet"><i class="ph-bold ph-trash"></i></button></div>`;
+                card.querySelector('[data-wallet-activate]')?.addEventListener('click', async () => {
+                    activeWalletAddress = wallet.address;
+                    linkedWallets = linkedWallets.map(item => ({ ...item, lastUsed:item.address.toLowerCase() === wallet.address.toLowerCase() ? Date.now() : item.lastUsed }));
+                    await persist();
+                    renderAllWalletUI();
+                });
+                card.querySelector('[data-wallet-delete]')?.addEventListener('click', async event => { event.stopPropagation(); await removeWallet(wallet.address); });
                 return card;
             }
 
@@ -2249,7 +2253,8 @@
                 if (!section) {
                     section = document.createElement('div');
                     section.id = 'feedWalletOverview';
-                    overview.prepend(section);
+                    const balanceColumn = overview.querySelector('.xl\:col-span-8');
+                    if (balanceColumn) balanceColumn.appendChild(section); else overview.appendChild(section);
                 }
                 section.innerHTML = `
                     <div class="rounded-[2.5rem] border border-gray-100 bg-white/80 p-6 shadow-sm md:p-8">
@@ -2417,10 +2422,23 @@
                 });
             }
 
+            function renderActiveWalletSummary() {
+                const overview = document.getElementById('dashboardOverview');
+                const balanceColumn = overview?.querySelector('.xl\:col-span-8');
+                const mainCard = balanceColumn?.firstElementChild;
+                if (!mainCard) return;
+                let summary = document.getElementById('feedActiveWalletSummary');
+                if (!summary) { summary = document.createElement('div'); summary.id = 'feedActiveWalletSummary'; mainCard.appendChild(summary); }
+                const wallet = linkedWallets.find(w => activeWalletAddress && w.address.toLowerCase() === activeWalletAddress.toLowerCase());
+                if (!wallet) { summary.innerHTML = ''; return; }
+                summary.innerHTML = `<div class="mt-6 rounded-3xl border border-white/20 bg-black/15 p-4"><div class="flex items-center justify-between gap-3"><div><div class="text-[9px] font-bold uppercase tracking-[.18em] text-white/60">Active wallet</div><div class="mt-1 font-mono text-xs font-bold text-white">${short(wallet.address)}</div></div><div class="rounded-full bg-white/15 px-3 py-1 text-[9px] font-bold uppercase tracking-wider text-white/80">Base Sepolia</div></div><div class="mt-3 grid grid-cols-3 gap-2 text-xs"><div class="rounded-xl bg-white/10 p-2"><div class="text-white/50">ETH</div><strong>${wallet.eth || '0'}</strong></div><div class="rounded-xl bg-white/10 p-2"><div class="text-white/50">$FEED</div><strong>${wallet.feed || '0'}</strong></div><div class="rounded-xl bg-white/10 p-2"><div class="text-white/50">USDC</div><strong>${wallet.usdc || '0'}</strong></div></div></div>`;
+            }
+
             function renderAllWalletUI() {
                 if (!document.body.classList.contains('dashboard-active')) return;
                 ensureSettingsTab();
                 renderOverview();
+                renderActiveWalletSummary();
                 renderProfile();
                 renderSettings();
                 quickText.textContent = linkedWallets.length ? `${linkedWallets.length}/3 wallets` : 'Connect wallet';
@@ -2433,8 +2451,10 @@
 
                 try {
                     const snap = await getDoc(doc(db, 'users', currentUid));
-                    const saved = snap.exists() && Array.isArray(snap.data()?.wallets) ? snap.data().wallets : [];
+                    const data = snap.exists() ? snap.data() : {};
+                    const saved = Array.isArray(data.wallets) ? data.wallets : [];
                     linkedWallets = saved.slice(0, MAX_SAVED);
+                    activeWalletAddress = data.activeWalletAddress || linkedWallets[0]?.address || null;
                     await refreshBalances(true);
                     renderAllWalletUI();
 
