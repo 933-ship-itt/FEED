@@ -299,7 +299,7 @@
 
     <!-- Web3Modal & Application Logic -->
     <script type="module">
-        import { createWeb3Modal, defaultConfig } from 'https://cdn.jsdelivr.net/npm/@web3modal/ethers6@4.1.2/+esm'
+        import { createWeb3Modal, defaultConfig } from 'https://cdn.jsdelivr.net/npm/@web3modal/ethers6@4.1.2/+esm';
 
         const PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
         const FEED_CONTRACT = '0xF7351B1D08f460e40B5a78A3BeD5E65EA96548Ce';
@@ -316,45 +316,8 @@
         const metadata = {
             name: 'FEED App',
             description: 'Social Network + Digital Asset Platform',
-            url: 'https://feed-azure.vercel.app', 
+            url: window.location.origin,
             icons: ['https://i.postimg.cc/W18WjK3V/image-(1).png']
-        };
-
-        let modal;
-        try {
-            modal = createWeb3Modal({
-                ethersConfig: defaultConfig({ metadata }),
-                chains: [baseSepolia],
-                projectId: PROJECT_ID,
-                enableAnalytics: false
-            });
-        } catch (err) {
-            console.error("Web3Modal initialization failure:", err);
-        }
-
-        // Called by the non-module TOS button handler.
-        window.startWalletConnect = async () => {
-            const btn = document.getElementById('btn-proceed');
-
-            if (!modal) {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'Proceed to Connect';
-                }
-                alert("Web3Modal failed to load. Please check your network connection or Project ID.");
-                return;
-            }
-
-            try {
-                await modal.open();
-            } catch (err) {
-                console.error("Failed to open modal:", err);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'Proceed to Connect';
-                }
-                alert("Could not open wallet modal: " + (err.message || err));
-            }
         };
 
         const erc20Abi = [
@@ -362,17 +325,18 @@
             "function decimals() view returns (uint8)"
         ];
 
+        let modal = null;
         let fetchedAccounts = [];
         let selectedAddresses = new Set();
+        let processingConnection = false;
 
         const viewTos = document.getElementById('view-tos');
         const viewLoading = document.getElementById('view-loading');
         const viewWallets = document.getElementById('view-wallets');
         const viewSaving = document.getElementById('view-saving');
         const viewSuccess = document.getElementById('view-success');
-        
+
         const cbTos = document.getElementById('tos-checkbox');
-        const tosLabel = document.getElementById('tos-label');
         const btnProceed = document.getElementById('btn-proceed');
         const btnSave = document.getElementById('btn-save');
         const walletListDiv = document.getElementById('wallet-list');
@@ -382,34 +346,105 @@
             viewElement.classList.add('active');
         }
 
-        if (modal) {
-            modal.subscribeProvider(async (state) => {
-                if (state.isConnected && state.address) {
+        function syncProceedButton() {
+            btnProceed.disabled = !cbTos.checked;
+        }
+
+        // Let the native <label> + checkbox behavior handle the toggle.
+        // Do NOT manually toggle the checkbox from the label click.
+        cbTos.addEventListener('change', syncProceedButton);
+        syncProceedButton();
+
+        function setProceedLoading(loading) {
+            btnProceed.disabled = loading || !cbTos.checked;
+            btnProceed.textContent = loading ? "Opening Wallet..." : "Proceed to Connect";
+        }
+
+        btnProceed.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (!cbTos.checked || processingConnection) return;
+
+            if (!modal) {
+                alert("Wallet connection is still loading. Please wait a moment and try again.");
+                return;
+            }
+
+            processingConnection = true;
+            setProceedLoading(true);
+
+            try {
+                await modal.open();
+            } catch (err) {
+                console.error("Failed to open wallet modal:", err);
+                alert("Could not open the wallet connection window. Please try again.");
+            } finally {
+                processingConnection = false;
+                setProceedLoading(false);
+            }
+        });
+
+        async function initWeb3Modal() {
+            try {
+                modal = createWeb3Modal({
+                    ethersConfig: defaultConfig({ metadata }),
+                    chains: [baseSepolia],
+                    projectId: PROJECT_ID,
+                    enableAnalytics: false
+                });
+
+                // Subscribe exactly once. This avoids repeatedly attaching
+                // provider listeners during rerenders/reinitialization.
+                modal.subscribeProvider(async (state) => {
+                    if (!state?.isConnected || !state?.address || !state?.provider) return;
+                    if (processingConnection === false && !document.getElementById('view-tos').classList.contains('active')) return;
+
+                    processingConnection = true;
+
                     try {
-                        await modal.close();
-                    } catch (e) {}
-                    switchView(viewLoading);
-                    await processWalletData(state.provider);
-                }
-            });
+                        try {
+                            await modal.close();
+                        } catch (_) {}
+
+                        switchView(viewLoading);
+                        await processWalletData(state.provider);
+                    } catch (err) {
+                        console.error("Wallet processing error:", err);
+                        alert("Connection failed. Please make sure the wallet is connected to Base Sepolia.");
+                        switchView(viewTos);
+                        syncProceedButton();
+                    } finally {
+                        processingConnection = false;
+                    }
+                });
+            } catch (err) {
+                console.error("Web3Modal initialization failure:", err);
+                modal = null;
+            }
         }
 
         async function processWalletData(walletProvider) {
             try {
                 const ethersProvider = new ethers.BrowserProvider(walletProvider);
                 const signers = await ethersProvider.listAccounts();
-                
+
+                if (!signers.length) {
+                    throw new Error("No wallet accounts were returned.");
+                }
+
                 const feedContract = new ethers.Contract(FEED_CONTRACT, erc20Abi, ethersProvider);
                 const usdcContract = new ethers.Contract(USDC_CONTRACT, erc20Abi, ethersProvider);
 
-                let accountData = [];
+                const accountData = [];
 
-                for (let i = 0; i < signers.length; i++) {
-                    const address = signers[i].address;
-                    
-                    const ethBalRaw = await ethersProvider.getBalance(address);
-                    const feedBalRaw = await feedContract.balanceOf(address);
-                    const usdcBalRaw = await usdcContract.balanceOf(address);
+                for (const signer of signers) {
+                    const address = signer.address;
+
+                    const [ethBalRaw, feedBalRaw, usdcBalRaw] = await Promise.all([
+                        ethersProvider.getBalance(address),
+                        feedContract.balanceOf(address),
+                        usdcContract.balanceOf(address)
+                    ]);
 
                     const ethBal = parseFloat(ethers.formatEther(ethBalRaw)).toFixed(4);
                     const feedBal = parseFloat(ethers.formatUnits(feedBalRaw, 18)).toFixed(2);
@@ -426,28 +461,34 @@
 
                 accountData.sort((a, b) => b.totalWeight - a.totalWeight);
                 fetchedAccounts = accountData.slice(0, 5);
+                selectedAddresses.clear();
 
                 renderWalletList();
                 switchView(viewWallets);
-
             } catch (err) {
                 console.error("Failed to parse wallet data:", err);
-                alert("Connection failed while fetching balances. Ensure your wallet is connected to Base Sepolia.");
-                switchView(viewTos);
-                syncProceedButton();
+                throw err;
             }
         }
 
         function renderWalletList() {
             walletListDiv.innerHTML = '';
-            
+
+            if (!fetchedAccounts.length) {
+                walletListDiv.innerHTML = `
+                    <div class="text-center text-sm text-gray-500 py-8">
+                        No wallet addresses were returned.
+                    </div>`;
+                return;
+            }
+
             fetchedAccounts.forEach((acc) => {
                 const shortAddr = `${acc.address.substring(0, 6)}...${acc.address.substring(acc.address.length - 4)}`;
-                
+
                 const card = document.createElement('div');
                 card.className = "wallet-card bg-white rounded-2xl cursor-pointer overflow-hidden p-4";
                 card.dataset.address = acc.address;
-                
+
                 card.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -463,7 +504,7 @@
                         </div>
                         <div class="flex items-center justify-center w-6 h-6 border-2 border-gray-200 rounded-full indicator transition-colors"></div>
                     </div>
-                    
+
                     <div class="bg-gray-50 border border-gray-100 p-3 rounded-xl mt-3 hidden balance-dropdown">
                         <div class="grid grid-cols-3 gap-2">
                             <div class="bg-white border border-gray-100 p-2 rounded-lg text-center">
@@ -479,14 +520,16 @@
                                 <div class="font-semibold text-xs mt-1">${acc.eth}</div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
 
                 const trigger = card.querySelector('.dropdown-trigger');
                 const dropdown = card.querySelector('.balance-dropdown');
+
                 trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     dropdown.classList.toggle('hidden');
+
                     const icon = trigger.querySelector('i');
                     icon.classList.toggle('ph-caret-down');
                     icon.classList.toggle('ph-caret-up');
@@ -494,7 +537,7 @@
 
                 card.addEventListener('click', () => {
                     const isSelected = selectedAddresses.has(acc.address);
-                    
+
                     if (isSelected) {
                         selectedAddresses.delete(acc.address);
                         card.classList.remove('selected');
@@ -505,18 +548,16 @@
                             alert("You can only activate up to 3 wallets.");
                             return;
                         }
+
                         selectedAddresses.add(acc.address);
                         card.classList.add('selected');
                         card.querySelector('.indicator').classList.add('bg-[#6036E1]', 'border-[#6036E1]');
                         card.querySelector('.indicator').innerHTML = '<i class="ph-bold ph-check text-white text-xs"></i>';
                     }
 
-                    if (selectedAddresses.size > 0) {
-                        btnSave.removeAttribute('disabled');
-                    } else {
-                        btnSave.setAttribute('disabled', 'true');
-                    }
-                    btnSave.querySelector('span').textContent = `Save ${selectedAddresses.size} Wallet${selectedAddresses.size !== 1 ? 's' : ''} to Profile`;
+                    btnSave.disabled = selectedAddresses.size === 0;
+                    btnSave.querySelector('span').textContent =
+                        `Save ${selectedAddresses.size} Wallet${selectedAddresses.size !== 1 ? 's' : ''} to Profile`;
                 });
 
                 walletListDiv.appendChild(card);
@@ -524,16 +565,26 @@
         }
 
         btnSave.addEventListener('click', async () => {
+            if (!selectedAddresses.size) return;
+
             switchView(viewSaving);
+
             const payload = fetchedAccounts.filter(acc => selectedAddresses.has(acc.address));
-            
-            setTimeout(async () => {
+
+            try {
                 if (window.saveWalletsToFirestore) {
                     await window.saveWalletsToFirestore(payload);
                 }
                 switchView(viewSuccess);
-            }, 1800);
+            } catch (err) {
+                console.error("Save error:", err);
+                alert("Could not save the selected wallets.");
+                switchView(viewWallets);
+            }
         });
+
+        // Start Web3Modal once, after the page is ready.
+        initWeb3Modal();
     </script>
 </body>
 </html>
