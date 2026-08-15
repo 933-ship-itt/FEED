@@ -17,7 +17,6 @@
             --ink: #0b0b12;
             --line: #ececf3;
             --gradient: linear-gradient(to right, #6036E1, #D83DC2);
-            --shadow: 0 24px 80px rgba(32, 18, 80, 0.10);
         }
 
         body {
@@ -53,10 +52,12 @@
             box-shadow: 0 16px 35px rgba(96,54,225,0.22);
         }
 
-        .bg-gradient-custom:disabled {
+        button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             filter: grayscale(100%);
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         .premium-card {
@@ -64,7 +65,6 @@
             background: rgba(255,255,255,0.88);
             backdrop-filter: blur(18px);
             box-shadow: 0 18px 60px rgba(23, 18, 43, 0.06);
-            transition: all 0.3s ease;
         }
 
         .wallet-card {
@@ -78,7 +78,6 @@
             box-shadow: 0 8px 24px rgba(96,54,225,0.1);
         }
 
-        /* Satisfying Loader */
         .spinner {
             width: 40px;
             height: 40px;
@@ -102,11 +101,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Hide elements by default */
         .view-section { display: none; }
         .view-section.active { display: block; }
         
-        /* Custom Checkbox */
         .custom-checkbox {
             appearance: none;
             width: 20px;
@@ -136,10 +133,8 @@
 
     <div class="w-full max-w-xl mx-auto premium-card rounded-3xl p-8 md:p-10 relative overflow-hidden">
         
-        <!-- App Watermark -->
         <i class="ph-fill ph-cube absolute -top-10 -right-10 text-[180px] text-[#6036E1] opacity-5 pointer-events-none"></i>
 
-        <!-- Header -->
         <div class="text-center mb-8">
             <img class="h-12 w-12 mx-auto rounded-xl object-contain mb-4 shadow-sm" src="https://i.postimg.cc/W18WjK3V/image-(1).png" alt="FEED">
             <h1 class="font-display text-2xl font-black tracking-tight">F<span class="text-gradient">EE</span>D Access</h1>
@@ -158,12 +153,12 @@
                 </ul>
             </div>
             
-            <label class="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition mb-6">
+            <label id="tos-label" class="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition mb-6">
                 <input type="checkbox" id="tos-checkbox" class="custom-checkbox shrink-0">
                 <span class="text-sm font-medium text-gray-700 select-none">I agree to the Terms of Service</span>
             </label>
 
-            <button id="btn-proceed" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg shadow-violet-200/40 text-center">
+            <button id="btn-proceed" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center">
                 Proceed to Connect
             </button>
         </div>
@@ -182,10 +177,9 @@
                 <p class="text-sm text-gray-500 mt-1">Choose 1 to 3 addresses to index to your FEED profile.</p>
             </div>
             
-            <!-- Dynamic Wallet List Injected Here -->
             <div id="wallet-list" class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1"></div>
 
-            <button id="btn-save" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg shadow-violet-200/40 text-center flex items-center justify-center gap-2">
+            <button id="btn-save" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center flex items-center justify-center gap-2">
                 <span>Save to Profile</span>
             </button>
         </div>
@@ -203,7 +197,7 @@
                 <i class="ph-bold ph-check text-white text-3xl"></i>
             </div>
             <p class="text-gray-800 font-medium text-lg px-4 leading-relaxed">
-                test succesfull now implement this into the main dashboard ap to index the wallet
+                Test successful! Now implement this into the main dashboard app to index the wallet.
             </p>
         </div>
 
@@ -214,45 +208,36 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
-  apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-  authDomain: "feed-65b35.firebaseapp.com",
-  projectId: "feed-65b35",
-  storageBucket: "feed-65b35.firebasestorage.app",
-  messagingSenderId: "1085499159984",
-  appId: "1:1085499159984:web:317e0443941085964a5275",
-  measurementId: "G-FVPRRX9X1M"
-};
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "feed-azure.firebaseapp.com",
+            projectId: "feed-azure",
+            storageBucket: "feed-azure.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Expose function globally for the Web3 script to use
         window.saveWalletsToFirestore = async (wallets) => {
             try {
-                // In production, get the UID from Firebase Auth.
                 const mockGoogleUid = "google_user_mock_123"; 
-                
                 await setDoc(doc(db, "users", mockGoogleUid), {
                     connected_wallets: wallets,
                     updated_at: new Date().toISOString()
                 }, { merge: true });
-                
                 return true;
             } catch (error) {
                 console.error("Firestore Save Error:", error);
-                // Return true anyway for the test environment to proceed visually
                 return true; 
             }
         };
     </script>
 
-    <!-- Web3Modal / AppKit Setup -->
-    <!-- Web3Modal / AppKit Setup -->
+    <!-- Web3Modal & Application Logic -->
     <script type="module">
         import { createWeb3Modal, defaultConfig } from 'https://cdn.jsdelivr.net/npm/@web3modal/ethers6@4.1.2/+esm'
 
-        // Constants
         const PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
         const FEED_CONTRACT = '0xF7351B1D08f460e40B5a78A3BeD5E65EA96548Ce';
         const USDC_CONTRACT = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
@@ -280,21 +265,18 @@
                 projectId: PROJECT_ID,
                 enableAnalytics: false
             });
-        } catch (e) {
-            console.error("Web3Modal initialization error:", e);
+        } catch (err) {
+            console.error("Web3Modal initialization failure:", err);
         }
 
-        // Basic ERC20 ABI to fetch balances
         const erc20Abi = [
             "function balanceOf(address owner) view returns (uint256)",
             "function decimals() view returns (uint8)"
         ];
 
-        // State variables
         let fetchedAccounts = [];
         let selectedAddresses = new Set();
 
-        // UI Elements
         const viewTos = document.getElementById('view-tos');
         const viewLoading = document.getElementById('view-loading');
         const viewWallets = document.getElementById('view-wallets');
@@ -302,6 +284,7 @@
         const viewSuccess = document.getElementById('view-success');
         
         const cbTos = document.getElementById('tos-checkbox');
+        const tosLabel = document.getElementById('tos-label');
         const btnProceed = document.getElementById('btn-proceed');
         const btnSave = document.getElementById('btn-save');
         const walletListDiv = document.getElementById('wallet-list');
@@ -311,60 +294,60 @@
             viewElement.classList.add('active');
         }
 
-        // 1. Robust TOS Checkbox Logic
-        const updateProceedState = () => {
-            btnProceed.disabled = !cbTos.checked;
-        };
-        cbTos.addEventListener('change', updateProceedState);
-        cbTos.addEventListener('input', updateProceedState);
+        // Direct Checkbox State Synchronizer
+        function syncProceedButton() {
+            if (cbTos.checked) {
+                btnProceed.removeAttribute('disabled');
+            } else {
+                btnProceed.setAttribute('disabled', 'true');
+            }
+        }
 
-        // Also allow clicking the entire label wrapper smoothly
-        cbTos.parentElement.addEventListener('click', (e) => {
+        cbTos.addEventListener('change', syncProceedButton);
+        
+        // Allow clicking anywhere on the label row to toggle checkbox smoothly
+        tosLabel.addEventListener('click', (e) => {
             if (e.target !== cbTos) {
                 cbTos.checked = !cbTos.checked;
-                updateProceedState();
             }
+            syncProceedButton();
         });
 
-        // 2. Proceed & Init WalletConnect with Error Handling
+        // Proceed Button Trigger
         btnProceed.addEventListener('click', async () => {
             if (!cbTos.checked) return;
-            
+
+            if (!modal) {
+                alert("Web3Modal failed to load. Please check your network connection or Project ID.");
+                return;
+            }
+
             try {
-                btnProceed.disabled = true;
-                btnProceed.textContent = "Initializing Modal...";
-                
-                if (!modal) {
-                    throw new Error("Web3Modal failed to initialize. Check Project ID or network connection.");
-                }
-                
+                btnProceed.textContent = "Opening Wallet...";
+                btnProceed.setAttribute('disabled', 'true');
                 await modal.open();
                 btnProceed.textContent = "Proceed to Connect";
-                btnProceed.disabled = false;
+                syncProceedButton();
             } catch (err) {
-                console.error("WalletConnect open error:", err);
-                alert("Could not open wallet connection: " + (err.message || err));
+                console.error("Failed to open modal:", err);
+                alert("Could not open wallet modal: " + (err.message || err));
                 btnProceed.textContent = "Proceed to Connect";
-                btnProceed.disabled = false;
+                syncProceedButton();
             }
         });
 
-        // Listen for Wallet Connection Success
         if (modal) {
             modal.subscribeProvider(async (state) => {
                 if (state.isConnected && state.address) {
                     try {
                         await modal.close();
-                    } catch (e) {
-                        // ignore close errors if already closed
-                    }
+                    } catch (e) {}
                     switchView(viewLoading);
                     await processWalletData(state.provider);
                 }
             });
         }
 
-        // 3. Process Wallet Data
         async function processWalletData(walletProvider) {
             try {
                 const ethersProvider = new ethers.BrowserProvider(walletProvider);
@@ -403,13 +386,12 @@
 
             } catch (err) {
                 console.error("Failed to parse wallet data:", err);
-                alert("Connection failed while fetching balances. Ensure your wallet is set to Base Sepolia.");
+                alert("Connection failed while fetching balances. Ensure your wallet is connected to Base Sepolia.");
                 switchView(viewTos);
-                btnProceed.disabled = false;
+                syncProceedButton();
             }
         }
 
-        // 4. Render Wallets dynamically
         function renderWalletList() {
             walletListDiv.innerHTML = '';
             
@@ -417,11 +399,11 @@
                 const shortAddr = `${acc.address.substring(0, 6)}...${acc.address.substring(acc.address.length - 4)}`;
                 
                 const card = document.createElement('div');
-                card.className = "wallet-card bg-white rounded-2xl cursor-pointer overflow-hidden";
+                card.className = "wallet-card bg-white rounded-2xl cursor-pointer overflow-hidden p-4";
                 card.dataset.address = acc.address;
                 
                 card.innerHTML = `
-                    <div class="p-4 flex items-center justify-between">
+                    <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#6036E1]/20 to-[#D83DC2]/20 flex items-center justify-center shrink-0">
                                 <i class="ph-fill ph-wallet text-[#6036E1] text-xl"></i>
@@ -436,19 +418,19 @@
                         <div class="flex items-center justify-center w-6 h-6 border-2 border-gray-200 rounded-full indicator transition-colors"></div>
                     </div>
                     
-                    <div class="bg-gray-50 border-t border-gray-100 p-4 hidden balance-dropdown">
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="bg-white border border-gray-100 p-2 rounded-xl text-center">
-                                <div class="text-[10px] uppercase font-bold text-gray-400">USDC</div>
-                                <div class="font-semibold text-sm mt-1">${acc.usdc}</div>
+                    <div class="bg-gray-50 border border-gray-100 p-3 rounded-xl mt-3 hidden balance-dropdown">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-gray-100 p-2 rounded-lg text-center">
+                                <div class="text-[9px] uppercase font-bold text-gray-400">USDC</div>
+                                <div class="font-semibold text-xs mt-1">${acc.usdc}</div>
                             </div>
-                            <div class="bg-white border border-gray-100 p-2 rounded-xl text-center shadow-[0_4px_12px_rgba(96,54,225,0.08)]">
-                                <div class="text-[10px] uppercase font-bold text-[#D83DC2]">FEED</div>
-                                <div class="font-bold text-sm mt-1 text-gray-900">${acc.feed}</div>
+                            <div class="bg-white border border-gray-100 p-2 rounded-lg text-center shadow-sm">
+                                <div class="text-[9px] uppercase font-bold text-[#D83DC2]">FEED</div>
+                                <div class="font-bold text-xs mt-1 text-gray-900">${acc.feed}</div>
                             </div>
-                            <div class="bg-white border border-gray-100 p-2 rounded-xl text-center">
-                                <div class="text-[10px] uppercase font-bold text-gray-400">ETH</div>
-                                <div class="font-semibold text-sm mt-1">${acc.eth}</div>
+                            <div class="bg-white border border-gray-100 p-2 rounded-lg text-center">
+                                <div class="text-[9px] uppercase font-bold text-gray-400">ETH</div>
+                                <div class="font-semibold text-xs mt-1">${acc.eth}</div>
                             </div>
                         </div>
                     </div>
@@ -483,15 +465,18 @@
                         card.querySelector('.indicator').innerHTML = '<i class="ph-bold ph-check text-white text-xs"></i>';
                     }
 
-                    btnSave.disabled = selectedAddresses.size === 0;
-                    btnSave.innerHTML = `Save ${selectedAddresses.size} Wallet${selectedAddresses.size !== 1 ? 's' : ''} to Profile`;
+                    if (selectedAddresses.size > 0) {
+                        btnSave.removeAttribute('disabled');
+                    } else {
+                        btnSave.setAttribute('disabled', 'true');
+                    }
+                    btnSave.querySelector('span').textContent = `Save ${selectedAddresses.size} Wallet${selectedAddresses.size !== 1 ? 's' : ''} to Profile`;
                 });
 
                 walletListDiv.appendChild(card);
             });
         }
 
-        // 5. Final Save Action
         btnSave.addEventListener('click', async () => {
             switchView(viewSaving);
             const payload = fetchedAccounts.filter(acc => selectedAddresses.has(acc.address));
