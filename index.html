@@ -1735,30 +1735,63 @@
         #feedWalletModal {
             position: fixed; inset: 0; z-index: 100000;
             display: none; align-items: center; justify-content: center;
-            padding: 20px; background: rgba(8,7,15,.62); backdrop-filter: blur(14px);
+            padding: 28px; background: rgba(248,248,252,.82); backdrop-filter: blur(16px);
         }
         #feedWalletModal.open { display: flex; }
         #feedWalletModal .feed-wallet-dialog {
-            width: min(980px, calc(100vw - 40px)); max-height: min(860px, calc(100vh - 40px));
-            min-height: min(680px, calc(100vh - 40px));
-            overflow: hidden; border-radius: 32px; background: #fff;
-            box-shadow: 0 35px 120px rgba(0,0,0,.28);
+            width: min(920px, calc(100vw - 56px));
+            max-height: min(820px, calc(100vh - 56px));
+            overflow: hidden; border-radius: 40px;
+            background: rgba(255,255,255,.96);
+            border: 1px solid rgba(255,255,255,.9);
+            box-shadow: 0 35px 100px rgba(32,18,80,.18);
         }
-        #feedWalletModal .feed-wallet-scroll { overflow-y: auto; max-height: calc(100vh - 40px); }
-        #feedWalletModal .feed-wallet-dialog > .feed-wallet-scroll > .flex { padding-left: 28px; padding-right: 28px; padding-top: 24px; padding-bottom: 24px; }
-        #feedWalletModal .feed-wallet-dialog > .feed-wallet-scroll > .p-6 { padding: 28px; }
+        #feedWalletModal .feed-wallet-scroll {
+            overflow-y: auto; max-height: min(820px, calc(100vh - 56px));
+        }
+        #feedWalletModal .wallet-module { padding: 34px; }
+        #feedWalletModal .wallet-module-header {
+            display:flex; align-items:flex-start; justify-content:space-between; gap:24px;
+            padding-bottom:24px; border-bottom:1px solid #ececf3;
+        }
+        #feedWalletModal .wallet-module-icon {
+            width:56px; height:56px; border-radius:18px; display:flex; align-items:center; justify-content:center;
+            background:#111018; color:#fff; flex:0 0 auto; box-shadow:0 12px 30px rgba(17,16,24,.14);
+        }
+        #feedWalletModal .wallet-provider-grid {
+            display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;
+        }
+        #feedWalletModal .wallet-provider-card {
+            border:1px solid #e6e5ee; background:#fff; border-radius:24px; padding:24px;
+            text-align:left; transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        #feedWalletModal .wallet-provider-card:hover {
+            transform:translateY(-2px); border-color:rgba(96,54,225,.24); box-shadow:0 18px 50px rgba(32,18,80,.08);
+        }
+        #feedWalletModal .wallet-provider-card.secondary:hover { border-color:rgba(216,61,194,.28); }
+        #feedWalletModal .wallet-provider-icon {
+            width:48px; height:48px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+        }
+        #feedWalletModal .wallet-status {
+            display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:22px;
+            background:#f8f8fc; border:1px solid #ececf3;
+        }
+        #feedWalletModal .wallet-status-dot { width:10px; height:10px; border-radius:999px; background:#f59e0b; box-shadow:0 0 0 6px rgba(245,158,11,.10); }
+        #feedWalletModal .wallet-info-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+        #feedWalletModal .wallet-info-tile { border-radius:20px; background:#fafaff; border:1px solid #ececf3; padding:16px; }
+        #feedWalletModal .wallet-info-tile .label { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.16em; color:#9a98a8; }
+        #feedWalletModal .wallet-info-tile .value { margin-top:7px; font-size:14px; font-weight:700; color:#262331; }
+        #feedWalletModal #feedWalletCandidatesStage { margin-top:24px; }
         @media (max-width: 767px) {
-            #feedWalletModal { padding: 12px; }
-            #feedWalletModal .feed-wallet-dialog { width: 100%; min-height: calc(100vh - 24px); max-height: calc(100vh - 24px); border-radius: 24px; }
-            #feedWalletModal .feed-wallet-dialog > .feed-wallet-scroll > .flex,
-            #feedWalletModal .feed-wallet-dialog > .feed-wallet-scroll > .p-6 { padding-left: 20px; padding-right: 20px; }
+            #feedWalletModal { padding:12px; align-items:stretch; }
+            #feedWalletModal .feed-wallet-dialog { width:100%; max-height:calc(100vh - 24px); border-radius:28px; }
+            #feedWalletModal .wallet-module { padding:22px; }
+            #feedWalletModal .wallet-provider-grid, #feedWalletModal .wallet-info-grid { grid-template-columns:1fr; }
         }
         #feedWalletQuick {
             position: fixed; right: 24px; bottom: 24px; z-index: 5000;
-            display: none; align-items: center; gap: 8px;
-            border-radius: 999px; background: #111018; color: #fff;
-            padding: 12px 16px; font-size: 12px; font-weight: 800;
-            box-shadow: 0 18px 50px rgba(0,0,0,.18);
+            display: none; align-items: center; gap: 8px; border-radius: 999px; background: #111018; color: #fff;
+            padding: 12px 16px; font-size: 12px; font-weight: 800; box-shadow: 0 18px 50px rgba(0,0,0,.18);
         }
         body.dashboard-active #feedWalletQuick { display: inline-flex; }
         #feedWalletOverview { margin-top: 32px; }
@@ -1771,44 +1804,66 @@
     <div id="feedWalletModal" aria-hidden="true">
         <div class="feed-wallet-dialog">
             <div class="feed-wallet-scroll">
-                <div class="flex items-start justify-between border-b border-gray-100 px-6 py-5 md:px-7">
-                    <div>
-                        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6036E1]">Wallet Security</div>
-                        <h2 class="mt-2 font-display text-2xl font-black tracking-tight text-gray-900">Connect Base Sepolia wallet</h2>
-                        <p class="mt-1 max-w-md text-sm leading-relaxed text-gray-500">Connect an existing wallet. FEED stores public address metadata only.</p>
-                    </div>
-                    <button id="feedWalletClose" type="button" class="rounded-xl p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close">
-                        <i class="ph-bold ph-x text-xl"></i>
-                    </button>
-                </div>
-
-                <div class="p-6 md:p-7">
-                    <div id="feedWalletConnectStage">
-                        <div class="grid gap-3 md:grid-cols-2">
-                            <button id="feedWalletInjected" type="button" class="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#6036E1]/35">
-                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6036E1]/10 text-[#6036E1]"><i class="ph-bold ph-browser text-2xl"></i></div>
-                                <div class="mt-4 font-display font-bold text-gray-900">Browser wallet</div>
-                                <div id="feedWalletInjectedCopy" class="mt-1 text-xs leading-relaxed text-gray-500">Detect MetaMask or Trust Wallet and request access.</div>
-                            </button>
-                            <button id="feedWalletQR" type="button" class="rounded-2xl border border-gray-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#D83DC2]/35">
-                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D83DC2]/10 text-[#D83DC2]"><i class="ph-bold ph-qr-code text-2xl"></i></div>
-                                <div class="mt-4 font-display font-bold text-gray-900">QR / mobile wallet</div>
-                                <div class="mt-1 text-xs leading-relaxed text-gray-500">Open the Reown / WalletConnect QR flow.</div>
-                            </button>
-                        </div>
-                        <div id="feedWalletMessage" class="mt-4 hidden rounded-2xl px-4 py-3 text-sm"></div>
-                    </div>
-
-                    <div id="feedWalletCandidatesStage" class="hidden">
-                        <div class="flex items-end justify-between gap-3">
+                <div class="wallet-module">
+                    <div class="wallet-module-header">
+                        <div class="flex items-start gap-4">
+                            <div class="wallet-module-icon"><i class="ph-bold ph-wallet text-2xl"></i></div>
                             <div>
-                                <div class="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">Account selection</div>
-                                <div class="mt-1 font-display text-lg font-bold">Choose up to 3 wallets</div>
+                                <div class="text-[10px] font-bold uppercase tracking-[.2em] text-[#6036E1]">Wallet connection</div>
+                                <h2 class="mt-2 font-display text-3xl md:text-4xl font-black tracking-tight text-gray-900">Connect your wallet</h2>
+                                <p class="mt-2 max-w-2xl text-sm md:text-base leading-relaxed text-gray-500">Connect an existing wallet to bring your public address and Base Sepolia balances into FEED.</p>
                             </div>
-                            <div id="feedWalletSelectedCount" class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-500">0 selected</div>
                         </div>
-                        <div id="feedWalletCandidateList" class="mt-4 max-h-[320px] space-y-2 overflow-y-auto"></div>
-                        <button id="feedWalletSave" type="button" disabled class="mt-4 w-full rounded-2xl bg-gray-900 px-5 py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Save selected wallets</button>
+                        <button id="feedWalletClose" type="button" class="rounded-2xl p-3 text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close">
+                            <i class="ph-bold ph-x text-xl"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-7 space-y-5">
+                        <div class="wallet-status">
+                            <span class="wallet-status-dot"></span>
+                            <div>
+                                <div class="text-sm font-bold text-gray-900">Wallet not connected</div>
+                                <div class="mt-1 text-xs text-gray-500">Choose a connection method below. Your private keys never leave your wallet.</div>
+                            </div>
+                        </div>
+
+                        <div id="feedWalletConnectStage">
+                            <div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Connection methods</div>
+                            <div class="wallet-provider-grid mt-3">
+                                <button id="feedWalletInjected" type="button" class="wallet-provider-card">
+                                    <div class="wallet-provider-icon bg-[#6036E1]/10 text-[#6036E1]"><i class="ph-bold ph-browser text-2xl"></i></div>
+                                    <div class="mt-5 font-display text-xl font-bold text-gray-900">Browser wallet</div>
+                                    <div id="feedWalletInjectedCopy" class="mt-2 text-sm leading-relaxed text-gray-500">Detect MetaMask, Trust Wallet, or another compatible browser wallet and request access.</div>
+                                    <div class="mt-5 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-bold text-white">Continue <i class="ph-bold ph-arrow-right"></i></div>
+                                </button>
+                                <button id="feedWalletQR" type="button" class="wallet-provider-card secondary">
+                                    <div class="wallet-provider-icon bg-[#D83DC2]/10 text-[#D83DC2]"><i class="ph-bold ph-qr-code text-2xl"></i></div>
+                                    <div class="mt-5 font-display text-xl font-bold text-gray-900">QR / mobile wallet</div>
+                                    <div class="mt-2 text-sm leading-relaxed text-gray-500">Open the Reown / WalletConnect flow and connect from your phone.</div>
+                                    <div class="mt-5 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-xs font-bold text-white">Continue <i class="ph-bold ph-arrow-right"></i></div>
+                                </button>
+                            </div>
+                            <div id="feedWalletMessage" class="mt-4 hidden rounded-2xl px-4 py-3 text-sm"></div>
+                        </div>
+
+                        <div class="wallet-info-grid">
+                            <div class="wallet-info-tile"><div class="label">Network</div><div class="value">Base Sepolia</div></div>
+                            <div class="wallet-info-tile"><div class="label">Balances</div><div class="value">$FEED · USDC · ETH</div></div>
+                            <div class="wallet-info-tile"><div class="label">Security</div><div class="value">Public address only</div></div>
+                        </div>
+
+                        <div id="feedWalletCandidatesStage" class="hidden">
+                            <div class="flex items-end justify-between gap-3">
+                                <div>
+                                    <div class="text-[10px] font-bold uppercase tracking-[.18em] text-gray-400">Account selection</div>
+                                    <div class="mt-1 font-display text-lg font-bold">Choose up to 3 wallets</div>
+                                </div>
+                                <div id="feedWalletSelectedCount" class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-500">0 selected</div>
+                            </div>
+                            <div id="feedWalletCandidateList" class="mt-4 max-h-[320px] space-y-2 overflow-y-auto"></div>
+                            <button id="feedWalletSave" type="button" disabled class="mt-4 w-full rounded-2xl bg-gray-900 px-5 py-3.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Save selected wallets</button>
+                        </div>
                     </div>
                 </div>
             </div>
