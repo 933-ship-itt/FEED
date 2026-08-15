@@ -390,11 +390,56 @@
         }
         .wallet-connect-modal-backdrop[hidden] { display: none !important; }
         .wallet-connect-modal {
-            width: min(440px, 100%);
-            border-radius: 24px;
+            width: min(680px, 100%);
+            border-radius: 32px;
             background: #fff;
-            box-shadow: 0 28px 90px rgba(0,0,0,.24);
+            box-shadow: 0 36px 110px rgba(0,0,0,.28);
             border: 1px solid rgba(0,0,0,.08);
+        }
+
+        .wallet-connect-modal .wallet-connect-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+        }
+
+        .wallet-connect-modal .wallet-connect-icon i {
+            font-size: 30px;
+        }
+
+        .wallet-connect-modal .wallet-connect-title {
+            font-size: clamp(1.75rem, 3vw, 2.5rem);
+            line-height: 1.05;
+        }
+
+        .wallet-connect-modal .wallet-connect-message {
+            max-width: 560px;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .wallet-connect-modal .wallet-connect-ok {
+            min-height: 58px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .wallet-connect-modal-backdrop {
+                padding: 16px;
+            }
+
+            .wallet-connect-modal {
+                width: 100%;
+                border-radius: 26px;
+            }
+
+            .wallet-connect-modal .wallet-connect-title {
+                font-size: 1.75rem;
+            }
+
+            .wallet-connect-modal .wallet-connect-message {
+                font-size: .98rem;
+            }
         }
 
         .premium-frame {
@@ -1453,16 +1498,16 @@
             <div id="dashboardPlaceholder" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-10 text-center"><i class="ph ph-hourglass text-4xl text-[#6036E1]"></i><h2 class="mt-4 font-display text-2xl font-bold">Coming soon</h2><p class="mt-2 text-gray-500">This authenticated FEED module is being prepared.</p></div></div>
         </main>
         <div id="walletConnectModal" class="wallet-connect-modal-backdrop" hidden aria-hidden="true">
-            <div class="wallet-connect-modal p-7 md:p-8" role="dialog" aria-modal="true" aria-labelledby="walletConnectModalTitle">
-                <div class="flex items-start justify-between gap-5">
+            <div class="wallet-connect-modal p-8 md:p-10" role="dialog" aria-modal="true" aria-labelledby="walletConnectModalTitle">
+                <div class="flex items-start justify-between gap-6">
                     <div>
-                        <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-black text-white"><i class="ph-bold ph-wallet text-xl"></i></div>
-                        <h2 id="walletConnectModalTitle" class="font-display text-2xl font-bold text-gray-900">Wallet Connect</h2>
-                        <p class="mt-2 text-sm leading-relaxed text-gray-500">Wallet connection is currently under development.</p>
+                        <div class="wallet-connect-icon mb-6 flex items-center justify-center bg-black text-white"><i class="ph-bold ph-wallet"></i></div>
+                        <h2 id="walletConnectModalTitle" class="wallet-connect-title font-display font-black text-gray-900">Wallet Connect</h2>
+                        <p class="wallet-connect-message mt-4 text-gray-500">Wallet connection is currently under development. This feature will be available in a future update.</p>
                     </div>
-                    <button type="button" id="walletConnectModalClose" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close"><i class="ph-bold ph-x text-xl"></i></button>
+                    <button type="button" id="walletConnectModalClose" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close"><i class="ph-bold ph-x text-xl"></i></button>
                 </div>
-                <button type="button" id="walletConnectModalOk" class="wallet-connect-btn mt-7 w-full rounded-2xl px-5 py-3 text-sm font-bold">Okay</button>
+                <button type="button" id="walletConnectModalOk" class="wallet-connect-btn wallet-connect-ok mt-8 w-full rounded-2xl px-6 py-4 font-bold">Okay</button>
             </div>
         </div>
     </section>
