@@ -2139,11 +2139,19 @@
                     </div>`;
                 const grid = section.querySelector('#feedWalletOverviewGrid');
                 if (!linkedWallets.length) {
-                    grid.innerHTML = `<div class="rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-6 py-12 text-center"><div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#6036E1] shadow-sm"><i class="ph-bold ph-wallet text-2xl"></i></div><div class="mt-4 font-display text-lg font-bold">No wallets connected</div><p class="mt-1 text-sm text-gray-500">Connect up to 3 Base Sepolia wallets to populate this area.</p></div>`;
+                    grid.innerHTML = `<div class="rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-6 py-12 text-center">
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#6036E1] shadow-sm"><i class="ph-bold ph-wallet text-2xl"></i></div>
+                        <div class="mt-4 font-display text-lg font-bold">No wallets connected</div>
+                        <p class="mx-auto mt-1 max-w-md text-sm text-gray-500">Connect a Base Sepolia wallet to show ETH gas, $FEED, and USDC balances here.</p>
+                        <button id="feedConnectWalletOverviewEmpty" type="button" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl">
+                            <i class="ph-bold ph-wallet"></i> Connect Wallet
+                        </button>
+                    </div>`;
                 } else {
                     linkedWallets.forEach((wallet, index) => grid.appendChild(walletCard(wallet, index)));
                 }
                 section.querySelector('#feedAddWalletOverview')?.addEventListener('click', showModal);
+                section.querySelector('#feedConnectWalletOverviewEmpty')?.addEventListener('click', showModal);
             }
 
             function renderProfile() {
@@ -2169,7 +2177,12 @@
                     <div id="feedWalletProfileList" class="mt-5 space-y-3"></div>`;
                 const list = section.querySelector('#feedWalletProfileList');
                 if (!linkedWallets.length) {
-                    list.innerHTML = `<div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-500">No wallet addresses linked.</div>`;
+                    list.innerHTML = `<div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center">
+                        <div class="text-sm text-gray-500">No wallet addresses linked to this Google account.</div>
+                        <button id="feedConnectWalletProfileEmpty" type="button" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-sm hover:-translate-y-0.5 hover:shadow-md">
+                            <i class="ph-bold ph-wallet"></i> Connect Wallet
+                        </button>
+                    </div>`;
                 } else {
                     linkedWallets.forEach((wallet, index) => {
                         const row = document.createElement('div');
@@ -2182,6 +2195,7 @@
                 }
                 const add = section.querySelector('#feedAddWalletProfile');
                 if (add && linkedWallets.length < MAX_SAVED) add.addEventListener('click', showModal);
+                section.querySelector('#feedConnectWalletProfileEmpty')?.addEventListener('click', showModal);
             }
 
             function ensureSettingsTab() {
