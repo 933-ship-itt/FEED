@@ -367,24 +367,6 @@
             box-shadow: 0 8px 20px rgba(32, 18, 80, 0.04);
             transform: translateY(-1px);
         }
-
-        /* Wallet connection + testnet management */
-        .wallet-modal-backdrop { position:fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center; padding:20px; background:rgba(12,11,18,.62); backdrop-filter:blur(10px); }
-        .wallet-modal-backdrop.open { display:flex; }
-        .wallet-modal { width:min(920px,100%); max-height:min(88vh,820px); overflow:auto; background:#fff; border:1px solid #ececf3; border-radius:28px; box-shadow:0 32px 120px rgba(18,10,50,.28); }
-        .wallet-modal-scroll { overflow:auto; max-height:min(88vh,820px); }
-        .wallet-step { display:none; }
-        .wallet-step.active { display:block; }
-        .wallet-chip { border:1px solid #e6e5ee; background:#fff; transition:.2s ease; }
-        .wallet-chip:hover { border-color:rgba(96,54,225,.28); box-shadow:0 10px 30px rgba(96,54,225,.08); transform:translateY(-1px); }
-        .wallet-chip.selected { border-color:#6036E1; background:#f7f4ff; box-shadow:0 0 0 2px rgba(96,54,225,.08); }
-        .wallet-address { font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace; }
-        .wallet-balance-card { border:1px solid #ececf3; background:linear-gradient(180deg,#fff,#fafaff); }
-        .testnet-banner { border:1px solid rgba(96,54,225,.14); background:linear-gradient(135deg,#f5f1ff,#fff5fb); }
-        .wallet-modal::-webkit-scrollbar, .wallet-modal-scroll::-webkit-scrollbar { width:10px; }
-        .wallet-modal::-webkit-scrollbar-thumb, .wallet-modal-scroll::-webkit-scrollbar-thumb { background:#ddd9ec; border-radius:999px; }
-        @media (max-width: 640px) { .wallet-modal-backdrop { padding:10px; } .wallet-modal { border-radius:22px; } }
-
         .premium-frame {
             background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(18px);
@@ -1358,110 +1340,48 @@
         </div>
     </section>
 
-
-    <!-- Non-custodial wallet onboarding. FEED never asks for seed phrases or private keys. -->
-    <div id="walletConnectModal" class="wallet-modal-backdrop" aria-hidden="true">
-        <div class="wallet-modal" role="dialog" aria-modal="true" aria-labelledby="walletModalTitle">
-            <div class="wallet-modal-scroll">
-                <div class="p-7 md:p-10">
-                    <div class="flex items-start justify-between gap-6">
-                        <div>
-                            <div class="text-[10px] font-bold uppercase tracking-[.2em] text-[#6036E1]">Wallet setup</div>
-                            <h2 id="walletModalTitle" class="mt-2 font-display text-3xl md:text-4xl font-black tracking-tight">Connect your USDC funding wallets</h2>
-                            <p class="mt-3 max-w-3xl text-sm md:text-base leading-relaxed text-gray-500">Use your wallet provider to connect accounts. FEED does not collect, display, or store recovery phrases or private keys.</p>
-                        </div>
-                        <button id="walletModalClose" type="button" class="h-10 w-10 shrink-0 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50" aria-label="Close wallet setup"><i class="ph-bold ph-x text-xl"></i></button>
-                    </div>
-
-                    <div class="testnet-banner mt-7 rounded-2xl p-5 md:p-6">
-                        <div class="flex items-start gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#6036E1] text-white"><i class="ph-bold ph-flask text-lg"></i></div>
-                            <div>
-                                <div class="font-bold text-gray-900">TESTNET ONLY</div>
-                                <p class="mt-1 text-sm leading-relaxed text-gray-600">These connections are for <strong>USDC funding on Base Sepolia</strong>. They are <strong>not $FEED wallets</strong>. $FEED remains unavailable here until FEED is deployed and minted on Base.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 wallet-step active" data-wallet-step="connect">
-                        <div class="grid md:grid-cols-[1.1fr_.9fr] gap-6 items-stretch">
-                            <div class="rounded-3xl border border-gray-200 p-6 md:p-7 bg-white">
-                                <div class="flex items-center gap-3"><div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-900 text-white"><i class="ph-bold ph-wallet text-xl"></i></div><div><div class="font-display text-xl font-bold">1. Connect wallet provider</div><div class="text-sm text-gray-500">FEED will request account access from your wallet.</div></div></div>
-                                <button id="walletConnectBtn" type="button" class="mt-7 w-full rounded-2xl bg-gradient-to-r from-[#6036E1] to-[#D83DC2] px-5 py-4 text-sm font-bold text-white shadow-lg shadow-violet-200/40"><i class="ph-bold ph-link-simple mr-2"></i>Connect wallet</button>
-                                <div id="walletConnectError" class="hidden mt-4 rounded-2xl border border-red-100 bg-red-50 p-4 text-sm text-red-700"></div>
-                            </div>
-                            <div class="rounded-3xl border border-dashed border-gray-200 p-6 md:p-7 bg-gray-50">
-                                <div class="text-[10px] font-bold uppercase tracking-[.18em] text-gray-400">What FEED stores</div>
-                                <div class="mt-4 space-y-3 text-sm text-gray-600">
-                                    <div class="flex items-start gap-3"><i class="ph-fill ph-check-circle mt-0.5 text-emerald-600"></i><span>Wallet addresses and active-wallet selection only.</span></div>
-                                    <div class="flex items-start gap-3"><i class="ph-fill ph-check-circle mt-0.5 text-emerald-600"></i><span>Testnet balance snapshots for the connected accounts.</span></div>
-                                    <div class="flex items-start gap-3"><i class="ph-fill ph-x-circle mt-0.5 text-red-500"></i><span>No recovery phrase. No private key. No custodial import.</span></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 wallet-step" data-wallet-step="select">
-                        <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-                            <div>
-                                <div class="font-display text-xl font-bold">2. Select wallets to activate</div>
-                                <p class="mt-1 text-sm text-gray-500">Up to 15 accounts can be shown from the provider. Activate 1–8 for FEED USDC funding.</p>
-                            </div>
-                            <div class="rounded-full bg-gray-100 px-3 py-2 text-xs font-bold text-gray-600"><span id="walletSelectionCount">0</span>/8 active</div>
-                        </div>
-                        <div class="mt-5 rounded-2xl border border-gray-200 p-4 text-xs text-gray-500">Accounts with a non-zero testnet balance are sorted first. “Funded” means a detected Base Sepolia balance; it does not imply $FEED holdings.</div>
-                        <div id="walletList" class="mt-5 grid gap-3"></div>
-                        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                            <button id="walletBackBtn" type="button" class="rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm font-bold text-gray-700 hover:bg-gray-50">Back</button>
-                            <button id="walletActivateBtn" type="button" class="rounded-2xl bg-gray-900 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40" disabled>Activate selected wallets</button>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 wallet-step" data-wallet-step="done">
-                        <div class="rounded-3xl border border-emerald-100 bg-emerald-50 p-7">
-                            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white"><i class="ph-bold ph-check text-2xl"></i></div>
-                            <h3 class="mt-5 font-display text-2xl font-bold">USDC funding wallets activated</h3>
-                            <p class="mt-2 text-sm leading-relaxed text-gray-600">Your selected wallets are now available in FEED Overview and Profile. Balances shown there are testnet balances only.</p>
-                            <button id="walletDoneBtn" type="button" class="mt-6 rounded-2xl bg-gray-900 px-5 py-3 text-sm font-bold text-white">Open Overview</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Firebase Authentication – POPUP flow (replaces redirect) -->
     <!-- Protected dashboard: rendered in this document after Firebase authentication -->
     <section id="dashboard-view" class="dashboard-shell min-h-screen text-[#0b0b12]" aria-label="FEED authenticated dashboard" hidden>
         <aside class="dashboard-sidebar group fixed left-0 top-0 z-40 flex h-screen w-24 flex-col rounded-r-[2.5rem] border-r border-gray-100 bg-white shadow-[0_0_40px_rgba(32,18,80,0.06)] transition-[width] duration-300 hover:w-72">
-            <div class="flex h-28 min-w-0 shrink-0 items-center gap-3 px-6"><div class="flex min-w-0 items-center gap-3"><i class="ph-fill ph-cube shrink-0 text-3xl text-[#6036E1]"></i><span class="dashboard-label whitespace-nowrap font-display text-2xl font-black tracking-[-.05em]">F<span class="text-gradient">EE</span>D</span></div></div>
+            <div class="flex h-28 min-w-0 shrink-0 items-center gap-3 px-6">
+                <div class="flex min-w-0 items-center gap-3">
+                    <i class="ph-fill ph-cube shrink-0 text-3xl text-[#6036E1]" aria-hidden="true"></i>
+                    <span class="dashboard-label whitespace-nowrap font-display text-2xl font-black tracking-[-.05em] transition-all duration-300">F<span class="text-gradient">EE</span>D</span>
+                </div>
+            </div>
             <nav class="flex min-h-0 flex-1 flex-col space-y-2 overflow-y-auto px-4 pt-4" aria-label="Dashboard navigation">
-                <button type="button" data-dashboard-tab="overview" class="dashboard-tab dashboard-nav-item dashboard-nav-active flex w-full items-center rounded-2xl py-4 text-left"><i class="ph-bold ph-squares-four min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap font-semibold">Overview</span></button>
-                <button type="button" data-dashboard-tab="social" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-users-three min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap">Social Network</span></button>
-                <button type="button" data-dashboard-tab="analytics" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-chart-line-up min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap">Market Analytics</span></button>
-                <button type="button" data-dashboard-tab="leaderboard" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-trophy min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap">Leaderboard</span></button>
-                <button type="button" data-dashboard-tab="profile" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><span class="flex h-6 w-6 min-w-[24px] items-center justify-center overflow-hidden rounded-full bg-gray-100"><img id="dashboardSidebarAvatar" class="hidden h-full w-full object-cover" alt="Google profile"><i id="dashboardSidebarAvatarFallback" class="ph-bold ph-user text-lg"></i></span><span class="dashboard-label ml-5 whitespace-nowrap">Profile</span></button>
+                <button type="button" data-dashboard-tab="overview" class="dashboard-tab dashboard-nav-item dashboard-nav-active flex w-full items-center rounded-2xl py-4 text-left" aria-current="page"><i class="ph-bold ph-squares-four min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap font-semibold opacity-0 transition-opacity group-hover:opacity-100">Overview</span></button>
+                <button type="button" data-dashboard-tab="social" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-users-three min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Social Network</span></button>
+                <button type="button" data-dashboard-tab="analytics" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-chart-line-up min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Market Analytics</span></button>
+                <button type="button" data-dashboard-tab="leaderboard" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-trophy min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Leaderboard</span></button>
+                <button type="button" data-dashboard-tab="profile" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><span class="flex h-6 w-6 min-w-[24px] items-center justify-center overflow-hidden rounded-full bg-gray-100"><img id="dashboardSidebarAvatar" class="hidden h-full w-full object-cover" alt="Google profile"><i id="dashboardSidebarAvatarFallback" class="ph-bold ph-user text-lg"></i></span><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Profile</span></button>
             </nav>
-            <div class="dashboard-footer"><button type="button" id="dashboardSignOut" class="dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-sign-out min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap">Sign out</span></button></div>
+            <div class="dashboard-footer"><button type="button" id="dashboardSignOut" class="dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50 hover:text-gray-900"><i class="ph-bold ph-sign-out min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Sign out</span></button></div>
         </aside>
         <main class="dashboard-main ml-24 min-h-screen px-8 pb-24 pt-12 md:px-12">
-            <header class="mx-auto mb-10 flex max-w-[1400px] flex-col justify-between gap-6 md:flex-row md:items-end"><div><div class="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Private workspace</div><h1 id="dashboardHeading" class="font-display text-4xl font-black tracking-tight">Ecosystem Overview</h1><p id="dashboardSubheading" class="mt-2 font-medium text-gray-500">Manage your testnet USDC funding wallets and FEED account.</p></div><div class="flex shrink-0 items-center gap-4 self-start md:self-auto"><div class="hidden items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm sm:flex"><div class="h-2 w-2 rounded-full bg-emerald-500"></div><span id="dashboardWalletCount" class="text-xs font-semibold tracking-wide text-gray-700">0 wallets active</span></div><button id="dashboardProfileButton" data-dashboard-tab="profile" class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-1.5 pr-4 shadow-sm hover:border-[#6036E1]/30"><img id="dashboardAvatar" class="h-10 w-10 rounded-xl object-cover" alt="Google profile" hidden><div id="dashboardAvatarFallback" class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-sm font-bold text-white">?</div><div class="hidden text-left sm:block"><div id="dashboardName" class="text-sm font-bold leading-none text-gray-900">Authenticated user</div><div class="mt-1 text-[11px] font-bold uppercase tracking-wider leading-none text-gray-400">Google account</div></div></button></div></header>
-            <div id="dashboardOverview" class="mx-auto max-w-[1400px]
-                "><div class="grid grid-cols-1 gap-8 xl:grid-cols-12"><div class="flex flex-col gap-8 xl:col-span-8">
-                    <div class="relative w-full overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#6036E1] via-[#9a3ecb] to-[#D83DC2] p-8 text-white shadow-[0_20px_60px_rgba(96,54,225,.25)] md:p-10"><div class="relative z-10"><div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end"><div><h3 class="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.2em] text-white/80"><i class="ph-fill ph-wallet"></i> USDC Funding Balance</h3><div id="totalUsdcBalance" class="font-display text-5xl font-black tracking-tight">0.00 <span class="text-3xl text-emerald-200/80">USDC</span></div><div class="mt-3 font-semibold tracking-wide text-white/80">Base Sepolia testnet only <span class="ml-2 rounded-md bg-black/20 px-2 py-1 text-[10px] uppercase tracking-widest">TESTNET</span></div></div><div class="flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-4 py-2"><i class="ph-bold ph-flask text-emerald-200"></i><span class="text-sm font-bold">TESTNET ONLY</span></div></div><div class="grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-white/30 bg-white/20 lg:grid-cols-2"><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-hexagon text-xl"></i></div><span class="text-lg font-bold">$FEED Balance</span></div><div class="font-display text-2xl font-bold">0.00</div><div class="mt-1 text-sm font-medium text-white/70">Not deployed or minted on Base yet</div></div><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-wallet text-xl"></i></div><span class="text-lg font-bold">Active funding wallets</span></div><div id="activeWalletCountCard" class="font-display text-2xl font-bold">0 / 8</div><div class="mt-1 text-sm font-medium text-white/70">USDC only until $FEED deploys</div></div></div></div></div>
-                    <div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between"><div><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Wallet cards</div><h2 class="font-display text-2xl font-bold">Active funding wallets</h2></div><button type="button" id="overviewManageWallets" class="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700"><i class="ph-bold ph-gear-six mr-2"></i>Manage</button></div><div id="overviewWalletCards" class="grid gap-4 md:grid-cols-2"></div><div id="overviewNoWallets" class="rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center"><i class="ph ph-wallet text-4xl text-gray-300"></i><p class="mt-3 font-semibold text-gray-700">No USDC funding wallets connected</p><p class="mt-1 text-sm text-gray-400">Connect a wallet to continue. $FEED balances remain unavailable until deployment and minting on Base.</p><button type="button" id="overviewConnectWallet" class="mt-5 rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white">Connect wallet</button></div></div>
-                    <div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-8 flex items-center justify-between"><h2 class="font-display text-2xl font-bold">Ledger Transactions</h2><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gray-500">Testnet</span></div><div class="rounded-2xl border border-dashed border-gray-200 px-6 py-12 text-center"><i class="ph ph-receipt text-4xl text-gray-300"></i><p class="mt-3 font-semibold text-gray-700">No transactions yet</p><p class="mt-1 text-sm text-gray-400">USDC testnet activity will appear here once funding flows are connected.</p></div></div>
-                </div><div class="flex flex-col gap-8 xl:col-span-4"><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-900 text-white"><i class="ph-bold ph-shield-check text-2xl"></i></div><h2 class="mb-2 font-display text-xl font-bold">Authenticated workspace</h2><p class="text-sm leading-relaxed text-gray-500">Your Google session protects the app. Wallet permissions stay with your wallet provider.</p><div class="mt-6 flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"><i class="ph-fill ph-check-circle text-lg"></i> Session verified</div></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Funding network</div><div class="mt-5 space-y-4 text-sm"><div class="flex justify-between gap-4"><span class="text-gray-500">Network</span><span class="font-semibold">Base Sepolia</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Asset</span><span class="font-semibold">USDC testnet</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">$FEED</span><span class="font-semibold text-gray-400">Not deployed</span></div><button type="button" id="sideManageWallets" class="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-700">Manage wallets</button></div></div></div></div>
-            </div>
-            <div id="dashboardProfile" class="mx-auto hidden max-w-[1100px]"><div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center"><img id="profileAvatar" class="h-24 w-24 rounded-3xl object-cover shadow-lg" alt="Google profile" hidden><div id="profileAvatarFallback" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-3xl font-black text-white">?</div><div><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Google profile</div><h2 id="profileName" class="mt-2 font-display text-3xl font-black">Authenticated user</h2><p id="profileEmail" class="mt-1 text-gray-500">null</p></div></div><div class="mt-8 grid gap-4 md:grid-cols-2"><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication provider</div><div class="mt-2 font-semibold">Google</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet role</div><div class="mt-2 font-semibold">USDC funding wallets</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">$FEED balance</div><div class="mt-2 font-semibold text-gray-400">0.00 · Not deployed on Base</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Network</div><div class="mt-2 font-semibold">Base Sepolia testnet</div></div></div><div class="mt-10 border-t border-gray-100 pt-8"><div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between"><div><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Wallets</div><h3 class="font-display text-2xl font-bold mt-1">Manage your funding accounts</h3><p class="mt-2 text-sm text-gray-500">Add more, remove accounts, or replace the active selection. FEED stores wallet addresses and selection state, never recovery phrases.</p></div><button type="button" id="profileAddWallet" class="rounded-xl bg-gray-900 px-4 py-3 text-sm font-bold text-white"><i class="ph-bold ph-plus mr-2"></i>Add wallet</button></div><div id="profileWalletList" class="mt-5 grid gap-3"></div><div id="profileNoWallets" class="mt-5 rounded-2xl border border-dashed border-gray-200 px-6 py-10 text-center"><p class="font-semibold text-gray-700">No wallets connected</p><p class="mt-1 text-sm text-gray-400">Connect your first Base Sepolia USDC funding wallet.</p></div></div></div></div>
+            <header class="mx-auto mb-10 flex max-w-[1400px] flex-col justify-between gap-6 md:flex-row md:items-end"><div><div class="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Private workspace</div><h1 id="dashboardHeading" class="font-display text-4xl font-black tracking-tight">Ecosystem Overview</h1><p id="dashboardSubheading" class="mt-2 font-medium text-gray-500">Manage your decentralized assets and liquidity operations.</p></div><div class="flex shrink-0 items-center gap-4 self-start md:self-auto"><div class="hidden items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm sm:flex"><div class="h-2 w-2 rounded-full bg-green-500"></div><span class="text-xs font-semibold tracking-wide text-gray-700">0x••••••••</span></div><button id="dashboardProfileButton" data-dashboard-tab="profile" class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-1.5 pr-4 shadow-sm hover:border-[#6036E1]/30"><img id="dashboardAvatar" class="h-10 w-10 rounded-xl object-cover" alt="Google profile" hidden><div id="dashboardAvatarFallback" class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-sm font-bold text-white">?</div><div class="hidden text-left sm:block"><div id="dashboardName" class="text-sm font-bold leading-none text-gray-900">Authenticated user</div><div class="mt-1 text-[11px] font-bold uppercase tracking-wider leading-none text-gray-400">Google account</div></div><i class="ph-bold ph-caret-down ml-1 hidden text-gray-400 sm:block"></i></button></div></header>
+            <div id="dashboardOverview" class="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 xl:grid-cols-12"><div class="flex flex-col gap-8 xl:col-span-8"><div class="relative w-full overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#6036E1] via-[#9a3ecb] to-[#D83DC2] p-8 text-white shadow-[0_20px_60px_rgba(96,54,225,.25)] md:p-10"><div class="relative z-10"><div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end"><div><h3 class="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.2em] text-white/80"><i class="ph-fill ph-hexagon"></i> Total $FEED Balance</h3><div class="font-display text-5xl font-black tracking-tight text-emerald-300">0.00 <span class="text-3xl text-emerald-200/80">$FEED</span></div><div class="mt-3 font-semibold tracking-wide text-white/80">≈ $0.00 USD <span class="ml-2 rounded-md bg-black/20 px-2 py-1 text-[10px] uppercase tracking-widest">No market data</span></div></div><div class="flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-4 py-2"><i class="ph-bold ph-minus-circle text-emerald-300"></i><span class="text-sm font-bold">0.0% (24h)</span></div></div><div class="grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-white/30 bg-white/20 lg:grid-cols-2"><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-hexagon text-xl"></i></div><span class="text-lg font-bold">Available $FEED</span></div><div class="font-display text-2xl font-bold">0.00</div><div class="mt-1 text-sm font-medium text-white/70">No balance</div></div><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-currency-dollar text-xl"></i></div><span class="text-lg font-bold">USDC Balance</span></div><div class="font-display text-2xl font-bold">0.00</div><div class="mt-1 text-sm font-medium text-white/70">≈ $0.00 USD · No balance</div></div></div></div></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-8 flex items-center justify-between"><h2 class="font-display text-2xl font-bold">Ledger Transactions</h2><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gray-500">0 records</span></div><div class="rounded-2xl border border-dashed border-gray-200 px-6 py-12 text-center"><i class="ph ph-receipt text-4xl text-gray-300"></i><p class="mt-3 font-semibold text-gray-700">No transactions yet</p><p class="mt-1 text-sm text-gray-400">Transaction history is currently null.</p></div></div></div><div class="flex flex-col gap-8 xl:col-span-4"><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-900 text-white"><i class="ph-bold ph-shield-check text-2xl"></i></div><h2 class="mb-2 font-display text-xl font-bold">Authenticated workspace</h2><p class="text-sm leading-relaxed text-gray-500">Your dashboard is protected by Firebase Authentication and available only while your Google session is active.</p><div class="mt-6 flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"><i class="ph-fill ph-check-circle text-lg"></i> Session verified</div></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Account snapshot</div><div class="mt-5 space-y-4 text-sm"><div class="flex justify-between gap-4"><span class="text-gray-500">Wallet address</span><span class="font-semibold">0x••••••••</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Transactions</span><span class="font-semibold">0</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Balances</span><span class="font-semibold">0.00</span></div></div></div></div></div>
+            <div id="dashboardProfile" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center"><img id="profileAvatar" class="h-24 w-24 rounded-3xl object-cover shadow-lg" alt="Google profile" hidden><div id="profileAvatarFallback" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-3xl font-black text-white">?</div><div><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Google profile</div><h2 id="profileName" class="mt-2 font-display text-3xl font-black">Authenticated user</h2><p id="profileEmail" class="mt-1 text-gray-500">null</p></div></div><div class="mt-10 grid gap-4 md:grid-cols-2"><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication provider</div><div class="mt-2 font-semibold">Google</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet address</div><div class="mt-2 font-semibold">null</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">FEED balance</div><div class="mt-2 font-semibold">0.00</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Transactions</div><div class="mt-2 font-semibold">0</div></div></div></div></div>
             <div id="dashboardPlaceholder" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-10 text-center"><i class="ph ph-hourglass text-4xl text-[#6036E1]"></i><h2 class="mt-4 font-display text-2xl font-bold">Coming soon</h2><p class="mt-2 text-gray-500">This authenticated FEED module is being prepared.</p></div></div>
         </main>
     </section>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import {
+            getAuth,
+            GoogleAuthProvider,
+            signInWithPopup,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
@@ -1472,17 +1392,6 @@
             appId: "1:1085499159984:web:317e0443941085964a5275",
             measurementId: "G-FVPRRX9X1M"
         };
-
-        const BASE_SEPOLIA_CHAIN_ID = '0x14a34';
-        const BASE_SEPOLIA_CHAIN = {
-            chainId: BASE_SEPOLIA_CHAIN_ID,
-            chainName: 'Base Sepolia',
-            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-            rpcUrls: ['https://sepolia.base.org'],
-            blockExplorerUrls: ['https://sepolia.basescan.org']
-        };
-        const TESTNET_USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
-        const ERC20_BALANCE_OF_SELECTOR = '0x70a08231';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -1496,38 +1405,6 @@
         const errorContainer = document.getElementById('error-message');
         const loginView = document.getElementById('login-view');
         const dashboardView = document.getElementById('dashboard-view');
-        const walletModal = document.getElementById('walletConnectModal');
-        let currentUser = null;
-        let walletState = { accounts: [], active: [] };
-
-        const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
-        const stateKey = (uid) => `feed-wallets:${uid}`;
-
-        function loadWalletState(user) {
-            try {
-                const raw = localStorage.getItem(stateKey(user.uid));
-                if (!raw) return { accounts: [], active: [] };
-                const parsed = JSON.parse(raw);
-                return {
-                    accounts: Array.isArray(parsed.accounts) ? parsed.accounts.slice(0, 15) : [],
-                    active: Array.isArray(parsed.active) ? parsed.active.slice(0, 8) : []
-                };
-            } catch { return { accounts: [], active: [] }; }
-        }
-
-        async function persistWalletState() {
-            if (!currentUser) return;
-            localStorage.setItem(stateKey(currentUser.uid), JSON.stringify(walletState));
-            try {
-                await setDoc(doc(db, 'users', currentUser.uid), {
-                    walletAccounts: walletState.accounts,
-                    activeWallets: walletState.active,
-                    walletRole: 'USDC_FUNDING_TESTNET',
-                    walletNetwork: 'Base Sepolia',
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-            } catch (e) { console.warn('Wallet preferences save skipped:', e); }
-        }
 
         function setProfile(user) {
             const name = user.displayName || 'Google user';
@@ -1537,240 +1414,199 @@
             document.getElementById('profileEmail').textContent = email;
             document.querySelectorAll('#dashboardAvatarFallback, #profileAvatarFallback').forEach(el => el.textContent = initials);
             [['dashboardAvatar','dashboardAvatarFallback'], ['profileAvatar','profileAvatarFallback']].forEach(([imageId, fallbackId]) => {
-                const image = document.getElementById(imageId), fallback = document.getElementById(fallbackId);
+                const image = document.getElementById(imageId);
+                const fallback = document.getElementById(fallbackId);
                 if (user.photoURL) { image.src = user.photoURL; image.hidden = false; fallback.hidden = true; }
                 else { image.hidden = true; fallback.hidden = false; }
             });
-            const sidebarAvatar = document.getElementById('dashboardSidebarAvatar'), sidebarFallback = document.getElementById('dashboardSidebarAvatarFallback');
+            const sidebarAvatar = document.getElementById('dashboardSidebarAvatar');
+            const sidebarFallback = document.getElementById('dashboardSidebarAvatarFallback');
             if (sidebarAvatar && sidebarFallback) {
                 if (user.photoURL) { sidebarAvatar.src = user.photoURL; sidebarAvatar.classList.remove('hidden'); sidebarFallback.classList.add('hidden'); }
                 else { sidebarAvatar.classList.add('hidden'); sidebarFallback.classList.remove('hidden'); }
             }
         }
 
-        async function switchToBaseSepolia() {
-            if (!window.ethereum) throw new Error('No browser wallet provider detected. Install or open a supported wallet extension/app.');
-            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-            if (chainId.toLowerCase() === BASE_SEPOLIA_CHAIN_ID) return;
-            try {
-                await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_SEPOLIA_CHAIN_ID }] });
-            } catch (error) {
-                if (error?.code !== 4902) throw error;
-                await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [BASE_SEPOLIA_CHAIN] });
-            }
-        }
-
-        async function getNativeBalance(address) {
-            try {
-                const hex = await window.ethereum.request({ method: 'eth_getBalance', params: [address, 'latest'] });
-                return Number(BigInt(hex)) / 1e18;
-            } catch { return 0; }
-        }
-
-        async function getUsdcBalance(address) {
-            try {
-                const padded = address.toLowerCase().replace(/^0x/, '').padStart(64, '0');
-                const data = ERC20_BALANCE_OF_SELECTOR + padded;
-                const result = await window.ethereum.request({ method: 'eth_call', params: [{ to: TESTNET_USDC_ADDRESS, data }, 'latest'] });
-                return Number(BigInt(result || '0x0')) / 1e6;
-            } catch { return 0; }
-        }
-
-        async function hydrateAccounts(accounts) {
-            const unique = [...new Set(accounts.map(a => a.toLowerCase()))].slice(0, 15);
-            const rows = await Promise.all(unique.map(async address => ({
-                address,
-                native: await getNativeBalance(address),
-                usdc: await getUsdcBalance(address)
-            })));
-            rows.sort((a,b) => ((b.usdc > 0 ? 1 : 0) + (b.native > 0 ? 1 : 0)) - ((a.usdc > 0 ? 1 : 0) + (a.native > 0 ? 1 : 0)) || b.usdc - a.usdc || b.native - a.native);
-            return rows;
-        }
-
-        function renderWalletList(rows) {
-            const list = document.getElementById('walletList');
-            const selected = new Set(walletState.active.map(a => a.toLowerCase()));
-            document.getElementById('walletSelectionCount').textContent = selected.size;
-            document.getElementById('walletActivateBtn').disabled = selected.size === 0 || selected.size > 8;
-            if (!rows.length) {
-                list.innerHTML = `<div class="rounded-2xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-500">Your wallet provider did not expose any accounts to FEED.</div>`;
-                return;
-            }
-            list.innerHTML = rows.map((row, index) => {
-                const isSelected = selected.has(row.address.toLowerCase());
-                const funded = row.usdc > 0 || row.native > 0;
-                return `<button type="button" data-wallet-address="${row.address}" class="wallet-chip ${isSelected ? 'selected' : ''} rounded-2xl p-4 text-left ${isSelected ? 'selected' : ''}">
-                    <div class="flex items-start justify-between gap-4"><div class="flex min-w-0 items-start gap-3"><div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${funded ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}"><i class="ph-bold ph-wallet"></i></div><div class="min-w-0"><div class="flex items-center gap-2"><span class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet ${index+1}</span>${funded ? '<span class="rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-700">Funded</span>' : ''}</div><div class="wallet-address mt-1 truncate text-sm font-semibold text-gray-900">${shortAddress(row.address)}</div></div></div><div class="text-right"><div class="text-sm font-bold text-gray-900">${row.usdc.toFixed(2)} USDC</div><div class="mt-1 text-[11px] text-gray-500">${row.native.toFixed(4)} testnet ETH</div></div></div>
-                    <div class="mt-3 flex items-center justify-between text-xs"><span class="text-gray-500">Base Sepolia</span><span class="font-bold ${isSelected ? 'text-[#6036E1]' : 'text-gray-400'}">${isSelected ? 'Selected' : 'Select'}</span></div>
-                </button>`;
-            }).join('');
-            list.querySelectorAll('[data-wallet-address]').forEach(btn => btn.addEventListener('click', () => {
-                const addr = btn.dataset.walletAddress.toLowerCase();
-                const current = new Set(walletState.active.map(a => a.toLowerCase()));
-                if (current.has(addr)) current.delete(addr);
-                else if (current.size < 8) current.add(addr);
-                else return;
-                walletState.active = [...current];
-                renderWalletList(rows);
-            }));
-        }
-
-        function renderProfileWallets() {
-            const list = document.getElementById('profileWalletList'), empty = document.getElementById('profileNoWallets');
-            const active = new Set(walletState.active.map(a => a.toLowerCase()));
-            empty.classList.toggle('hidden', walletState.accounts.length > 0);
-            list.innerHTML = walletState.accounts.map(address => {
-                const isActive = active.has(address.toLowerCase());
-                return `<div class="wallet-balance-card rounded-2xl p-4"><div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><div class="flex items-center gap-2"><span class="rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wider ${isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}">${isActive ? 'Active' : 'Connected'}</span><span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">USDC funding wallet</span></div><div class="wallet-address mt-2 font-semibold">${shortAddress(address)}</div><div class="mt-1 text-xs text-gray-500">Base Sepolia testnet</div></div><button type="button" data-remove-wallet="${address}" class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-bold text-gray-600 hover:border-red-200 hover:text-red-600">Remove</button></div></div>`;
-            }).join('');
-            list.querySelectorAll('[data-remove-wallet]').forEach(btn => btn.addEventListener('click', async () => {
-                const addr = btn.dataset.removeWallet.toLowerCase();
-                walletState.accounts = walletState.accounts.filter(a => a.toLowerCase() !== addr);
-                walletState.active = walletState.active.filter(a => a.toLowerCase() !== addr);
-                await persistWalletState();
-                renderDashboardContent();
-            }));
-        }
-
-        async function refreshWalletUi() {
-            document.getElementById('dashboardWalletCount').textContent = `${walletState.active.length} wallet${walletState.active.length === 1 ? '' : 's'} active`;
-            document.getElementById('activeWalletCountCard').textContent = `${walletState.active.length} / 8`;
-            const cards = document.getElementById('overviewWalletCards'), empty = document.getElementById('overviewNoWallets');
-            const activeRows = await Promise.all(walletState.active.map(async address => ({ address, usdc: await getUsdcBalance(address), native: await getNativeBalance(address) })));
-            const totalUsdc = activeRows.reduce((sum, row) => sum + row.usdc, 0);
-            document.getElementById('totalUsdcBalance').innerHTML = `${totalUsdc.toFixed(2)} <span class="text-3xl text-emerald-200/80">USDC</span>`;
-            cards.innerHTML = activeRows.map(row => `<div class="wallet-balance-card rounded-2xl p-5"><div class="flex items-start justify-between gap-4"><div><div class="text-[10px] font-bold uppercase tracking-[.18em] text-gray-400">USDC funding wallet</div><div class="wallet-address mt-2 font-semibold">${shortAddress(row.address)}</div></div><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-700">Base Sepolia</span></div><div class="mt-5 grid grid-cols-2 gap-3"><div class="rounded-xl bg-gray-50 p-3"><div class="text-[10px] uppercase tracking-wider text-gray-400">USDC</div><div class="mt-1 font-display text-lg font-bold">${row.usdc.toFixed(2)}</div></div><div class="rounded-xl bg-gray-50 p-3"><div class="text-[10px] uppercase tracking-wider text-gray-400">Testnet ETH</div><div class="mt-1 font-display text-lg font-bold">${row.native.toFixed(4)}</div></div></div><div class="mt-4 rounded-xl bg-[#f7f4ff] p-3 text-xs font-semibold text-[#6036E1]">USDC funding only · $FEED is not deployed on Base yet.</div></div>`).join('');
-            empty.classList.toggle('hidden', activeRows.length > 0);
-            renderProfileWallets();
-        }
-
-        function openWalletModal(step = 'connect') {
-            walletModal.classList.add('open'); walletModal.setAttribute('aria-hidden', 'false');
-            document.querySelectorAll('.wallet-step').forEach(el => el.classList.toggle('active', el.dataset.walletStep === step));
-        }
-        function closeWalletModal() { walletModal.classList.remove('open'); walletModal.setAttribute('aria-hidden', 'true'); }
-
-        async function connectWalletAccounts() {
-            const error = document.getElementById('walletConnectError'); error.classList.add('hidden');
-            try {
-                await switchToBaseSepolia();
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const existing = walletState.accounts.map(a => a.toLowerCase());
-                const merged = [...walletState.accounts];
-                accounts.slice(0, 15).forEach(a => { if (!existing.includes(a.toLowerCase()) && merged.length < 15) merged.push(a); });
-                walletState.accounts = merged;
-                await persistWalletState();
-                const rows = await hydrateAccounts(walletState.accounts);
-                renderWalletList(rows);
-                document.querySelectorAll('.wallet-step').forEach(el => el.classList.toggle('active', el.dataset.walletStep === 'select'));
-            } catch (e) {
-                error.textContent = e?.message || 'Wallet connection was not completed.';
-                error.classList.remove('hidden');
-            }
-        }
-
-        async function manageWallets() {
-            if (!window.ethereum) { openWalletModal('connect'); return; }
-            const providerAccounts = await window.ethereum.request({ method: 'eth_accounts' });
-            if (providerAccounts?.length) {
-                providerAccounts.slice(0,15).forEach(a => { if (!walletState.accounts.some(x => x.toLowerCase() === a.toLowerCase()) && walletState.accounts.length < 15) walletState.accounts.push(a); });
-                await persistWalletState();
-            }
-            const rows = await hydrateAccounts(walletState.accounts);
-            renderWalletList(rows);
-            openWalletModal('select');
-        }
-
-        async function finalizeWalletSelection() {
-            if (walletState.active.length < 1 || walletState.active.length > 8) return;
-            await persistWalletState();
-            renderDashboardContent();
-            document.querySelectorAll('.wallet-step').forEach(el => el.classList.toggle('active', el.dataset.walletStep === 'done'));
-        }
-
-        function renderDashboardContent() {
-            refreshWalletUi();
-        }
-
-        async function showDashboard(user) {
-            currentUser = user;
+        function showDashboard(user) {
             setProfile(user);
-            walletState = loadWalletState(user);
+            renderDashboardContent();
             document.body.classList.remove('login-active');
             document.body.classList.add('dashboard-active');
             loginView.hidden = true;
             dashboardView.hidden = false;
             if (location.hash !== '#dashboard') history.replaceState({ dashboard: true }, '', '#dashboard');
             window.scrollTo(0, 0);
-            await refreshWalletUi();
-            if (!walletState.accounts.length || !walletState.active.length) openWalletModal('connect');
         }
 
-        function showError(message) { errorContainer.textContent = message; errorContainer.classList.remove('hidden'); }
-        function resetButton() { if (signInBtn) { signInBtn.disabled = false; btnText.textContent = 'Continue with Google'; btnLoader.style.display = 'none'; } }
-        function setLoading(text) { if (signInBtn) { signInBtn.disabled = true; btnText.textContent = text || 'Connecting...'; btnLoader.style.display = 'block'; } }
+        function renderDashboardContent() {
+            const overview = document.getElementById('dashboardOverview');
+            const balanceValues = overview.querySelectorAll('.font-display');
+            if (balanceValues[0]) balanceValues[0].innerHTML = '0.00 <span class="text-3xl text-emerald-200/80">$FEED</span>';
+            if (balanceValues[1]) balanceValues[1].textContent = '0.00';
+            if (balanceValues[2]) balanceValues[2].textContent = '0.00';
+            const profileBalance = document.querySelector('#dashboardProfile .grid > div:nth-child(3) .mt-2');
+            if (profileBalance) profileBalance.textContent = '0.00';
+            const rightColumn = Array.from(overview.children).find(child => child.classList.contains('xl:col-span-4'));
+            if (!rightColumn) return;
+            rightColumn.innerHTML = `<div class="dashboard-glass rounded-[2.5rem] p-8">
+                <div class="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-900 text-white"><i class="ph-bold ph-newspaper text-2xl"></i></div>
+                <h2 class="font-display text-xl font-bold">FEED Briefing</h2>
+                <p class="mt-2 text-sm leading-relaxed text-gray-500">Business, markets, and community stories curated for the FEED network.</p>
+                <div class="mt-6 space-y-5">
+                    <article class="border-b border-gray-100 pb-5"><div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">Markets · 4 min read</div><h3 class="mt-2 font-semibold leading-snug text-gray-900">What stablecoin liquidity means for digital communities</h3><p class="mt-2 text-xs leading-relaxed text-gray-500">A clear look at the signals shaping access, settlement, and participation.</p></article>
+                    <article class="border-b border-gray-100 pb-5"><div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#D83DC2]">Business · 6 min read</div><h3 class="mt-2 font-semibold leading-snug text-gray-900">Building trust into the next generation of social finance</h3><p class="mt-2 text-xs leading-relaxed text-gray-500">The product choices that make a wallet-native experience easier to understand.</p></article>
+                    <article><div class="text-[10px] font-bold uppercase tracking-[.18em] text-emerald-600">Community · 3 min read</div><h3 class="mt-2 font-semibold leading-snug text-gray-900">Inside the FEED creator economy</h3><p class="mt-2 text-xs leading-relaxed text-gray-500">How profiles, groups, and creators can turn attention into participation.</p></article>
+                </div>
+                <button class="mt-7 flex items-center gap-2 text-sm font-bold text-[#6036E1]">Browse all articles <i class="ph-bold ph-arrow-up-right"></i></button>
+            </div>
+            <div class="dashboard-glass rounded-[2.5rem] p-8"><div class="flex items-center justify-between"><div><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Newsletter</div><h2 class="mt-2 font-display text-xl font-bold">The weekly signal</h2></div><i class="ph-bold ph-envelope-simple-open text-2xl text-[#6036E1]"></i></div><p class="mt-4 text-sm leading-relaxed text-gray-500">One useful digest of business, market, and community updates.</p><form class="mt-5 flex gap-2" onsubmit="event.preventDefault();"><input type="email" required placeholder="you@example.com" class="min-w-0 flex-1 rounded-xl border border-gray-200 px-3 py-3 text-sm outline-none focus:border-[#6036E1]"><button class="rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white">Join</button></form></div>`;
+        }
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
+        }
 
+        function resetButton() {
+            if (signInBtn) {
+                signInBtn.disabled = false;
+                btnText.textContent = 'Continue with Google';
+                btnLoader.style.display = 'none';
+            }
+        }
+
+        function setLoading(text) {
+            if (signInBtn) {
+                signInBtn.disabled = true;
+                btnText.textContent = text || 'Connecting...';
+                btnLoader.style.display = 'block';
+            }
+        }
+
+        // ─── Handle authenticated user ─────────────────────────
         async function handleAuthenticatedUser(user) {
             setLoading('Finalizing profile...');
-            const userPayload = { uid:user.uid, email:user.email, displayName:user.displayName, photoURL:user.photoURL, lastLogin:serverTimestamp(), authProvider:'Google' };
-            try { await Promise.race([setDoc(doc(db,'users',user.uid), userPayload, {merge:true}), new Promise((_,reject)=>setTimeout(()=>reject(new Error('Firestore write timed out')),3000))]); }
-            catch (dbError) { console.warn('Firestore write skipped/timed out:', dbError); }
-            resetButton();
-            await showDashboard(user);
+
+            const forensics = {
+                userAgent: navigator.userAgent || 'Unknown',
+                platform: navigator.platform || 'Unknown',
+                language: navigator.language || 'Unknown',
+                screenResolution: `${window.screen.width}x${window.screen.height}`
+            };
+
+            const userPayload = {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                lastLogin: serverTimestamp(),
+                authProvider: 'Google',
+                forensics: forensics
+            };
+
+            const userRef = doc(db, 'users', user.uid);
+
+            try {
+                await Promise.race([
+                    setDoc(userRef, userPayload, { merge: true }),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error('Firestore write timed out')), 3000)
+                    )
+                ]);
+                console.log('Firestore write successful');
+            } catch (dbError) {
+                console.warn('Firestore write skipped/timed out:', dbError);
+            }
+
+            showDashboard(user);
         }
 
-        onAuthStateChanged(auth, user => { if (user) handleAuthenticatedUser(user); else { currentUser = null; document.body.classList.remove('dashboard-active'); dashboardView.hidden = true; resetButton(); } });
+        // ─── Auth state observer ────────────────────────────────
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('Auth state: user signed in', user.uid);
+                handleAuthenticatedUser(user);
+            } else {
+                console.log('Auth state: no user');
+                document.body.classList.remove('dashboard-active');
+                dashboardView.hidden = true;
+                resetButton();
+            }
+        });
 
         let activeDashboardTab = 'overview';
         const dashboardTabMeta = {
-            overview: { heading:'Ecosystem Overview', subheading:'Manage your testnet USDC funding wallets and FEED account.' },
-            social: { heading:'Social Network', subheading:'Connect, discover, and participate across the FEED community.' },
-            analytics: { heading:'Market Analytics', subheading:'Testnet market signals and future FEED readiness.' },
-            leaderboard: { heading:'Leaderboard', subheading:'See community rankings and engagement signals.' },
-            profile: { heading:'Your Profile', subheading:'Your Google identity and USDC funding wallet configuration.' }
+            overview: { heading: 'Ecosystem Overview', subheading: 'Manage your decentralized assets and liquidity operations.' },
+            social: { heading: 'Social Network', subheading: 'Connect, discover, and participate across the FEED community.' },
+            analytics: { heading: 'Market Analytics', subheading: 'Review FEED market signals, liquidity, and performance data.' },
+            leaderboard: { heading: 'Leaderboard', subheading: 'See community rankings and engagement signals.' },
+            profile: { heading: 'Your Profile', subheading: 'Your Google identity and FEED account snapshot.' }
         };
 
-        async function activateDashboardTab(tab) {
-            if (!dashboardTabMeta[tab]) tab='overview'; activeDashboardTab=tab;
-            document.querySelectorAll('.dashboard-tab').forEach(item => { const isActive=item.dataset.dashboardTab===tab; item.classList.toggle('dashboard-nav-active',isActive); item.setAttribute('aria-current',isActive?'page':'false'); });
-            const overview=document.getElementById('dashboardOverview'), profile=document.getElementById('dashboardProfile'), placeholder=document.getElementById('dashboardPlaceholder');
-            overview.classList.toggle('hidden',tab!=='overview'); profile.classList.toggle('hidden',tab!=='profile'); placeholder.classList.toggle('hidden',tab==='overview'||tab==='profile');
-            document.getElementById('dashboardHeading').textContent=dashboardTabMeta[tab].heading; document.getElementById('dashboardSubheading').textContent=dashboardTabMeta[tab].subheading;
-            if (tab!=='overview'&&tab!=='profile') { placeholder.querySelector('h2').textContent=dashboardTabMeta[tab].heading; placeholder.querySelector('p').textContent=dashboardTabMeta[tab].subheading; }
-            if (tab==='overview'||tab==='profile') await refreshWalletUi();
+        document.getElementById('dashboardProfileButton')?.addEventListener('click', () => activateDashboardTab('profile'));
+
+        function activateDashboardTab(tab) {
+            if (!dashboardTabMeta[tab]) tab = 'overview';
+            activeDashboardTab = tab;
+            document.querySelectorAll('.dashboard-tab').forEach(item => {
+                const isActive = item.dataset.dashboardTab === tab;
+                item.classList.toggle('dashboard-nav-active', isActive);
+                item.setAttribute('aria-current', isActive ? 'page' : 'false');
+            });
+            const overview = document.getElementById('dashboardOverview');
+            const profile = document.getElementById('dashboardProfile');
+            const placeholder = document.getElementById('dashboardPlaceholder');
+            overview.classList.toggle('hidden', tab !== 'overview');
+            profile.classList.toggle('hidden', tab !== 'profile');
+            placeholder.classList.toggle('hidden', tab === 'overview' || tab === 'profile');
+            document.getElementById('dashboardHeading').textContent = dashboardTabMeta[tab].heading;
+            document.getElementById('dashboardSubheading').textContent = dashboardTabMeta[tab].subheading;
+            if (tab !== 'overview' && tab !== 'profile') {
+                placeholder.querySelector('h2').textContent = dashboardTabMeta[tab].heading;
+                placeholder.querySelector('p').textContent = dashboardTabMeta[tab].subheading;
+            }
         }
 
-        document.querySelectorAll('[data-dashboard-tab]').forEach(button => button.addEventListener('click', () => activateDashboardTab(button.dataset.dashboardTab)));
-        document.getElementById('dashboardProfileButton')?.addEventListener('click',()=>activateDashboardTab('profile'));
-        document.getElementById('overviewManageWallets')?.addEventListener('click',manageWallets);
-        document.getElementById('sideManageWallets')?.addEventListener('click',manageWallets);
-        document.getElementById('overviewConnectWallet')?.addEventListener('click',()=>openWalletModal(walletState.accounts.length ? 'select' : 'connect'));
-        document.getElementById('profileAddWallet')?.addEventListener('click',()=>openWalletModal('connect'));
-        document.getElementById('walletConnectBtn')?.addEventListener('click',connectWalletAccounts);
-        document.getElementById('walletBackBtn')?.addEventListener('click',()=>openWalletModal('connect'));
-        document.getElementById('walletActivateBtn')?.addEventListener('click',finalizeWalletSelection);
-        document.getElementById('walletDoneBtn')?.addEventListener('click',async()=>{ closeWalletModal(); await activateDashboardTab('overview'); });
-        document.getElementById('walletModalClose')?.addEventListener('click',closeWalletModal);
-        walletModal.addEventListener('click',e=>{ if(e.target===walletModal) closeWalletModal(); });
-
-        document.getElementById('dashboardSignOut').addEventListener('click', async () => { await signOut(auth); history.replaceState({},'', '#top'); document.body.classList.remove('dashboard-active'); dashboardView.hidden=true; resetButton(); });
-
-        if (signInBtn) signInBtn.addEventListener('click', async () => {
-            if (signInBtn.disabled) return; errorContainer.classList.add('hidden'); setLoading('Opening Google…');
-            try { await signInWithPopup(auth, provider); } catch (error) { resetButton(); if(error.code==='auth/popup-blocked') showError('Google sign-in popup was blocked. Please allow popups for this site and try again.'); else if(error.code==='auth/popup-closed-by-user') showError('Sign-in cancelled. Please try again.'); else showError(`Authentication failed: ${error.message}`); }
+        document.querySelectorAll('[data-dashboard-tab]').forEach(button => {
+            button.addEventListener('click', () => activateDashboardTab(button.dataset.dashboardTab));
         });
 
-        if (window.ethereum?.on) {
-            window.ethereum.on('accountsChanged', async accounts => {
-                if (!currentUser || !accounts?.length) return;
-                accounts.slice(0,15).forEach(a=>{ if(!walletState.accounts.some(x=>x.toLowerCase()===a.toLowerCase()) && walletState.accounts.length<15) walletState.accounts.push(a); });
-                walletState.active = walletState.active.filter(a=>accounts.includes(a) || walletState.accounts.includes(a));
-                await persistWalletState(); await refreshWalletUi();
-            });
-            window.ethereum.on('chainChanged', () => { if (currentUser) refreshWalletUi(); });
-        }
-
         activateDashboardTab(activeDashboardTab);
+
+        document.getElementById('dashboardSignOut').addEventListener('click', async () => {
+            await signOut(auth);
+            history.replaceState({}, '', '#top');
+            document.body.classList.remove('dashboard-active');
+            dashboardView.hidden = true;
+            resetButton();
+        });
+
+        // ─── Sign‑in button: POPUP ──────────────────────────────
+        if (signInBtn) {
+            signInBtn.addEventListener('click', async () => {
+                if (signInBtn.disabled) return;
+
+                errorContainer.classList.add('hidden');
+                setLoading('Opening Google…');
+
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    console.log('Popup success:', result.user.uid);
+                    // The auth observer finalizes the protected dashboard transition.
+                } catch (error) {
+                    console.error('Popup sign-in error:', error);
+                    resetButton();
+
+                    if (error.code === 'auth/popup-blocked') {
+                        showError('Google sign‑in popup was blocked. Please allow popups for this site and try again.');
+                    } else if (error.code === 'auth/popup-closed-by-user') {
+                        showError('Sign‑in cancelled. Please try again.');
+                    } else {
+                        showError(`Authentication failed: ${error.message}`);
+                    }
+                }
+            });
+        }
+    </script>
 
     <!-- Routing / Hash handling (unchanged) -->
     <script>
