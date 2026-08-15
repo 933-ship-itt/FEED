@@ -1109,6 +1109,63 @@
         </div>
     </footer>
 
+    <!-- Automatic viewport scaling
+         Keeps desktop layouts at a comfortable visual scale without requiring
+         the visitor to manually change browser zoom. Responsive/mobile layouts
+         remain controlled by the existing Tailwind breakpoints. -->
+    <style id="auto-scale-styles">
+        html {
+            --auto-page-scale: 1;
+            zoom: var(--auto-page-scale);
+        }
+
+        /* Keep normal responsive behavior on tablets/phones. */
+        @media (max-width: 1023px) {
+            html {
+                zoom: 1;
+            }
+        }
+    </style>
+
+    <script>
+        (() => {
+            const DESKTOP_BREAKPOINT = 1024;
+            const REFERENCE_WIDTH = 1600;
+            const MIN_SCALE = 0.78;
+            const MAX_SCALE = 1;
+
+            let scaleFrame = null;
+
+            function updateAutoScale() {
+                const width = window.innerWidth;
+                const root = document.documentElement;
+
+                if (width < DESKTOP_BREAKPOINT) {
+                    root.style.setProperty('--auto-page-scale', '1');
+                    return;
+                }
+
+                // Scale down only when the viewport is narrower than the
+                // reference desktop width. Never enlarge beyond 100%.
+                const scale = Math.max(
+                    MIN_SCALE,
+                    Math.min(MAX_SCALE, width / REFERENCE_WIDTH)
+                );
+
+                root.style.setProperty('--auto-page-scale', scale.toFixed(4));
+            }
+
+            function scheduleAutoScale() {
+                if (scaleFrame) cancelAnimationFrame(scaleFrame);
+                scaleFrame = requestAnimationFrame(updateAutoScale);
+            }
+
+            updateAutoScale();
+            window.addEventListener('resize', scheduleAutoScale, { passive: true });
+            window.addEventListener('orientationchange', scheduleAutoScale, { passive: true });
+        })();
+    </script>
+
     <!-- Reveal animation -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
