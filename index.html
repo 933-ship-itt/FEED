@@ -1749,7 +1749,16 @@
     </button>
 
     <script type="module">
+        import { getApps } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
         (() => {
+            const firebaseApp = getApps()[0];
+            if (!firebaseApp) { console.error("FEED wallet layer: Firebase app is not initialized."); return; }
+            const auth = getAuth(firebaseApp);
+            const db = getFirestore(firebaseApp);
+
             const CHAIN_ID = 84532;
             const HEX_CHAIN_ID = '0x14a34';
             const ALCHEMY_RPC = 'https://base-sepolia.g.alchemy.com/v2/un_fsyvrLK_w11KP75BED';
