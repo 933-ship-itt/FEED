@@ -247,6 +247,7 @@
     </script>
 
     <!-- Web3Modal / AppKit Setup -->
+    <!-- Web3Modal / AppKit Setup -->
     <script type="module">
         import { createWeb3Modal, defaultConfig } from 'https://cdn.jsdelivr.net/npm/@web3modal/ethers6@4.1.2/+esm'
 
@@ -270,12 +271,17 @@
             icons: ['https://i.postimg.cc/W18WjK3V/image-(1).png']
         };
 
-        const modal = createWeb3Modal({
-            ethersConfig: defaultConfig({ metadata }),
-            chains: [baseSepolia],
-            projectId: PROJECT_ID,
-            enableAnalytics: false
-        });
+        let modal;
+        try {
+            modal = createWeb3Modal({
+                ethersConfig: defaultConfig({ metadata }),
+                chains: [baseSepolia],
+                projectId: PROJECT_ID,
+                enableAnalytics: false
+            });
+        } catch (e) {
+            console.error("Web3Modal initialization error:", e);
+        }
 
         // Basic ERC20 ABI to fetch balances
         const erc20Abi = [
@@ -304,31 +310,63 @@
             viewElement.classList.add('active');
         }
 
-        // 1. TOS Checkbox Logic
-        cbTos.addEventListener('change', (e) => {
-            btnProceed.disabled = !e.target.checked;
+        // 1. Robust TOS Checkbox Logic
+        const updateProceedState = () => {
+            btnProceed.disabled = !cbTos.checked;
+        };
+        cbTos.addEventListener('change', updateProceedState);
+        cbTos.addEventListener('input', updateProceedState);
+
+        // Also allow clicking the entire label wrapper smoothly
+        cbTos.parentElement.addEventListener('click', (e) => {
+            if (e.target !== cbTos) {
+                cbTos.checked = !cbTos.checked;
+                updateProceedState();
+            }
         });
 
-        // 2. Proceed & Init WalletConnect
+        // 2. Proceed & Init WalletConnect with Error Handling
         btnProceed.addEventListener('click', async () => {
-            await modal.open();
+            if (!cbTos.checked) return;
+            
+            try {
+                btnProceed.disabled = true;
+                btnProceed.textContent = "Initializing Modal...";
+                
+                if (!modal) {
+                    throw new Error("Web3Modal failed to initialize. Check Project ID or network connection.");
+                }
+                
+                await modal.open();
+                btnProceed.textContent = "Proceed to Connect";
+                btnProceed.disabled = false;
+            } catch (err) {
+                console.error("WalletConnect open error:", err);
+                alert("Could not open wallet connection: " + (err.message || err));
+                btnProceed.textContent = "Proceed to Connect";
+                btnProceed.disabled = false;
+            }
         });
 
         // Listen for Wallet Connection Success
-        modal.subscribeProvider(async (state) => {
-            if (state.isConnected && state.address) {
-                await modal.close();
-                switchView(viewLoading);
-                await processWalletData(state.provider);
-            }
-        });
+        if (modal) {
+            modal.subscribeProvider(async (state) => {
+                if (state.isConnected && state.address) {
+                    try {
+                        await modal.close();
+                    } catch (e) {
+                        // ignore close errors if already closed
+                    }
+                    switchView(viewLoading);
+                    await processWalletData(state.provider);
+                }
+            });
+        }
 
         // 3. Process Wallet Data
         async function processWalletData(walletProvider) {
             try {
                 const ethersProvider = new ethers.BrowserProvider(walletProvider);
-                
-                // Get all accounts exposed by the wallet
                 const signers = await ethersProvider.listAccounts();
                 
                 const feedContract = new ethers.Contract(FEED_CONTRACT, erc20Abi, ethersProvider);
@@ -339,25 +377,23 @@
                 for (let i = 0; i < signers.length; i++) {
                     const address = signers[i].address;
                     
-                    // Fetch Balances
                     const ethBalRaw = await ethersProvider.getBalance(address);
                     const feedBalRaw = await feedContract.balanceOf(address);
                     const usdcBalRaw = await usdcContract.balanceOf(address);
 
                     const ethBal = parseFloat(ethers.formatEther(ethBalRaw)).toFixed(4);
                     const feedBal = parseFloat(ethers.formatUnits(feedBalRaw, 18)).toFixed(2);
-                    const usdcBal = parseFloat(ethers.formatUnits(usdcBalRaw, 6)).toFixed(2); // USDC is 6 decimals
+                    const usdcBal = parseFloat(ethers.formatUnits(usdcBalRaw, 6)).toFixed(2);
 
                     accountData.push({
                         address,
                         eth: ethBal,
                         feed: feedBal,
                         usdc: usdcBal,
-                        totalWeight: parseFloat(ethBal) + parseFloat(feedBal) + parseFloat(usdcBal) // Simple proxy to sort active wallets
+                        totalWeight: parseFloat(ethBal) + parseFloat(feedBal) + parseFloat(usdcBal)
                     });
                 }
 
-                // Sort wallets so ones with balances are on top, then take the first 5
                 accountData.sort((a, b) => b.totalWeight - a.totalWeight);
                 fetchedAccounts = accountData.slice(0, 5);
 
@@ -366,8 +402,9 @@
 
             } catch (err) {
                 console.error("Failed to parse wallet data:", err);
-                alert("Connection failed. Please ensure you are on Base Sepolia.");
+                alert("Connection failed while fetching balances. Ensure your wallet is set to Base Sepolia.");
                 switchView(viewTos);
+                btnProceed.disabled = false;
             }
         }
 
@@ -375,7 +412,7 @@
         function renderWalletList() {
             walletListDiv.innerHTML = '';
             
-            fetchedAccounts.forEach((acc, index) => {
+            fetchedAccounts.forEach((acc) => {
                 const shortAddr = `${acc.address.substring(0, 6)}...${acc.address.substring(acc.address.length - 4)}`;
                 
                 const card = document.createElement('div');
@@ -398,7 +435,6 @@
                         <div class="flex items-center justify-center w-6 h-6 border-2 border-gray-200 rounded-full indicator transition-colors"></div>
                     </div>
                     
-                    <!-- Dropdown Balances -->
                     <div class="bg-gray-50 border-t border-gray-100 p-4 hidden balance-dropdown">
                         <div class="grid grid-cols-3 gap-3">
                             <div class="bg-white border border-gray-100 p-2 rounded-xl text-center">
@@ -417,18 +453,16 @@
                     </div>
                 `;
 
-                // Handle Balance Dropdown Toggle
                 const trigger = card.querySelector('.dropdown-trigger');
                 const dropdown = card.querySelector('.balance-dropdown');
                 trigger.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Don't trigger wallet selection
+                    e.stopPropagation();
                     dropdown.classList.toggle('hidden');
                     const icon = trigger.querySelector('i');
                     icon.classList.toggle('ph-caret-down');
                     icon.classList.toggle('ph-caret-up');
                 });
 
-                // Handle Card Selection
                 card.addEventListener('click', () => {
                     const isSelected = selectedAddresses.has(acc.address);
                     
@@ -448,7 +482,6 @@
                         card.querySelector('.indicator').innerHTML = '<i class="ph-bold ph-check text-white text-xs"></i>';
                     }
 
-                    // Toggle Save Button State
                     btnSave.disabled = selectedAddresses.size === 0;
                     btnSave.innerHTML = `Save ${selectedAddresses.size} Wallet${selectedAddresses.size !== 1 ? 's' : ''} to Profile`;
                 });
@@ -460,11 +493,8 @@
         // 5. Final Save Action
         btnSave.addEventListener('click', async () => {
             switchView(viewSaving);
-            
-            // Format selected data to pass to Firestore
             const payload = fetchedAccounts.filter(acc => selectedAddresses.has(acc.address));
             
-            // Artificial delay for a satisfying UX response
             setTimeout(async () => {
                 if (window.saveWalletsToFirestore) {
                     await window.saveWalletsToFirestore(payload);
@@ -472,7 +502,6 @@
                 switchView(viewSuccess);
             }, 1800);
         });
-
     </script>
 </body>
 </html>
