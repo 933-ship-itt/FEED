@@ -158,7 +158,7 @@
                 <span class="text-sm font-medium text-gray-700 select-none">I agree to the Terms of Service</span>
             </label>
 
-            <button id="btn-proceed" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center">
+            <button type="button" id="btn-proceed" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center">
                 Proceed to Connect
             </button>
         </div>
@@ -202,6 +202,68 @@
         </div>
 
     </div>
+
+
+    <!-- TOS controls are intentionally kept outside the module scripts.
+         This means the Agree/Proceed control still works even if a wallet SDK
+         or another module fails to load. -->
+    <script>
+        (() => {
+            const cb = document.getElementById('tos-checkbox');
+            const label = document.getElementById('tos-label');
+            const button = document.getElementById('btn-proceed');
+
+            if (!cb || !label || !button) return;
+
+            const sync = () => {
+                button.disabled = !cb.checked;
+                button.setAttribute('aria-disabled', String(!cb.checked));
+            };
+
+            cb.addEventListener('change', sync);
+
+            // The label already toggles a checkbox natively. Do not toggle it
+            // again manually; that can leave the state unchanged.
+            label.addEventListener('click', (event) => {
+                if (event.target === cb) return;
+                // Let the label's native behavior perform the toggle.
+                requestAnimationFrame(sync);
+            });
+
+            button.addEventListener('click', async () => {
+                if (!cb.checked) {
+                    sync();
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent = 'Opening Wallet...';
+
+                // The wallet module exposes this once Web3Modal is ready.
+                if (typeof window.startWalletConnect === 'function') {
+                    await window.startWalletConnect();
+                } else {
+                    // Give the module a moment to finish loading instead of
+                    // silently doing nothing.
+                    let attempts = 0;
+                    const waitForWallet = setInterval(async () => {
+                        attempts++;
+                        if (typeof window.startWalletConnect === 'function') {
+                            clearInterval(waitForWallet);
+                            await window.startWalletConnect();
+                        } else if (attempts >= 50) {
+                            clearInterval(waitForWallet);
+                            button.disabled = false;
+                            button.textContent = 'Proceed to Connect';
+                            alert('Wallet connection is still loading. Please refresh and try again.');
+                        }
+                    }, 100);
+                }
+            });
+
+            sync();
+        })();
+    </script>
 
     <!-- Firebase SDK Setup -->
     <script type="module">
@@ -270,6 +332,31 @@
             console.error("Web3Modal initialization failure:", err);
         }
 
+        // Called by the non-module TOS button handler.
+        window.startWalletConnect = async () => {
+            const btn = document.getElementById('btn-proceed');
+
+            if (!modal) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Proceed to Connect';
+                }
+                alert("Web3Modal failed to load. Please check your network connection or Project ID.");
+                return;
+            }
+
+            try {
+                await modal.open();
+            } catch (err) {
+                console.error("Failed to open modal:", err);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Proceed to Connect';
+                }
+                alert("Could not open wallet modal: " + (err.message || err));
+            }
+        };
+
         const erc20Abi = [
             "function balanceOf(address owner) view returns (uint256)",
             "function decimals() view returns (uint8)"
@@ -294,48 +381,6 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             viewElement.classList.add('active');
         }
-
-        // Direct Checkbox State Synchronizer
-        function syncProceedButton() {
-            if (cbTos.checked) {
-                btnProceed.removeAttribute('disabled');
-            } else {
-                btnProceed.setAttribute('disabled', 'true');
-            }
-        }
-
-        cbTos.addEventListener('change', syncProceedButton);
-        
-        // Allow clicking anywhere on the label row to toggle checkbox smoothly
-        tosLabel.addEventListener('click', (e) => {
-            if (e.target !== cbTos) {
-                cbTos.checked = !cbTos.checked;
-            }
-            syncProceedButton();
-        });
-
-        // Proceed Button Trigger
-        btnProceed.addEventListener('click', async () => {
-            if (!cbTos.checked) return;
-
-            if (!modal) {
-                alert("Web3Modal failed to load. Please check your network connection or Project ID.");
-                return;
-            }
-
-            try {
-                btnProceed.textContent = "Opening Wallet...";
-                btnProceed.setAttribute('disabled', 'true');
-                await modal.open();
-                btnProceed.textContent = "Proceed to Connect";
-                syncProceedButton();
-            } catch (err) {
-                console.error("Failed to open modal:", err);
-                alert("Could not open wallet modal: " + (err.message || err));
-                btnProceed.textContent = "Proceed to Connect";
-                syncProceedButton();
-            }
-        });
 
         if (modal) {
             modal.subscribeProvider(async (state) => {
