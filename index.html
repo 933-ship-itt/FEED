@@ -1690,8 +1690,14 @@
             walletConnectModal.hidden = false;
             walletConnectModal.setAttribute('aria-hidden', 'false');
         };
-        document.getElementById('overviewWalletConnectBtn')?.addEventListener('click', () => document.getElementById('feedWalletQuick')?.click());
-        document.getElementById('profileWalletConnectBtn')?.addEventListener('click', () => document.getElementById('feedWalletQuick')?.click());
+        window.showWalletModalFromUI = () => {
+            const walletButton = document.getElementById('feedWalletQuick');
+            if (typeof window.openFeedWalletModal === 'function') window.openFeedWalletModal();
+            else if (walletButton) walletButton.click();
+            else console.error('FEED wallet layer: Connect Wallet button is not mounted.');
+        };
+        document.getElementById('overviewWalletConnectBtn')?.addEventListener('click', showWalletModalFromUI);
+        document.getElementById('profileWalletConnectBtn')?.addEventListener('click', showWalletModalFromUI);
         document.getElementById('walletConnectModalClose')?.addEventListener('click', walletConnectClose);
         document.getElementById('walletConnectModalOk')?.addEventListener('click', walletConnectClose);
         walletConnectModal?.addEventListener('click', (event) => {
@@ -1936,21 +1942,26 @@
             let activeWalletAddress = null;
 
             function showModal() {
+                if (!modal) {
+                    console.error('FEED wallet layer: wallet modal element is missing.');
+                    return;
+                }
                 modal.classList.add('open');
                 modal.setAttribute('aria-hidden', 'false');
-                termsStage.classList.remove('hidden');
-                connectStage.classList.add('hidden');
-                candidatesStage.classList.add('hidden');
-                savingStage.classList.add('hidden');
+                termsStage?.classList.remove('hidden');
+                connectStage?.classList.add('hidden');
+                candidatesStage?.classList.add('hidden');
+                savingStage?.classList.add('hidden');
                 clearMessage();
-                termsAgree.checked = false;
-                proceedButton.disabled = true;
+                if (termsAgree) termsAgree.checked = false;
+                if (proceedButton) proceedButton.disabled = true;
                 selected = new Set();
+                requestAnimationFrame(() => termsAgree?.focus());
             }
 
             function hideModal() {
-                modal.classList.remove('open');
-                modal.setAttribute('aria-hidden', 'true');
+                modal?.classList.remove('open');
+                modal?.setAttribute('aria-hidden', 'true');
             }
 
             function clearMessage() {
@@ -2071,8 +2082,15 @@
             }
 
             async function persist() {
-                if (!currentUid) return;
-                await setDoc(doc(db, 'users', currentUid), { wallets: linkedWallets, activeWalletAddress: activeWalletAddress || null, walletUpdatedAt: Date.now() }, { merge: true });
+                if (!currentUid) throw new Error('You must be signed in with Google before saving wallets.');
+                try {
+                    await setDoc(doc(db, 'users', currentUid), { wallets: linkedWallets, activeWalletAddress: activeWalletAddress || null, walletUpdatedAt: Date.now() }, { merge: true });
+                } catch (error) {
+                    if (error?.code === 'not-found') {
+                        throw new Error('Cloud Firestore is not enabled for this Firebase project. Create the default Firestore database in Firebase Console, then try again.');
+                    }
+                    throw error;
+                }
             }
 
             function renderCandidates() {
@@ -2127,8 +2145,8 @@
 
             async function initializeReown() {
                 if (walletConnectProvider) return walletConnectProvider;
-                const module = await import('https://esm.sh/@walletconnect/ethereum-provider?target=es2022');
-                const EthereumProvider = module.default || module.EthereumProvider;
+                const module = await import('https://esm.sh/@walletconnect/ethereum-provider@2.23.10?target=es2022&bundle');
+                const EthereumProvider = module.EthereumProvider || module.default;
                 if (!EthereumProvider?.init) throw new Error('Reown WalletConnect provider could not be loaded.');
                 walletConnectProvider = await EthereumProvider.init({
                     projectId: REOWN_PROJECT_ID,
@@ -2204,6 +2222,7 @@
 
             document.getElementById('feedWalletClose')?.addEventListener('click', hideModal);
             quickButton?.addEventListener('click', showModal);
+            window.openFeedWalletModal = showModal;
             modal?.addEventListener('click', event => { if (event.target === modal) hideModal(); });
 
             async function refreshBalances(quiet = false) {
