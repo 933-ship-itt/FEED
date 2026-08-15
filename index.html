@@ -1755,7 +1755,11 @@
 
         (() => {
             const firebaseApp = getApps()[0];
-            if (!firebaseApp) { console.error("FEED wallet layer: Firebase app is not initialized."); return; }
+            if (!firebaseApp) {
+                console.error("FEED wallet layer: Firebase app is not initialized.");
+                return;
+            }
+
             const auth = getAuth(firebaseApp);
             const db = getFirestore(firebaseApp);
 
@@ -1767,6 +1771,7 @@
             const REOWN_PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
             const MAX_SAVED = 3;
             const MAX_CANDIDATES = 10;
+            const REFRESH_MS = 45000;
 
             const modal = document.getElementById('feedWalletModal');
             const connectStage = document.getElementById('feedWalletConnectStage');
@@ -1786,43 +1791,20 @@
             let walletConnectProvider = null;
             let currentUid = null;
             let refreshTimer = null;
+            let providerCleanup = null;
+            let walletOperationNonce = 0;
 
-            function showModal() {
-                modal.classList.add('open');
-                modal.setAttribute('aria-hidden', 'false');
-                connectStage.classList.remove('hidden');
-                candidatesStage.classList.add('hidden');
-                clearMessage();
-                renderCandidates();
+            function short(address) {
+                return `${address.slice(0, 6)}…${address.slice(-4)}`;
             }
 
-            function hideModal() {
-                modal.classList.remove('open');
-                modal.setAttribute('aria-hidden', 'true');
+            function normalizeAddress(address) {
+                return String(address || '').toLowerCase();
             }
 
-            function clearMessage() {
-                message.className = 'mt-4 hidden rounded-2xl px-4 py-3 text-sm';
-                message.textContent = '';
-            }
-
-            function showMessage(text, type = 'info') {
-                const classes = {
-                    info: 'border border-blue-100 bg-blue-50 text-blue-700',
-                    error: 'border border-red-100 bg-red-50 text-red-700',
-                    success: 'border border-emerald-100 bg-emerald-50 text-emerald-700'
-                };
-                message.className = `mt-4 rounded-2xl px-4 py-3 text-sm ${classes[type] || classes.info}`;
-                message.textContent = text;
-            }
-
-            function short(address) { return `${address.slice(0, 6)}…${address.slice(-4)}`; }
-
-            function injectedProviders() {
-                const injected = window.ethereum;
-                if (!injected) return [];
-                const providers = Array.isArray(injected.providers) && injected.providers.length ? injected.providers : [injected];
-                return providers.filter(Boolean);
+            function isBaseSepolia(chainId) {
+                const value = String(chainId || '').toLowerCase();
+                return value === String(CHAIN_ID) || value === HEX_CHAIN_ID;
             }
 
             function providerName(provider) {
@@ -1832,18 +1814,121 @@
                 return 'Browser Wallet';
             }
 
-            function isBaseSepolia(chainId) {
-                if (typeof chainId === 'number') return chainId === CHAIN_ID;
-                return String(chainId).toLowerCase() === String(CHAIN_ID) || String(chainId).toLowerCase() === HEX_CHAIN_ID;
+            function injectedProviders() {
+                const injected = window.ethereum;
+                if (!injected) return [];
+                const providers = Array.isArray(injected.providers) && injected.providers.length
+                    ? injected.providers
+                    : [injected];
+                return providers.filter(Boolean);
+            }
+
+            function clearMessage() {
+                if (!message) return;
+                message.className = 'mt-4 hidden rounded-2xl px-4 py-3 text-sm';
+                message.textContent = '';
+            }
+
+            function showMessage(text, type = 'info') {
+                if (!message) return;
+                const classes = {
+                    info: 'border border-blue-100 bg-blue-50 text-blue-700',
+                    error: 'border border-red-100 bg-red-50 text-red-700',
+                    success: 'border border-emerald-100 bg-emerald-50 text-emerald-700'
+                };
+                message.className = `mt-4 rounded-2xl px-4 py-3 text-sm ${classes[type] || classes.info}`;
+                message.textContent = text;
+            }
+
+            function showModal() {
+                if (!modal) return;
+                if (linkedWallets.length >= MAX_SAVED) {
+                    renderAllWalletUI();
+                }
+                modal.classList.add('open');
+                modal.setAttribute('aria-hidden', 'false');
+                connectStage?.classList.remove('hidden');
+                candidatesStage?.classList.add('hidden');
+                clearMessage();
+                candidates = [];
+                selected = new Set();
+                renderCandidates();
+            }
+
+            function hideModal() {
+                modal?.classList.remove('open');
+                modal?.setAttribute('aria-hidden', 'true');
+            }
+
+            function normalizeSavedWallets(wallets) {
+                const seen = new Set();
+                return (Array.isArray(wallets) ? wallets : [])
+                    .filter(wallet => wallet && wallet.address)
+                    .map(wallet => ({
+                        address: wallet.address,
+                        provider: wallet.provider || 'Wallet',
+                        chainId: Number(wallet.chainId) || CHAIN_ID,
+                        connectedAt: Number(wallet.connectedAt) || Date.now(),
+                        lastUsed: Number(wallet.lastUsed) || Number(wallet.connectedAt) || Date.now(),
+                        active: Boolean(wallet.active),
+                        networkState: wallet.networkState || 'connected',
+                        eth: wallet.eth,
+                        feed: wallet.feed,
+                        usdc: wallet.usdc,
+                        feedDecimals: wallet.feedDecimals,
+                        usdcDecimals: wallet.usdcDecimals,
+                        updatedAt: wallet.updatedAt || null,
+                        balanceErrors: wallet.balanceErrors || {}
+                    }))
+                    .filter(wallet => {
+                        const key = normalizeAddress(wallet.address);
+                        if (!key || seen.has(key)) return false;
+                        seen.add(key);
+                        return true;
+                    })
+                    .slice(0, MAX_SAVED);
+            }
+
+            function getActiveWallet() {
+                return linkedWallets.find(wallet => wallet.active)
+                    || linkedWallets[0]
+                    || null;
+            }
+
+            function ensureActiveWallet() {
+                if (!linkedWallets.length) return;
+                const existing = linkedWallets.find(wallet => wallet.active);
+                const address = existing?.address || linkedWallets[0].address;
+                linkedWallets = linkedWallets.map(wallet => ({
+                    ...wallet,
+                    active: normalizeAddress(wallet.address) === normalizeAddress(address)
+                }));
+            }
+
+            // Firestore security requirement for deployment: rules must enforce request.auth.uid == userId
+            // for users/{userId}; the client never stores private keys, seed phrases, passwords, or signing secrets.
+            async function persist() {
+                if (!currentUid) return;
+                ensureActiveWallet();
+                await setDoc(doc(db, 'users', currentUid), {
+                    wallets: linkedWallets,
+                    activeWallet: getActiveWallet()?.address || null,
+                    updatedAt: Date.now()
+                }, { merge: true });
             }
 
             async function ensureChain(provider) {
+                if (!provider?.request) throw new Error('This wallet provider is not EIP-1193 compatible.');
                 let chain = await provider.request({ method: 'eth_chainId' });
                 if (isBaseSepolia(chain)) return;
+
                 try {
-                    await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: HEX_CHAIN_ID }] });
+                    await provider.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: HEX_CHAIN_ID }]
+                    });
                 } catch (error) {
-                    if (error?.code === 4902 || /Unrecognized chain|not added/i.test(error?.message || '')) {
+                    if (error?.code === 4902 || /Unrecognized chain|not added|unknown chain/i.test(error?.message || '')) {
                         await provider.request({
                             method: 'wallet_addEthereumChain',
                             params: [{
@@ -1858,14 +1943,21 @@
                         throw error;
                     }
                 }
+
                 chain = await provider.request({ method: 'eth_chainId' });
                 if (!isBaseSepolia(chain)) throw new Error('Please switch the wallet to Base Sepolia.');
             }
 
             async function discoverAccounts(provider) {
                 let accounts = await provider.request({ method: 'eth_accounts' }).catch(() => []);
-                if (!accounts?.length) accounts = await provider.request({ method: 'eth_requestAccounts' });
-                return [...new Map((accounts || []).map(a => [a.toLowerCase(), a])).values()].slice(0, MAX_CANDIDATES);
+                if (!accounts?.length) {
+                    accounts = await provider.request({ method: 'eth_requestAccounts' });
+                }
+                return [...new Map(
+                    (accounts || [])
+                        .filter(Boolean)
+                        .map(address => [normalizeAddress(address), address])
+                ).values()].slice(0, MAX_CANDIDATES);
             }
 
             async function jsonRpcBatch(calls) {
@@ -1876,72 +1968,144 @@
                 });
                 if (!response.ok) throw new Error(`Alchemy HTTP ${response.status}`);
                 const json = await response.json();
-                return Array.isArray(json) ? json : [json];
+                const rows = Array.isArray(json) ? json : [json];
+                return rows;
             }
 
             function balanceOfData(address) {
-                return `0x70a08231${address.replace(/^0x/, '').toLowerCase().padStart(64, '0')}`;
+                return `0x70a08231${String(address).replace(/^0x/, '').toLowerCase().padStart(64, '0')}`;
             }
 
-            async function decimals(contract) {
-                const result = await jsonRpcBatch([{
-                    jsonrpc: '2.0', id: 1, method: 'eth_call',
+            async function readTokenDecimals(contract) {
+                const results = await jsonRpcBatch([{
+                    jsonrpc: '2.0',
+                    id: `decimals-${contract}`,
+                    method: 'eth_call',
                     params: [{ to: contract, data: '0x313ce567' }, 'latest']
                 }]);
-                return Number(BigInt(result[0]?.result || '0x12'));
+                const raw = results[0]?.result;
+                if (!raw) throw new Error(`Unable to read token decimals for ${contract}.`);
+                const value = Number(BigInt(raw));
+                if (!Number.isSafeInteger(value) || value < 0 || value > 36) {
+                    throw new Error(`Invalid token decimals returned by ${contract}.`);
+                }
+                return value;
             }
 
-            function formatUnits(raw, decimalsCount) {
-                const value = BigInt(raw || '0x0');
-                const base = 10n ** BigInt(decimalsCount);
-                const whole = value / base;
-                const fraction = value % base;
-                if (fraction === 0n) return whole.toString();
-                return `${whole}.${fraction.toString().padStart(decimalsCount, '0').slice(0, 6)}`.replace(/\.0+$/, '');
+            function formatUnits(raw, decimalsCount, maxFraction = 6) {
+                if (raw == null) return 'Unavailable';
+                try {
+                    const value = BigInt(raw);
+                    const base = 10n ** BigInt(decimalsCount);
+                    const whole = value / base;
+                    const fraction = value % base;
+                    if (fraction === 0n) return whole.toString();
+                    return `${whole}.${fraction.toString().padStart(decimalsCount, '0').slice(0, maxFraction)}`.replace(/\.0+$/, '');
+                } catch (_) {
+                    return 'Unavailable';
+                }
+            }
+
+            function unavailableBalances(addresses, reason) {
+                return addresses.map(address => ({
+                    address,
+                    eth: 'Unavailable',
+                    feed: 'Unavailable',
+                    usdc: 'Unavailable',
+                    updatedAt: Date.now(),
+                    balanceErrors: {
+                        rpc: reason || 'Unable to read Base Sepolia balances right now.'
+                    }
+                }));
             }
 
             async function readBalances(addresses) {
-                const unique = [...new Set(addresses.map(a => a.toLowerCase()))];
+                const unique = [...new Map(
+                    addresses.map(address => [normalizeAddress(address), address])
+                ).values()];
                 if (!unique.length) return [];
-                const [feedDecimals, usdcDecimals] = await Promise.all([decimals(FEED), decimals(USDC)]);
+
                 const calls = [];
                 const map = [];
+                const errors = {};
                 let id = 1;
+
+                let feedDecimals = null;
+                let usdcDecimals = null;
+                try {
+                    [feedDecimals, usdcDecimals] = await Promise.all([
+                        readTokenDecimals(FEED),
+                        readTokenDecimals(USDC)
+                    ]);
+                } catch (error) {
+                    console.error('Token decimals read failed:', error);
+                    errors.tokens = error?.message || 'Token contract failure.';
+                }
 
                 unique.forEach(address => {
                     const row = { address, eth: id++, feed: id++, usdc: id++ };
-                    calls.push({ jsonrpc: '2.0', id: row.eth, method: 'eth_getBalance', params: [address, 'latest'] });
-                    calls.push({ jsonrpc: '2.0', id: row.feed, method: 'eth_call', params: [{ to: FEED, data: balanceOfData(address) }, 'latest'] });
-                    calls.push({ jsonrpc: '2.0', id: row.usdc, method: 'eth_call', params: [{ to: USDC, data: balanceOfData(address) }, 'latest'] });
+                    calls.push({
+                        jsonrpc: '2.0',
+                        id: row.eth,
+                        method: 'eth_getBalance',
+                        params: [address, 'latest']
+                    });
+                    if (feedDecimals != null) {
+                        calls.push({
+                            jsonrpc: '2.0',
+                            id: row.feed,
+                            method: 'eth_call',
+                            params: [{ to: FEED, data: balanceOfData(address) }, 'latest']
+                        });
+                    }
+                    if (usdcDecimals != null) {
+                        calls.push({
+                            jsonrpc: '2.0',
+                            id: row.usdc,
+                            method: 'eth_call',
+                            params: [{ to: USDC, data: balanceOfData(address) }, 'latest']
+                        });
+                    }
                     map.push(row);
                 });
 
-                const results = await jsonRpcBatch(calls);
-                const byId = new Map(results.map(r => [r.id, r]));
+                let results = [];
+                try {
+                    results = await jsonRpcBatch(calls);
+                } catch (error) {
+                    console.error('Base Sepolia balance RPC failed:', error);
+                    return unavailableBalances(unique, 'Unable to read Base Sepolia balances right now. Please try again.');
+                }
+
+                const byId = new Map(results.map(result => [result.id, result]));
                 return map.map(row => {
-                    const ethRaw = byId.get(row.eth)?.result || '0x0';
-                    const feedRaw = byId.get(row.feed)?.result || '0x0';
-                    const usdcRaw = byId.get(row.usdc)?.result || '0x0';
+                    const ethResult = byId.get(row.eth);
+                    const feedResult = byId.get(row.feed);
+                    const usdcResult = byId.get(row.usdc);
+
+                    const balanceErrors = { ...errors };
+                    if (!ethResult?.result) balanceErrors.eth = 'ETH balance unavailable.';
+                    if (feedDecimals != null && !feedResult?.result) balanceErrors.feed = 'FEED balance unavailable.';
+                    if (usdcDecimals != null && !usdcResult?.result) balanceErrors.usdc = 'USDC balance unavailable.';
+
                     return {
-                        eth: formatUnits(ethRaw, 18),
-                        feed: formatUnits(feedRaw, feedDecimals),
-                        usdc: formatUnits(usdcRaw, usdcDecimals),
+                        address: row.address,
+                        eth: ethResult?.result ? formatUnits(ethResult.result, 18, 8) : 'Unavailable',
+                        feed: feedResult?.result && feedDecimals != null ? formatUnits(feedResult.result, feedDecimals, 6) : 'Unavailable',
+                        usdc: usdcResult?.result && usdcDecimals != null ? formatUnits(usdcResult.result, usdcDecimals, 6) : 'Unavailable',
                         feedDecimals,
                         usdcDecimals,
+                        balanceErrors,
                         updatedAt: Date.now()
                     };
                 });
             }
 
-            async function persist() {
-                if (!currentUid) return;
-                await setDoc(doc(db, 'users', currentUid), { wallets: linkedWallets }, { merge: true });
-            }
-
             function renderCandidates() {
+                if (!candidateList) return;
                 candidateList.innerHTML = '';
                 candidates.forEach((candidate, index) => {
-                    const key = candidate.address.toLowerCase();
+                    const key = normalizeAddress(candidate.address);
                     const isSelected = selected.has(key);
                     const button = document.createElement('button');
                     button.type = 'button';
@@ -1959,7 +2123,7 @@
                         if (selected.has(key)) {
                             selected.delete(key);
                         } else {
-                            if (selected.size >= MAX_SAVED) {
+                            if (selected.size >= MAX_SAVED || linkedWallets.length + selected.size >= MAX_SAVED) {
                                 showMessage('You can save up to 3 wallets under one Google account.', 'error');
                                 return;
                             }
@@ -1969,60 +2133,181 @@
                     });
                     candidateList.appendChild(button);
                 });
-                selectedCount.textContent = `${selected.size} selected`;
-                saveButton.disabled = selected.size === 0;
+                if (selectedCount) selectedCount.textContent = `${selected.size} selected`;
+                if (saveButton) saveButton.disabled = selected.size === 0;
             }
 
             async function presentCandidates(accounts, provider, sourceName) {
-                const existing = new Set(linkedWallets.map(w => w.address.toLowerCase()));
-                candidates = accounts.filter(a => !existing.has(a.toLowerCase())).slice(0, MAX_CANDIDATES).map(address => ({
-                    address,
-                    providerName: sourceName
-                }));
+                const existing = new Set(linkedWallets.map(wallet => normalizeAddress(wallet.address)));
+                candidates = [...new Map(
+                    (accounts || [])
+                        .filter(address => address && !existing.has(normalizeAddress(address)))
+                        .slice(0, MAX_CANDIDATES)
+                        .map(address => [normalizeAddress(address), {
+                            address,
+                            providerName: sourceName
+                        }])
+                ).values()];
                 selected = new Set();
                 currentProvider = provider;
                 currentProviderName = sourceName;
 
                 if (!candidates.length) {
-                    showMessage('No new public accounts are available from the connected wallet. Switch the active account in the wallet and try again.', 'error');
+                    showMessage(
+                        linkedWallets.length >= MAX_SAVED
+                            ? 'You already have 3 wallets linked. Remove or replace one before adding another.'
+                            : 'No new public accounts are available from the connected wallet.',
+                        'error'
+                    );
                     return;
                 }
-                connectStage.classList.add('hidden');
-                candidatesStage.classList.remove('hidden');
+
+                connectStage?.classList.add('hidden');
+                candidatesStage?.classList.remove('hidden');
                 renderCandidates();
+            }
+
+            function cleanupProviderListeners() {
+                if (typeof providerCleanup === 'function') {
+                    try { providerCleanup(); } catch (_) {}
+                }
+                providerCleanup = null;
+            }
+
+            function bindProviderListeners(provider, sourceName) {
+                cleanupProviderListeners();
+                if (!provider?.on) return;
+
+                const onAccountsChanged = async accounts => {
+                    try {
+                        const exposed = [...new Map((accounts || []).filter(Boolean).map(a => [normalizeAddress(a), a])).values()].slice(0, MAX_CANDIDATES);
+                        const currentActive = getActiveWallet();
+                        if (currentActive && !exposed.some(address => normalizeAddress(address) === normalizeAddress(currentActive.address))) {
+                            linkedWallets = linkedWallets.map(wallet => ({ ...wallet, networkState: 'account-changed' }));
+                            renderAllWalletUI();
+                        } else if (currentActive) {
+                            linkedWallets = linkedWallets.map(wallet =>
+                                normalizeAddress(wallet.address) === normalizeAddress(currentActive.address)
+                                    ? { ...wallet, lastUsed: Date.now(), networkState: 'connected' }
+                                    : wallet
+                            );
+                            await refreshBalances(true, true);
+                        }
+                    } catch (error) {
+                        console.warn(`${sourceName} accountsChanged handling failed:`, error);
+                    }
+                };
+
+                const onChainChanged = async chainId => {
+                    if (!isBaseSepolia(chainId)) {
+                        markNetworkState('wrong-network');
+                        showPersistentWalletStatus('Wrong network', 'Please switch back to Base Sepolia before refreshing this wallet.');
+                        return;
+                    }
+                    linkedWallets = linkedWallets.map(wallet => ({ ...wallet, networkState: 'connected' }));
+                    renderAllWalletUI();
+                    await refreshBalances(true, true);
+                };
+
+                const onDisconnect = () => {
+                    linkedWallets = linkedWallets.map(wallet => ({ ...wallet, networkState: 'disconnected' }));
+                    renderAllWalletUI();
+                    showPersistentWalletStatus('Wallet disconnected', 'The provider disconnected. Reconnect to resume live provider state.');
+                };
+
+                provider.on('accountsChanged', onAccountsChanged);
+                provider.on('chainChanged', onChainChanged);
+                provider.on('disconnect', onDisconnect);
+
+                providerCleanup = () => {
+                    try { provider.removeListener?.('accountsChanged', onAccountsChanged); } catch (_) {}
+                    try { provider.removeListener?.('chainChanged', onChainChanged); } catch (_) {}
+                    try { provider.removeListener?.('disconnect', onDisconnect); } catch (_) {}
+                };
+            }
+
+            function markNetworkState(state) {
+                linkedWallets = linkedWallets.map(wallet => ({
+                    ...wallet,
+                    networkState: state,
+                    eth: 'Unavailable',
+                    feed: 'Unavailable',
+                    usdc: 'Unavailable',
+                    updatedAt: Date.now()
+                }));
+                renderAllWalletUI();
+            }
+
+            function showPersistentWalletStatus(title, detail) {
+                const targets = [
+                    document.getElementById('feedWalletNetworkStatusOverview'),
+                    document.getElementById('feedWalletNetworkStatusProfile')
+                ].filter(Boolean);
+
+                targets.forEach(target => {
+                    target.innerHTML = `<div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3"><div class="font-bold text-amber-900">${title}</div><div class="mt-1 text-sm text-amber-800/80">${detail}</div></div>`;
+                });
+
+                if (message && modal?.classList.contains('open')) {
+                    showMessage(`${title}: ${detail}`, 'error');
+                }
+            }
+
+            async function connectInjected(provider) {
+                const name = providerName(provider);
+                currentProvider = provider;
+                currentProviderName = name;
+                bindProviderListeners(provider, name);
+                showMessage(`Requesting access from ${name}…`);
+                await provider.request({ method: 'eth_requestAccounts' });
+                await ensureChain(provider);
+                const accounts = await discoverAccounts(provider);
+                await presentCandidates(accounts, provider, name);
             }
 
             document.getElementById('feedWalletInjected')?.addEventListener('click', async () => {
                 clearMessage();
-                const providers = injectedProviders();
-                if (!providers.length) {
-                    showMessage('No browser wallet extension was detected. Use the QR / mobile wallet option instead.', 'error');
+                if (linkedWallets.length >= MAX_SAVED) {
+                    showMessage('3 wallets are already linked. Remove or replace one first.', 'error');
                     return;
                 }
+
+                const providers = injectedProviders();
+                if (!providers.length) {
+                    showMessage('No compatible browser wallet was detected. Use the QR / mobile wallet option instead.', 'error');
+                    return;
+                }
+
                 try {
-                    currentProvider = providers[0];
-                    const name = providerName(currentProvider);
-                    showMessage(`Requesting access from ${name}…`);
-                    await ensureChain(currentProvider);
-                    const accounts = await discoverAccounts(currentProvider);
-                    await presentCandidates(accounts, currentProvider, name);
+                    await connectInjected(providers[0]);
                 } catch (error) {
                     console.error(error);
-                    showMessage(error?.message || 'Browser wallet connection failed.', 'error');
+                    if (error?.code === 4001 || /reject|denied|cancel/i.test(error?.message || '')) {
+                        showMessage('Wallet connection was cancelled.', 'error');
+                    } else if (/Base Sepolia|network|chain/i.test(error?.message || '')) {
+                        showMessage('Please switch to Base Sepolia.', 'error');
+                    } else {
+                        showMessage(error?.message || 'Browser wallet connection failed.', 'error');
+                    }
                 }
             });
 
             document.getElementById('feedWalletQR')?.addEventListener('click', async () => {
                 clearMessage();
+                if (linkedWallets.length >= MAX_SAVED) {
+                    showMessage('3 wallets are already linked. Remove or replace one first.', 'error');
+                    return;
+                }
+
                 try {
                     showMessage('Opening the Reown / WalletConnect QR flow…');
-                    const module = await import('https://esm.sh/@walletconnect/ethereum-provider?target=es2022');
-                    const EthereumProvider = module.default || module.EthereumProvider;
+                    const module = await import('https://esm.sh/@walletconnect/ethereum-provider@2.23.10?target=es2022');
+                    const EthereumProvider = module.EthereumProvider || module.default;
+                    if (!EthereumProvider) throw new Error('Unable to load the WalletConnect Ethereum provider.');
 
                     if (!walletConnectProvider) {
                         walletConnectProvider = await EthereumProvider.init({
                             projectId: REOWN_PROJECT_ID,
-                            chains: [CHAIN_ID],
                             optionalChains: [CHAIN_ID],
                             showQrModal: true,
                             rpcMap: { [CHAIN_ID]: ALCHEMY_RPC },
@@ -2033,67 +2318,111 @@
                                 icons: ['https://i.postimg.cc/W18WjK3V/image-(1).png']
                             }
                         });
+                        bindProviderListeners(walletConnectProvider, 'WalletConnect');
                     }
 
-                    await walletConnectProvider.enable();
+                    await walletConnectProvider.connect();
                     await ensureChain(walletConnectProvider);
                     const accounts = await walletConnectProvider.request({ method: 'eth_accounts' });
                     await presentCandidates(accounts.slice(0, MAX_CANDIDATES), walletConnectProvider, 'WalletConnect');
                 } catch (error) {
                     console.error(error);
-                    showMessage(error?.message || 'QR wallet connection failed or was cancelled.', 'error');
+                    if (error?.code === 4001 || /reject|denied|cancel/i.test(error?.message || '')) {
+                        showMessage('Wallet connection was cancelled.', 'error');
+                    } else {
+                        showMessage(error?.message || 'QR wallet connection failed.', 'error');
+                    }
                 }
             });
 
             saveButton?.addEventListener('click', async () => {
                 if (!currentUid || !selected.size) return;
+                if (linkedWallets.length >= MAX_SAVED) {
+                    showMessage('Remove or replace a wallet before saving another.', 'error');
+                    return;
+                }
+
+                const operationId = ++walletOperationNonce;
                 try {
                     saveButton.disabled = true;
                     showMessage('Reading Base Sepolia balances…');
-                    const chosen = candidates.filter(c => selected.has(c.address.toLowerCase()));
-                    const balances = await readBalances(chosen.map(c => c.address));
 
+                    const chosen = candidates.filter(candidate => selected.has(normalizeAddress(candidate.address)));
+                    const balances = await readBalances(chosen.map(candidate => candidate.address));
+                    if (operationId !== walletOperationNonce) return;
+
+                    const now = Date.now();
                     chosen.forEach((candidate, index) => {
+                        if (linkedWallets.length >= MAX_SAVED) return;
                         linkedWallets.push({
                             address: candidate.address,
-                            provider: candidate.providerName,
+                            provider: candidate.providerName || currentProviderName,
                             chainId: CHAIN_ID,
-                            connectedAt: Date.now(),
-                            lastUsed: Date.now(),
+                            connectedAt: now,
+                            lastUsed: now,
+                            active: linkedWallets.length === 0,
+                            networkState: 'connected',
                             ...balances[index]
                         });
                     });
 
-                    linkedWallets = linkedWallets.slice(0, MAX_SAVED);
+                    linkedWallets = normalizeSavedWallets(linkedWallets);
+                    ensureActiveWallet();
                     await persist();
-                    await refreshBalances(true);
                     hideModal();
                     renderAllWalletUI();
                 } catch (error) {
                     console.error(error);
                     showMessage(error?.message || 'Could not save the selected wallets.', 'error');
-                    saveButton.disabled = selected.size === 0;
+                    if (saveButton) saveButton.disabled = selected.size === 0;
                 }
             });
 
             document.getElementById('feedWalletClose')?.addEventListener('click', hideModal);
             quickButton?.addEventListener('click', showModal);
-            modal?.addEventListener('click', event => { if (event.target === modal) hideModal(); });
+            modal?.addEventListener('click', event => {
+                if (event.target === modal) hideModal();
+            });
 
-            async function refreshBalances(quiet = false) {
+            async function refreshBalances(quiet = false, providerAware = false) {
                 if (!linkedWallets.length) return;
+
+                if (providerAware && currentProvider) {
+                    try {
+                        const chain = await currentProvider.request({ method: 'eth_chainId' });
+                        if (!isBaseSepolia(chain)) {
+                            markNetworkState('wrong-network');
+                            return;
+                        }
+                    } catch (_) {}
+                }
+
                 try {
-                    const balances = await readBalances(linkedWallets.map(w => w.address));
-                    linkedWallets = linkedWallets.map((wallet, index) => ({ ...wallet, ...balances[index] }));
+                    const balances = await readBalances(linkedWallets.map(wallet => wallet.address));
+                    linkedWallets = linkedWallets.map(wallet => {
+                        const balance = balances.find(item => normalizeAddress(item.address) === normalizeAddress(wallet.address));
+                        return balance ? { ...wallet, ...balance, networkState: 'connected' } : wallet;
+                    });
                     if (!quiet) await persist();
                     renderAllWalletUI();
                 } catch (error) {
                     console.warn('Wallet balance refresh failed:', error);
+                    linkedWallets = linkedWallets.map(wallet => ({
+                        ...wallet,
+                        eth: 'Unavailable',
+                        feed: 'Unavailable',
+                        usdc: 'Unavailable',
+                        balanceErrors: { rpc: 'Unable to read Base Sepolia balances right now.' },
+                        updatedAt: Date.now()
+                    }));
+                    renderAllWalletUI();
                 }
             }
 
             async function removeWallet(address) {
-                linkedWallets = linkedWallets.filter(w => w.address.toLowerCase() !== address.toLowerCase());
+                const removing = normalizeAddress(address);
+                linkedWallets = linkedWallets.filter(wallet => normalizeAddress(wallet.address) !== removing);
+                ensureActiveWallet();
                 await persist();
                 renderAllWalletUI();
             }
@@ -2103,24 +2432,70 @@
                 showModal();
             }
 
+            async function switchActiveWallet(address) {
+                const target = normalizeAddress(address);
+                if (!linkedWallets.some(wallet => normalizeAddress(wallet.address) === target)) return;
+
+                const previous = getActiveWallet();
+                linkedWallets = linkedWallets.map(wallet => ({
+                    ...wallet,
+                    active: normalizeAddress(wallet.address) === target,
+                    lastUsed: normalizeAddress(wallet.address) === target ? Date.now() : wallet.lastUsed
+                }));
+                await persist();
+
+                if (currentProvider?.request) {
+                    try {
+                        const accounts = await discoverAccounts(currentProvider);
+                        if (!accounts.some(account => normalizeAddress(account) === target)) {
+                            showPersistentWalletStatus('Wallet switched in FEED', `Active wallet is ${short(address)}. Your browser provider currently exposes ${accounts[0] ? short(accounts[0]) : 'a different account'}.`);
+                        }
+                    } catch (error) {
+                        console.warn('Provider active-wallet reconciliation failed:', error);
+                    }
+                }
+
+                if (!previous || normalizeAddress(previous.address) !== target) {
+                    await refreshBalances(true, true);
+                }
+                renderAllWalletUI();
+            }
+
             function walletCard(wallet, index) {
                 const card = document.createElement('div');
-                card.className = 'rounded-[2rem] border border-gray-200 bg-white p-5 shadow-sm';
+                const active = wallet.active;
+                const stateLabel = wallet.networkState === 'wrong-network'
+                    ? 'Wrong network'
+                    : wallet.networkState === 'disconnected'
+                        ? 'Disconnected'
+                        : wallet.networkState === 'account-changed'
+                            ? 'Provider account changed'
+                            : active ? 'Active' : 'Saved';
+
+                card.className = `rounded-[2rem] border ${active ? 'border-[#6036E1]/30 shadow-[0_18px_60px_rgba(96,54,225,0.10)]' : 'border-gray-200'} bg-white p-5 shadow-sm`;
                 card.innerHTML = `
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">${wallet.provider || 'Wallet'} · Base Sepolia</div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">${wallet.provider || 'Wallet'} · Base Sepolia</div>
+                                <span class="rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wider ${active ? 'bg-[#6036E1]/10 text-[#6036E1]' : 'bg-gray-100 text-gray-500'}">${stateLabel}</span>
+                            </div>
                             <div class="mt-2 font-display text-lg font-black">Wallet ${index + 1}</div>
-                            <div class="mt-1 truncate font-mono text-xs text-gray-400">${wallet.address}</div>
+                            <div class="mt-1 truncate font-mono text-xs text-gray-400" title="${wallet.address}">${short(wallet.address)} <span class="hidden sm:inline">(${wallet.address})</span></div>
                         </div>
-                        <button type="button" data-wallet-delete class="rounded-xl p-2 text-gray-300 hover:bg-red-50 hover:text-red-600" title="Remove wallet"><i class="ph-bold ph-trash"></i></button>
+                        <div class="flex items-center gap-1">
+                            ${active ? '' : `<button type="button" data-wallet-activate class="rounded-xl border border-gray-200 px-3 py-2 text-[10px] font-bold text-gray-600 hover:border-[#6036E1]/30 hover:text-[#6036E1]">Use</button>`}
+                            <button type="button" data-wallet-delete class="rounded-xl p-2 text-gray-300 hover:bg-red-50 hover:text-red-600" title="Remove wallet"><i class="ph-bold ph-trash"></i></button>
+                        </div>
                     </div>
-                    <div class="mt-5 grid grid-cols-3 gap-3">
-                        <div class="rounded-2xl bg-gray-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">ETH gas</div><div class="mt-2 font-display text-lg font-bold">${wallet.eth || '0'}</div><div class="text-[10px] text-gray-400">ETH</div></div>
-                        <div class="rounded-2xl bg-violet-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-violet-500">$FEED</div><div class="mt-2 font-display text-lg font-bold">${wallet.feed || '0'}</div><div class="text-[10px] text-gray-400">tokens</div></div>
-                        <div class="rounded-2xl bg-blue-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-blue-500">USDC</div><div class="mt-2 font-display text-lg font-bold">${wallet.usdc || '0'}</div><div class="text-[10px] text-gray-400">USDC</div></div>
+                    <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div class="rounded-2xl bg-gray-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">ETH gas</div><div class="mt-2 break-all font-display text-lg font-bold">${wallet.eth ?? 'Unavailable'}</div><div class="text-[10px] text-gray-400">ETH</div></div>
+                        <div class="rounded-2xl bg-violet-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-violet-500">$FEED</div><div class="mt-2 break-all font-display text-lg font-bold">${wallet.feed ?? 'Unavailable'}</div><div class="text-[10px] text-gray-400">tokens</div></div>
+                        <div class="rounded-2xl bg-blue-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-blue-500">USDC</div><div class="mt-2 break-all font-display text-lg font-bold">${wallet.usdc ?? 'Unavailable'}</div><div class="text-[10px] text-gray-400">USDC</div></div>
                     </div>
-                    <div class="mt-4 flex items-center justify-between text-[10px] text-gray-400"><span>Public address only</span><span>${wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '—'}</span></div>`;
+                    <div class="mt-4 flex flex-col gap-1 text-[10px] text-gray-400 sm:flex-row sm:items-center sm:justify-between"><span>Public address only</span><span>${wallet.updatedAt ? `Last refresh ${new Date(wallet.updatedAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : 'Not refreshed yet'}</span></div>
+                `;
+                card.querySelector('[data-wallet-activate]')?.addEventListener('click', () => switchActiveWallet(wallet.address));
                 card.querySelector('[data-wallet-delete]')?.addEventListener('click', () => removeWallet(wallet.address));
                 return card;
             }
@@ -2128,12 +2503,14 @@
             function renderOverview() {
                 const overview = document.getElementById('dashboardOverview');
                 if (!overview) return;
+
                 let section = document.getElementById('feedWalletOverview');
                 if (!section) {
                     section = document.createElement('div');
                     section.id = 'feedWalletOverview';
                     overview.prepend(section);
                 }
+
                 section.innerHTML = `
                     <div class="rounded-[2.5rem] border border-gray-100 bg-white/80 p-6 shadow-sm md:p-8">
                         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -2144,14 +2521,16 @@
                             </div>
                             <button id="feedAddWalletOverview" type="button" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">${linkedWallets.length >= MAX_SAVED ? 'Manage wallets' : 'Add wallet'}</button>
                         </div>
+                        <div id="feedWalletNetworkStatusOverview" class="mt-4"></div>
                         <div id="feedWalletOverviewGrid" class="mt-6"></div>
                     </div>`;
+
                 const grid = section.querySelector('#feedWalletOverviewGrid');
                 if (!linkedWallets.length) {
                     grid.innerHTML = `<div class="rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-6 py-12 text-center">
                         <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#6036E1] shadow-sm"><i class="ph-bold ph-wallet text-2xl"></i></div>
                         <div class="mt-4 font-display text-lg font-bold">No wallets connected</div>
-                        <p class="mx-auto mt-1 max-w-md text-sm text-gray-500">Connect a Base Sepolia wallet to show ETH gas, $FEED, and USDC balances here.</p>
+                        <p class="mx-auto mt-1 max-w-md text-sm text-gray-500">Connect a Base Sepolia wallet to view ETH gas, FEED, and USDC.</p>
                         <button id="feedConnectWalletOverviewEmpty" type="button" class="mt-5 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-xl">
                             <i class="ph-bold ph-wallet"></i> Connect Wallet
                         </button>
@@ -2159,6 +2538,7 @@
                 } else {
                     linkedWallets.forEach((wallet, index) => grid.appendChild(walletCard(wallet, index)));
                 }
+
                 section.querySelector('#feedAddWalletOverview')?.addEventListener('click', showModal);
                 section.querySelector('#feedConnectWalletOverviewEmpty')?.addEventListener('click', showModal);
             }
@@ -2174,16 +2554,19 @@
                     section.className = 'mt-8 rounded-[2.5rem] border border-gray-100 bg-white/80 p-6 md:p-8';
                     profile.appendChild(section);
                 }
+
                 section.innerHTML = `
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">Wallets</div>
                             <h3 class="mt-2 font-display text-2xl font-black">Linked Base Sepolia addresses</h3>
-                            <p class="mt-1 text-sm text-gray-500">Remove, replace, or add up to 3 wallets under this Google account.</p>
+                            <p class="mt-1 text-sm text-gray-500">Remove, replace, switch, or add up to 3 wallets under this Google account.</p>
                         </div>
                         <button id="feedAddWalletProfile" type="button" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">${linkedWallets.length >= MAX_SAVED ? '3 wallets linked' : 'Add wallet'}</button>
                     </div>
+                    <div id="feedWalletNetworkStatusProfile" class="mt-4"></div>
                     <div id="feedWalletProfileList" class="mt-5 space-y-3"></div>`;
+
                 const list = section.querySelector('#feedWalletProfileList');
                 if (!linkedWallets.length) {
                     list.innerHTML = `<div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center">
@@ -2195,13 +2578,15 @@
                 } else {
                     linkedWallets.forEach((wallet, index) => {
                         const row = document.createElement('div');
-                        row.className = 'rounded-2xl border border-gray-200 bg-white p-4';
-                        row.innerHTML = `<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div class="min-w-0"><div class="flex items-center gap-2"><span class="font-semibold">Wallet ${index+1}</span><span class="rounded-full bg-gray-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-500">${wallet.provider || 'Wallet'}</span></div><div class="mt-1 truncate font-mono text-xs text-gray-500">${wallet.address}</div></div><div class="flex gap-2"><button type="button" data-remove class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700">Remove</button><button type="button" data-replace class="rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white">Replace</button></div></div>`;
+                        row.className = `rounded-2xl border ${wallet.active ? 'border-[#6036E1]/30 bg-violet-50/40' : 'border-gray-200'} bg-white p-4`;
+                        row.innerHTML = `<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><span class="font-semibold">Wallet ${index + 1}</span><span class="rounded-full bg-gray-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-500">${wallet.provider || 'Wallet'}</span>${wallet.active ? '<span class="rounded-full bg-[#6036E1]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#6036E1]">Active</span>' : ''}</div><div class="mt-1 truncate font-mono text-xs text-gray-500" title="${wallet.address}">${short(wallet.address)}</div><div class="mt-1 text-[10px] text-gray-400">Base Sepolia · ${wallet.networkState || 'connected'}</div></div><div class="flex flex-wrap gap-2"><button type="button" data-use class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-[#6036E1]/30 hover:text-[#6036E1]">${wallet.active ? 'Active' : 'Switch'}</button><button type="button" data-remove class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700">Remove</button><button type="button" data-replace class="rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white">Replace</button></div></div>`;
+                        row.querySelector('[data-use]')?.addEventListener('click', () => switchActiveWallet(wallet.address));
                         row.querySelector('[data-remove]')?.addEventListener('click', () => removeWallet(wallet.address));
                         row.querySelector('[data-replace]')?.addEventListener('click', () => replaceWallet(wallet.address));
                         list.appendChild(row);
                     });
                 }
+
                 const add = section.querySelector('#feedAddWalletProfile');
                 if (add && linkedWallets.length < MAX_SAVED) add.addEventListener('click', showModal);
                 section.querySelector('#feedConnectWalletProfileEmpty')?.addEventListener('click', showModal);
@@ -2210,11 +2595,13 @@
             function ensureSettingsTab() {
                 const nav = document.querySelector('.dashboard-sidebar nav');
                 if (!nav || nav.querySelector('[data-feed-settings-tab]')) return;
+
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.dataset.feedSettingsTab = 'true';
                 button.className = 'dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50';
                 button.innerHTML = '<i class="ph-bold ph-gear min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Settings</span>';
+
                 button.addEventListener('click', e => {
                     e.stopImmediatePropagation();
                     const overview = document.getElementById('dashboardOverview');
@@ -2227,12 +2614,8 @@
                     document.getElementById('dashboardSubheading').textContent = 'Manage wallet connections and account controls.';
                     renderSettings();
                 });
-                nav.appendChild(button);
 
-                document.addEventListener('click', e => {
-                    const tab = e.target.closest?.('[data-dashboard-tab]');
-                    if (tab) document.getElementById('feedWalletSettings')?.classList.add('hidden');
-                }, true);
+                nav.appendChild(button);
             }
 
             function renderSettings() {
@@ -2253,21 +2636,26 @@
                         <h2 class="mt-3 font-display text-3xl font-black">Wallet &amp; account controls</h2>
                         <p class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">Manage the public wallets linked to this Google account.</p>
 
-                        <div class="mt-8 grid gap-4 md:grid-cols-2">
-                            <div class="rounded-3xl border border-gray-200 bg-white p-6">
-                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gray-100 text-gray-700"><i class="ph-bold ph-wallet text-2xl"></i></div>
-                                <h3 class="mt-4 font-display text-lg font-bold">Wallet connections</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-gray-500">Connect up to three Base Sepolia wallets and use them with this Google account.</p>
-                                <button id="feedSettingsAdd" type="button" class="mt-5 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">${linkedWallets.length >= MAX_SAVED ? 'Manage below' : 'Add wallet'}</button>
-                            </div>
-                            <div class="rounded-3xl border border-red-100 bg-red-50 p-6">
-                                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-red-600"><i class="ph-bold ph-plugs-connected text-2xl"></i></div>
-                                <h3 class="mt-4 font-display text-lg font-bold text-red-900">Disconnect entirely</h3>
-                                <p class="mt-2 text-sm leading-relaxed text-red-800/70">Remove every saved wallet association from this Google account. Nothing on-chain is changed.</p>
-                                <button id="feedSettingsDisconnectAll" type="button" class="mt-5 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-100">Disconnect all wallets</button>
+                        <div class="mt-8 rounded-3xl border border-gray-200 bg-white p-6">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet connections</div>
+                                    <h3 class="mt-2 font-display text-lg font-bold">${linkedWallets.length} / ${MAX_SAVED} wallets linked</h3>
+                                    <p class="mt-2 text-sm leading-relaxed text-gray-500">Active wallet: ${getActiveWallet() ? short(getActiveWallet().address) : 'None'}</p>
+                                </div>
+                                <button id="feedSettingsAdd" type="button" ${linkedWallets.length >= MAX_SAVED ? 'disabled' : ''} class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">${linkedWallets.length >= MAX_SAVED ? 'Maximum linked' : 'Add wallet'}</button>
                             </div>
                         </div>
-                        <div id="feedSettingsWallets" class="mt-8 space-y-3"></div>
+
+                        <div id="feedSettingsWallets" class="mt-6 space-y-3"></div>
+
+                        <div class="mt-6 rounded-3xl border border-red-100 bg-red-50 p-6">
+                            <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-red-600"><i class="ph-bold ph-plugs-connected text-2xl"></i></div>
+                            <h3 class="mt-4 font-display text-lg font-bold text-red-900">Disconnect all wallets</h3>
+                            <p class="mt-2 text-sm leading-relaxed text-red-800/70">This removes all wallet associations from your FEED Google account. Nothing is transferred and nothing is changed on-chain; the wallets remain under your control.</p>
+                            <button id="feedSettingsDisconnectAll" type="button" class="mt-5 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-100">Disconnect all wallets</button>
+                        </div>
+
                         <div id="feedSettingsMessage" class="mt-4 hidden rounded-2xl px-4 py-3 text-sm"></div>
                     </div>`;
 
@@ -2277,20 +2665,38 @@
                 } else {
                     linkedWallets.forEach((wallet, index) => {
                         const row = document.createElement('div');
-                        row.className = 'rounded-2xl border border-gray-200 bg-white p-4';
-                        row.innerHTML = `<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><div class="font-semibold">Wallet ${index+1} · ${wallet.provider || 'Wallet'}</div><div class="mt-1 font-mono text-xs text-gray-500">${wallet.address}</div></div><button type="button" data-delete class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700">Remove</button></div>`;
+                        row.className = `rounded-2xl border ${wallet.active ? 'border-[#6036E1]/30 bg-violet-50/30' : 'border-gray-200'} bg-white p-4`;
+                        row.innerHTML = `<div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><div class="font-semibold">Wallet ${index + 1} · ${wallet.provider || 'Wallet'}</div>${wallet.active ? '<span class="rounded-full bg-[#6036E1]/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-[#6036E1]">Active</span>' : ''}</div><div class="mt-1 truncate font-mono text-xs text-gray-500" title="${wallet.address}">${wallet.address}</div></div><div class="flex flex-wrap gap-2"><button type="button" data-use class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-[#6036E1]/30 hover:text-[#6036E1]">${wallet.active ? 'Active' : 'Switch'}</button><button type="button" data-delete class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700">Remove</button><button type="button" data-replace class="rounded-xl bg-gray-900 px-3 py-2 text-xs font-bold text-white">Replace</button></div></div>`;
+                        row.querySelector('[data-use]')?.addEventListener('click', () => switchActiveWallet(wallet.address));
                         row.querySelector('[data-delete]')?.addEventListener('click', () => removeWallet(wallet.address));
+                        row.querySelector('[data-replace]')?.addEventListener('click', () => replaceWallet(wallet.address));
                         list.appendChild(row);
                     });
                 }
 
-                settings.querySelector('#feedSettingsAdd')?.addEventListener('click', showModal);
+                settings.querySelector('#feedSettingsAdd')?.addEventListener('click', () => {
+                    if (linkedWallets.length < MAX_SAVED) showModal();
+                });
+
                 settings.querySelector('#feedSettingsDisconnectAll')?.addEventListener('click', async () => {
-                    if (!window.confirm('Disconnect and remove every saved wallet association from this Google account?')) return;
+                    const confirmed = window.confirm('This removes all wallet associations from your FEED Google account. Nothing is transferred, nothing is changed on-chain, and your wallets remain under your control. Continue?');
+                    if (!confirmed) return;
+
                     linkedWallets = [];
+                    ensureActiveWallet();
                     await persist();
-                    if (walletConnectProvider?.disconnect) { try { await walletConnectProvider.disconnect(); } catch (_) {} }
+
+                    if (walletConnectProvider?.disconnect) {
+                        try { await walletConnectProvider.disconnect(); } catch (_) {}
+                    }
+                    walletConnectProvider = null;
+                    cleanupProviderListeners();
+                    currentProvider = null;
+                    currentProviderName = 'Wallet';
+
+                    hideModal();
                     renderAllWalletUI();
+
                     const status = document.getElementById('feedSettingsMessage');
                     if (status) {
                         status.className = 'mt-4 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-700';
@@ -2306,7 +2712,7 @@
                 renderOverview();
                 renderProfile();
                 renderSettings();
-                quickText.textContent = linkedWallets.length ? `${linkedWallets.length}/3 wallets` : 'Connect wallet';
+                quickText.textContent = linkedWallets.length ? `${linkedWallets.length}/3 wallets · ${getActiveWallet() ? short(getActiveWallet().address) : ''}` : 'Connect wallet';
             }
 
             async function loadUserWallets(user) {
@@ -2316,9 +2722,16 @@
 
                 try {
                     const snap = await getDoc(doc(db, 'users', currentUid));
-                    const saved = snap.exists() && Array.isArray(snap.data()?.wallets) ? snap.data().wallets : [];
-                    linkedWallets = saved.slice(0, MAX_SAVED);
-                    await refreshBalances(true);
+                    const data = snap.exists() ? (snap.data() || {}) : {};
+                    linkedWallets = normalizeSavedWallets(data.wallets);
+                    if (data.activeWallet) {
+                        linkedWallets = linkedWallets.map(wallet => ({
+                            ...wallet,
+                            active: normalizeAddress(wallet.address) === normalizeAddress(data.activeWallet)
+                        }));
+                    }
+                    ensureActiveWallet();
+                    await refreshBalances(true, true);
                     renderAllWalletUI();
 
                     if (!linkedWallets.length) {
@@ -2337,14 +2750,23 @@
                     loadUserWallets(user);
                     if (!refreshTimer) {
                         refreshTimer = window.setInterval(() => {
-                            if (document.body.classList.contains('dashboard-active') && linkedWallets.length) refreshBalances(true);
-                        }, 45000);
+                            if (document.body.classList.contains('dashboard-active') && linkedWallets.length) {
+                                refreshBalances(true, true);
+                            }
+                        }, REFRESH_MS);
                     }
                 } else {
                     currentUid = null;
                     linkedWallets = [];
+                    selected = new Set();
+                    candidates = [];
+                    cleanupProviderListeners();
+                    currentProvider = null;
                     modal?.classList.remove('open');
-                    if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
+                    if (refreshTimer) {
+                        clearInterval(refreshTimer);
+                        refreshTimer = null;
+                    }
                 }
             });
         })();
