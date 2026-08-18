@@ -285,7 +285,7 @@
     <!-- Firebase SDK Setup -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { initializeFirestore, getFirestore, doc, setDoc, deleteDoc, enableNetwork } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
   apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
@@ -297,7 +297,10 @@
   measurementId: "G-FVPRRX9X1M"
 };
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Use long-polling for Firestore in browser environments where wallet extensions,
+        // proxies, or blocked WebSockets can stall the normal transport.
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+        enableNetwork(db).catch(error => console.warn("[FEED] Firestore network initialization warning:", error));
 
         const FEED_USER_ID = "google_user_mock_123";
 
@@ -408,6 +411,17 @@
                 toast('Connecting wallet',`Requesting account access from ${name}. Approve the request in the selected wallet application.`);
                 const authorized=await entry.provider.request({method:'eth_requestAccounts'});
                 if(!authorized?.length)throw new Error('The selected wallet returned zero authorized accounts.');
+                // Re-query the provider after authorization. Some EIP-1193 wallets
+                // return only the newly approved account from eth_requestAccounts,
+                // while eth_accounts returns all accounts currently exposed to this site.
+                let exposed=authorized;
+                try {
+                    const current=await entry.provider.request({method:'eth_accounts'});
+                    if(Array.isArray(current) && current.length) exposed=[...new Set([...authorized,...current])];
+                } catch(accountReadError) {
+                    console.warn('[FEED] eth_accounts re-query failed; using authorization response:', accountReadError);
+                }
+                exposed=exposed.slice(0,10);
                 let chainId=await entry.provider.request({method:'eth_chainId'});
                 if(BigInt(chainId)!==BASE_SEPOLIA_CHAIN_ID){
                     try{ await entry.provider.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x14a34'}]}); chainId=await entry.provider.request({method:'eth_chainId'}); }
@@ -415,7 +429,7 @@
                 }
                 if(BigInt(chainId)!==BASE_SEPOLIA_CHAIN_ID)throw new Error(`Network verification failed. Expected Base Sepolia 84532, received ${chainId}.`);
                 loadingMessage.textContent='Reading every authorized address exposed by the selected wallet...'; switchView(views.loading);
-                await loadWalletData(entry.provider,authorized,name);
+                await loadWalletData(entry.provider,exposed,name);
             }catch(error){
                 console.error('[FEED] Wallet connection failure',error);
                 toast('Wallet connection failed',error?.message||'Unknown wallet connection error','error',`Provider: ${providerName(entry)}\nError name: ${error?.name||'Unknown'}\nError code: ${error?.code??'None'}\nStack:\n${error?.stack||'Unavailable'}`);
@@ -429,8 +443,8 @@
             if(network.chainId!==BASE_SEPOLIA_CHAIN_ID)throw new Error(`The provider changed networks during loading. Current chain: ${network.chainId}.`);
             const feedContract=new ethers.Contract(FEED_CONTRACT,FEED_ABI,ethersProvider);
             fetchedAccounts=[];
-            // A wallet provider exposes only the accounts it has authorized to this site.
-            // We inspect up to 10 such exposed accounts. We do not guess unrelated addresses.
+            // The provider is the source of truth: inspect every address it exposes to this site,
+            // capped at 10. We do not infer or guess unrelated addresses from token history.
             for(const address of [...new Set(authorized)].slice(0,10)){
                 const row={address,eth:'0.0000',feed:'0.00',provider:name,warnings:[]};
                 try{row.eth=parseFloat(ethers.formatEther(await timed(ethersProvider.getBalance(address),'ETH balance read'))).toFixed(4);}catch(e){row.warnings.push(`ETH: ${e.message}`);}
