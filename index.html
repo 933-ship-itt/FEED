@@ -725,14 +725,14 @@
             gap: 12px;
             pointer-events: none;
         }
-        #feed-toast-root > * {
+        #feed-toast-root>* {
             pointer-events: auto;
         }
         .toast-item {
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 16px;
-            box-shadow: 0 12px 40px rgba(0,0,0,.08);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .08);
             padding: 16px 20px;
             animation: fadeIn 0.3s ease;
         }
@@ -2036,7 +2036,7 @@
 
         function esc(value) {
             return String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;',
-                "'": '&#039;' } [c] || c));
+                    "'": '&#039;' } [c] || c));
         }
 
         /* ============================================================
@@ -2555,7 +2555,7 @@
             document.getElementById('btn-done')?.addEventListener('click', () => {
                 DOM.wallet.successMessage.textContent = 'The Solana Devnet account was scanned successfully.';
                 switchWalletView(DOM.wallet.successView);
-                // Save wallet to Firestore
+                // Save wallet to Firestore (or localStorage fallback)
                 saveWalletToFirestore(fetchedAccounts[0]);
             });
 
@@ -2597,65 +2597,103 @@
         })();
 
         /* ============================================================
-           FIRESTORE WALLET PERSISTENCE
+           FIRESTORE & LOCALSTORAGE WALLET PERSISTENCE (fallback)
            ============================================================ */
+        function getLocalStorageKey(userId) {
+            return `feed_wallets_${userId}`;
+        }
+
         async function saveWalletToFirestore(account) {
             const auth = window.__feed?.auth;
             if (!auth) return;
             const user = auth.currentUser;
             if (!user) return;
             const db = window.__feed?.db;
-            if (!db) return;
-            try {
-                const walletData = {
-                    address: account.address,
-                    provider: account.provider,
-                    network: APP_CONFIG.blockchain.network,
-                    sol: account.sol,
-                    feed: account.feed,
-                    usdc: account.usdc,
-                    updatedAt: new Date().toISOString()
-                };
-                // Check if already exists
-                const docRef = db.collection('users').doc(user.uid);
-                const doc = await docRef.get();
-                let wallets = [];
-                if (doc.exists && doc.data().wallets) {
-                    wallets = doc.data().wallets;
-                }
-                // Remove existing entry with same address
-                wallets = wallets.filter(w => w.address !== account.address);
-                wallets.push(walletData);
-                // Limit to maxWallets
-                if (wallets.length > APP_CONFIG.limits.maxWallets) {
-                    wallets = wallets.slice(-APP_CONFIG.limits.maxWallets);
-                }
-                await docRef.set({ wallets }, { merge: true });
-                linkedWallets = wallets;
-                updateDashboardUI();
-                toast('Wallet saved', `Address ${shortAddress(account.address)} linked to your Google account.`, 'success');
-            } catch (err) {
-                console.warn('Failed to save wallet:', err);
-                toast('Wallet save failed', err.message, 'error');
+            const uid = user.uid;
+
+            // Always update linkedWallets and localStorage
+            const walletData = {
+                address: account.address,
+                provider: account.provider,
+                network: APP_CONFIG.blockchain.network,
+                sol: account.sol,
+                feed: account.feed,
+                usdc: account.usdc,
+                updatedAt: new Date().toISOString()
+            };
+
+            // Remove existing entry with same address
+            linkedWallets = linkedWallets.filter(w => w.address !== account.address);
+            linkedWallets.push(walletData);
+            if (linkedWallets.length > APP_CONFIG.limits.maxWallets) {
+                linkedWallets = linkedWallets.slice(-APP_CONFIG.limits.maxWallets);
             }
+
+            // Save to localStorage as fallback
+            try {
+                localStorage.setItem(getLocalStorageKey(uid), JSON.stringify(linkedWallets));
+            } catch (e) { /* ignore */ }
+
+            // Try Firestore
+            if (db) {
+                try {
+                    const docRef = db.collection('users').doc(uid);
+                    await docRef.set({ wallets: linkedWallets }, { merge: true });
+                    toast('Wallet saved', `Address ${shortAddress(account.address)} linked to your Google account.`,
+                    'success');
+                } catch (err) {
+                    console.warn('Firestore save failed, using localStorage fallback:', err);
+                    toast('Wallet saved locally', `Address ${shortAddress(account.address)} stored in your browser (offline mode).`, 'warning');
+                }
+            } else {
+                toast('Wallet saved locally', `Address ${shortAddress(account.address)} stored in your browser (Firestore unavailable).`, 'warning');
+            }
+
+            updateDashboardUI();
         }
 
         async function loadUserWallets(user) {
             if (!user) return;
             const db = window.__feed?.db;
-            if (!db) return;
+            const uid = user.uid;
+
+            // Try Firestore first
+            if (db) {
+                try {
+                    const doc = await db.collection('users').doc(uid).get();
+                    if (doc.exists && doc.data().wallets) {
+                        linkedWallets = doc.data().wallets;
+                        // Also cache to localStorage
+                        try {
+                            localStorage.setItem(getLocalStorageKey(uid), JSON.stringify(linkedWallets));
+                        } catch (e) { /* ignore */ }
+                        updateDashboardUI();
+                        if (linkedWallets.length) {
+                            toast('Wallets loaded', `${linkedWallets.length} wallet(s) restored from your account.`, 'info');
+                        }
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('Firestore load failed, checking localStorage:', err);
+                }
+            }
+
+            // Fallback: localStorage
             try {
-                const doc = await db.collection('users').doc(user.uid).get();
-                if (doc.exists && doc.data().wallets) {
-                    linkedWallets = doc.data().wallets;
-                    updateDashboardUI();
-                    if (linkedWallets.length) {
-                        toast('Wallets loaded', `${linkedWallets.length} wallet(s) restored from your account.`, 'info');
+                const stored = localStorage.getItem(getLocalStorageKey(uid));
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length) {
+                        linkedWallets = parsed;
+                        updateDashboardUI();
+                        toast('Wallets loaded from local cache', `${linkedWallets.length} wallet(s) restored.`, 'info');
+                        return;
                     }
                 }
-            } catch (err) {
-                console.warn('Load wallets failed:', err);
-            }
+            } catch (e) { /* ignore */ }
+
+            linkedWallets = [];
+            updateDashboardUI();
         }
 
         /* ============================================================
@@ -2739,7 +2777,14 @@
                         const db = window.__feed?.db;
                         const user = window.__feed?.auth?.currentUser;
                         if (db && user) {
-                            await db.collection('users').doc(user.uid).set({ wallets: linkedWallets }, { merge: true });
+                            await db.collection('users').doc(user.uid).set({ wallets: linkedWallets }, { merge: true })
+                                .catch(() => {});
+                        }
+                        // Update localStorage
+                        if (user) {
+                            try {
+                                localStorage.setItem(getLocalStorageKey(user.uid), JSON.stringify(linkedWallets));
+                            } catch (e) {}
                         }
                         updateDashboardUI();
                         renderSettingsView();
@@ -2757,7 +2802,10 @@
                 const db = window.__feed?.db;
                 const user = window.__feed?.auth?.currentUser;
                 if (db && user) {
-                    await db.collection('users').doc(user.uid).set({ wallets: [] }, { merge: true });
+                    await db.collection('users').doc(user.uid).set({ wallets: [] }, { merge: true }).catch(() => {});
+                    try {
+                        localStorage.setItem(getLocalStorageKey(user.uid), JSON.stringify([]));
+                    } catch (e) {}
                 }
                 updateDashboardUI();
                 const msg = el.querySelector('#feedSettingsMessage');
@@ -2820,7 +2868,7 @@
             }
         }, APP_CONFIG.limits.walletRefreshMs);
 
-        console.log('FEED application initialized with wallet_connect UI');
+        console.log('FEED application initialized with wallet_connect UI and localStorage fallback');
         APP_STATE.initialized = true;
     </script>
 
