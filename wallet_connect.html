@@ -3,177 +3,795 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 EIP-6963 Isolated Connector</title>
+    <title>FEED | Wallet Connection Setup</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/W18WjK3V/image-(1).png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.10.0/ethers.umd.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --violet: #6036E1;
+            --magenta: #D83DC2;
+            --ink: #0b0b12;
+            --line: #ececf3;
+            --gradient: linear-gradient(to right, #6036E1, #D83DC2);
+        }
+
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #0b0f19;
-            color: #38bdf8;
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 80% 5%, rgba(216,61,194,0.09), transparent 26%),
+                radial-gradient(circle at 10% 12%, rgba(96,54,225,0.09), transparent 24%),
+                #f8f8fc;
+            color: var(--ink);
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
         }
-        .container {
-            background: #1e293b;
-            border: 1px solid #334155;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            max-width: 600px;
-            width: 100%;
-        }
-        h2 { color: #f8fafc; margin-top: 0; }
-        button {
-            background-color: #2563eb;
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            margin: 6px 0;
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        button:hover { background-color: #1d4ed8; }
-        .trust-btn { background-color: #3b82f6; }
-        .trust-btn:hover { background-color: #2563eb; }
-        button:disabled { background-color: #475569; cursor: not-allowed; opacity: 0.6; }
+
+        .font-display { font-family: 'Archivo', sans-serif; }
         
-        #debug-console {
-            background: #020617;
-            border: 1px solid #1e293b;
-            color: #4ade80;
-            padding: 12px;
-            border-radius: 6px;
-            height: 180px;
-            overflow-y: auto;
-            font-size: 12px;
-            margin-top: 20px;
-            text-align: left;
-            white-space: pre-wrap;
-            word-break: break-all;
+        .text-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .log-error { color: #f87171; }
-        .log-info { color: #38bdf8; }
-        .log-success { color: #4ade80; }
+        
+        .bg-gradient-custom {
+            background: var(--gradient);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+        }
+        
+        .bg-gradient-custom:hover:not(:disabled) {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .premium-card {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 18px 60px rgba(23, 18, 43, 0.06);
+        }
+
+        .wallet-card {
+            border: 1px solid var(--line);
+            transition: all 0.2s ease;
+        }
+
+        .wallet-card.selected {
+            border-color: var(--violet);
+            background: rgba(96,54,225,0.04);
+            box-shadow: 0 8px 24px rgba(96,54,225,0.1);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid rgba(96,54,225,0.1);
+            border-top-color: var(--violet);
+            border-right-color: var(--magenta);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d1d6;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .custom-checkbox:checked {
+            background: var(--gradient);
+            border-color: transparent;
+        }
+
+        .wallet-choice {
+            border: 1px solid var(--line);
+            background: white;
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        .wallet-choice:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: var(--violet);
+            box-shadow: 0 10px 28px rgba(96,54,225,.12);
+        }
+        .wallet-choice:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+        .success-ring {
+            width: 78px;
+            height: 78px;
+            border-radius: 999px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #34d399, #10b981);
+            box-shadow: 0 14px 35px rgba(16,185,129,.25);
+            animation: successPop .55s cubic-bezier(.2,.8,.2,1) both;
+        }
+        .success-ring i {
+            animation: successCheck .45s .15s ease both;
+        }
+        @keyframes successPop {
+            0% { opacity: 0; transform: scale(.55); }
+            70% { transform: scale(1.08); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes successCheck {
+            from { opacity: 0; transform: scale(.4) rotate(-15deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        .danger-button {
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            background: #fff;
+            transition: background .2s ease, border-color .2s ease;
+        }
+        .danger-button:hover:not(:disabled) {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
 </head>
-<body>
+<body class="p-6">
 
-    <div class="container">
-        <h2>🛠️ EIP-6963 Isolated Wallet Test</h2>
-        <p style="color: #94a3b8; font-size: 14px;">Project ID: <code>7d7ef210c61dbe38335f827df3368220</code></p>
+    <div class="w-full max-w-xl mx-auto premium-card rounded-3xl p-8 md:p-10 relative overflow-hidden">
         
-        <!-- Isolated Action Buttons -->
-        <button id="metaMaskBtn" onclick="connectSpecificWallet('MetaMask')" disabled>🔗 Connect MetaMask (Waiting for discovery...)</button>
-        <button class="trust-btn" id="trustBtn" onclick="connectSpecificWallet('Trust Wallet')" disabled>🔗 Connect Trust Wallet (Waiting for discovery...)</button>
-        
-        <!-- Live Debug Output Terminal -->
-        <div id="debug-console">[SYSTEM] Initializing EIP-6963 multi-provider listener...</div>
+        <i class="ph-fill ph-cube absolute -top-10 -right-10 text-[180px] text-[#6036E1] opacity-5 pointer-events-none"></i>
+
+        <div class="text-center mb-8">
+            <img class="h-12 w-12 mx-auto rounded-xl object-contain mb-4 shadow-sm" src="https://i.postimg.cc/W18WjK3V/image-(1).png" alt="FEED">
+            <h1 class="font-display text-2xl font-black tracking-tight">F<span class="text-gradient">EE</span>D Access</h1>
+        </div>
+
+        <!-- STATE 1: Terms of Service -->
+        <div id="view-tos" class="view-section active fade-in">
+            <h2 class="text-lg font-bold mb-3">Asset Protocol Agreement</h2>
+            <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm text-gray-500 h-40 overflow-y-auto mb-6 leading-relaxed">
+                By connecting your wallet, you are accessing the decentralized FEED protocol. You agree that:
+                <ul class="list-disc pl-5 mt-2 space-y-1">
+                    <li>Asset custody remains entirely on your device.</li>
+                    <li>You are interacting with automated smart contracts on Base Sepolia.</li>
+                    <li>The protocol does not hold or manage your keys.</li>
+                    <li>You accept full responsibility for verifying network data and transactions.</li>
+                </ul>
+            </div>
+            
+            <label id="tos-label" class="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition mb-6">
+                <input type="checkbox" id="tos-checkbox" class="custom-checkbox shrink-0">
+                <span class="text-sm font-medium text-gray-700 select-none">I agree to the Terms of Service</span>
+            </label>
+
+            <button type="button" id="btn-proceed" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center">
+                Proceed to Connect
+            </button>
+        </div>
+
+        <!-- STATE 2: Wallet Choice -->
+        <div id="view-wallet-choice" class="view-section fade-in">
+            <div class="text-center mb-7">
+                <h2 class="text-xl font-bold font-display">Choose your wallet</h2>
+                <p class="text-sm text-gray-500 mt-1">Select the wallet you want to connect to FEED.</p>
+            </div>
+
+            <div class="space-y-3">
+                <button id="btn-metamask" type="button" disabled
+                    class="wallet-choice w-full rounded-2xl p-4 flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center shrink-0">
+                        <span class="text-2xl">🦊</span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-900">MetaMask</div>
+                        <div id="metamask-status" class="text-xs text-gray-500 mt-0.5">Searching for MetaMask…</div>
+                    </div>
+                    <i class="ph-bold ph-arrow-right ml-auto text-gray-400"></i>
+                </button>
+
+                <button id="btn-trust" type="button" disabled
+                    class="wallet-choice w-full rounded-2xl p-4 flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+                        <span class="text-2xl">🛡️</span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-bold text-gray-900">Trust Wallet</div>
+                        <div id="trust-status" class="text-xs text-gray-500 mt-0.5">Searching for Trust Wallet…</div>
+                    </div>
+                    <i class="ph-bold ph-arrow-right ml-auto text-gray-400"></i>
+                </button>
+            </div>
+
+            <button id="btn-back-wallet-choice" type="button"
+                class="w-full mt-5 text-sm font-semibold text-gray-500 hover:text-gray-900">
+                Back
+            </button>
+        </div>
+
+        <!-- STATE 3: Wallet Loading -->
+        <div id="view-loading" class="view-section fade-in text-center py-10">
+            <div class="spinner mx-auto mb-6"></div>
+            <h2 class="text-lg font-bold">Establishing Protocol Link</h2>
+            <p id="loading-message" class="text-sm text-gray-500 mt-2">Fetching wallet metrics on Base Sepolia...</p>
+        </div>
+
+        <!-- STATE 3: Select Wallets -->
+        <div id="view-wallets" class="view-section fade-in">
+            <div class="text-center mb-6">
+                <h2 class="text-xl font-bold font-display">Select Active Wallets</h2>
+                <p class="text-sm text-gray-500 mt-1">Choose 1 to 3 addresses to index to your FEED profile.</p>
+            </div>
+            
+            <div id="wallet-list" class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1"></div>
+
+            <button id="btn-save" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center flex items-center justify-center gap-2">
+                <span>Save to Profile</span>
+            </button>
+        </div>
+
+        <!-- STATE 4: Final Saving -->
+        <div id="view-saving" class="view-section fade-in text-center py-10">
+            <div class="spinner mx-auto mb-6"></div>
+            <h2 class="text-lg font-bold">Indexing to Network</h2>
+            <p class="text-sm text-gray-500 mt-2">Securing your selected addresses to Firestore...</p>
+        </div>
+
+        <!-- STATE 5: Success -->
+        <div id="view-success" class="view-section fade-in text-center py-8">
+            <div class="success-ring">
+                <i class="ph-bold ph-check text-white text-4xl"></i>
+            </div>
+            <h2 class="font-display text-2xl font-black">Profile complete</h2>
+            <p id="success-message" class="text-gray-500 text-sm mt-2 px-4 leading-relaxed">
+                Your selected wallet addresses have been added to your FEED profile.
+            </p>
+
+            <button id="btn-erase-data" type="button"
+                class="danger-button w-full mt-7 py-3.5 rounded-2xl font-semibold">
+                Completely erase my wallet data
+            </button>
+            <p id="erase-status" class="text-xs text-gray-400 mt-3"></p>
+        </div>
+
     </div>
 
+
+    <!-- TOS controls are intentionally kept outside the module scripts.
+         This means the Agree/Proceed control still works even if a wallet SDK
+         or another module fails to load. -->
     <script>
-        const PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
-        
-        // Store discovered providers safely by name or RDNS
+        (() => {
+            const cb = document.getElementById('tos-checkbox');
+            const label = document.getElementById('tos-label');
+            const button = document.getElementById('btn-proceed');
+
+            if (!cb || !label || !button) return;
+
+            const sync = () => {
+                button.disabled = !cb.checked;
+                button.setAttribute('aria-disabled', String(!cb.checked));
+            };
+
+            cb.addEventListener('change', sync);
+
+            // The label already toggles a checkbox natively. Do not toggle it
+            // again manually; that can leave the state unchanged.
+            label.addEventListener('click', (event) => {
+                if (event.target === cb) return;
+                // Let the label's native behavior perform the toggle.
+                requestAnimationFrame(sync);
+            });
+
+            button.addEventListener('click', async () => {
+                if (!cb.checked) {
+                    sync();
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent = 'Opening Wallet...';
+
+                // The wallet module exposes this once Web3Modal is ready.
+                if (typeof window.startWalletConnect === 'function') {
+                    await window.startWalletConnect();
+                } else {
+                    // Give the module a moment to finish loading instead of
+                    // silently doing nothing.
+                    let attempts = 0;
+                    const waitForWallet = setInterval(async () => {
+                        attempts++;
+                        if (typeof window.startWalletConnect === 'function') {
+                            clearInterval(waitForWallet);
+                            await window.startWalletConnect();
+                        } else if (attempts >= 50) {
+                            clearInterval(waitForWallet);
+                            button.disabled = false;
+                            button.textContent = 'Proceed to Connect';
+                            alert('Wallet connection is still loading. Please refresh and try again.');
+                        }
+                    }, 100);
+                }
+            });
+
+            sync();
+        })();
+    </script>
+
+    <!-- Firebase SDK Setup -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+  authDomain: "feed-65b35.firebaseapp.com",
+  projectId: "feed-65b35",
+  storageBucket: "feed-65b35.firebasestorage.app",
+  messagingSenderId: "1085499159984",
+  appId: "1:1085499159984:web:317e0443941085964a5275",
+  measurementId: "G-FVPRRX9X1M"
+};
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const FEED_USER_ID = "google_user_mock_123";
+
+        window.saveWalletsToFirestore = async (wallets) => {
+            await setDoc(doc(db, "users", FEED_USER_ID), {
+                connected_wallets: wallets,
+                updated_at: new Date().toISOString()
+            }, { merge: true });
+            return true;
+        };
+
+        window.eraseWalletDataFromFirestore = async () => {
+            await deleteDoc(doc(db, "users", FEED_USER_ID));
+            return true;
+        };
+    </script>
+
+    <!-- EIP-6963 Wallet Connection Logic -->
+    <script type="module">
+        const FEED_CONTRACT = '0xF7351B1D08f460e40B5a78A3BeD5E65EA96548Ce';
+        const USDC_CONTRACT = '0x036CbD53842c5426634e7929541eC2318f3dCF7e';
+        const BASE_SEPOLIA_CHAIN_ID = '0x14a34';
+
+        const erc20Abi = [
+            "function balanceOf(address owner) view returns (uint256)"
+        ];
+
+        let fetchedAccounts = [];
+        let selectedAddresses = new Set();
+        let connectedProvider = null;
+        let connectedWalletName = '';
+        let connectionInProgress = false;
+
+        // EIP-6963 stores each injected wallet independently. This avoids
+        // fighting over window.ethereum when multiple extensions are installed.
         const discoveredProviders = new Map();
 
-        function debugLog(message, type = 'info') {
-            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-            const formattedMsg = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
-            
-            if (type === 'error') console.error(formattedMsg);
-            else if (type === 'success') console.log('%c ' + formattedMsg, 'color: #4ade80; font-weight: bold;');
-            else console.log(formattedMsg);
+        const viewTos = document.getElementById('view-tos');
+        const viewChoice = document.getElementById('view-wallet-choice');
+        const viewLoading = document.getElementById('view-loading');
+        const viewWallets = document.getElementById('view-wallets');
+        const viewSaving = document.getElementById('view-saving');
+        const viewSuccess = document.getElementById('view-success');
 
-            const consoleEl = document.getElementById('debug-console');
-            const colorClass = type === 'error' ? 'log-error' : (type === 'success' ? 'log-success' : 'log-info');
-            consoleEl.innerHTML += `<div class="${colorClass}">${formattedMsg}</div>`;
-            consoleEl.scrollTop = consoleEl.scrollHeight;
+        const cbTos = document.getElementById('tos-checkbox');
+        const btnProceed = document.getElementById('btn-proceed');
+        const btnSave = document.getElementById('btn-save');
+        const walletListDiv = document.getElementById('wallet-list');
+        const btnMetaMask = document.getElementById('btn-metamask');
+        const btnTrust = document.getElementById('btn-trust');
+        const metaMaskStatus = document.getElementById('metamask-status');
+        const trustStatus = document.getElementById('trust-status');
+        const loadingMessage = document.getElementById('loading-message');
+        const btnErase = document.getElementById('btn-erase-data');
+        const eraseStatus = document.getElementById('erase-status');
+
+        function switchView(viewElement) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            viewElement.classList.add('active');
         }
 
-        // --- EIP-6963 Provider Discovery Listener ---
-        window.addEventListener('eip6963:announceProvider', (event) => {
-            const { info, provider } = event.detail;
-            debugLog(`Discovered provider: ${info.name} (RDNS: ${info.rdns})`, 'success');
-            
-            discoveredProviders.set(info.name.toLowerCase(), { info, provider });
+        function syncProceedButton() {
+            btnProceed.disabled = !cbTos.checked;
+        }
 
-            // Enable matching UI buttons dynamically based on actual extensions found
-            if (info.name.toLowerCase().includes('metamask')) {
-                const btn = document.getElementById('metaMaskBtn');
-                btn.disabled = false;
-                btn.innerText = "🔗 Connect MetaMask Extension";
-            }
-            if (info.name.toLowerCase().includes('trust')) {
-                const btn = document.getElementById('trustBtn');
-                btn.disabled = false;
-                btn.innerText = "🔗 Connect Trust Wallet Extension";
-            }
+        cbTos.addEventListener('change', syncProceedButton);
+        syncProceedButton();
+
+        // ---------- EIP-6963 discovery ----------
+        function providerKey(info) {
+            return `${String(info?.rdns || '')}|${String(info?.uuid || '')}|${String(info?.name || '')}`.toLowerCase();
+        }
+
+        function isMetaMask(info) {
+            const name = String(info?.name || '').toLowerCase();
+            const rdns = String(info?.rdns || '').toLowerCase();
+            return name.includes('metamask') || rdns.includes('metamask');
+        }
+
+        function isTrustWallet(info) {
+            const name = String(info?.name || '').toLowerCase();
+            const rdns = String(info?.rdns || '').toLowerCase();
+            return name.includes('trust wallet') || name === 'trust' || rdns.includes('trust');
+        }
+
+        function updateWalletChoiceButtons() {
+            const meta = [...discoveredProviders.values()].find(entry => isMetaMask(entry.info));
+            const trust = [...discoveredProviders.values()].find(entry => isTrustWallet(entry.info));
+
+            btnMetaMask.disabled = !meta || connectionInProgress;
+            btnTrust.disabled = !trust || connectionInProgress;
+
+            metaMaskStatus.textContent = meta ? 'Available on this device' : 'MetaMask not detected';
+            trustStatus.textContent = trust ? 'Available on this device' : 'Trust Wallet not detected';
+        }
+
+        window.addEventListener('eip6963:announceProvider', (event) => {
+            const detail = event.detail;
+            if (!detail?.provider || !detail?.info) return;
+
+            discoveredProviders.set(providerKey(detail.info), {
+                info: detail.info,
+                provider: detail.provider
+            });
+
+            updateWalletChoiceButtons();
         });
 
-        // Broadcast request to prompt all browser extensions to announce themselves
-        window.dispatchEvent(new Event('eip6963:requestProvider'));
+        // Ask all installed EIP-6963 wallets to announce themselves.
+        function requestWalletDiscovery() {
+            window.dispatchEvent(new Event('eip6963:requestProvider'));
 
-        // Fallback check after 1 second if EIP-6963 announcements take a moment or legacy injection overrides
-        setTimeout(() => {
-            if (discoveredProviders.size === 0 && window.ethereum) {
-                debugLog("No EIP-6963 announcements captured. Falling back to legacy window.ethereum parsing...", 'info');
-                
-                if (window.ethereum.isMetaMask) {
-                    discoveredProviders.set('metamask', { info: { name: 'MetaMask' }, provider: window.ethereum });
-                    const btn = document.getElementById('metaMaskBtn');
-                    btn.disabled = false;
-                    btn.innerText = "🔗 Connect MetaMask Extension (Legacy)";
+            // Legacy fallback for older extensions.
+            setTimeout(() => {
+                const legacy = window.ethereum;
+                if (!legacy) {
+                    updateWalletChoiceButtons();
+                    return;
                 }
-                if (window.ethereum.isTrust || window.trustwallet) {
-                    const trustProv = window.trustwallet || window.ethereum;
-                    discoveredProviders.set('trust wallet', { info: { name: 'Trust Wallet' }, provider: trustProv });
-                    const btn = document.getElementById('trustBtn');
-                    btn.disabled = false;
-                    btn.innerText = "🔗 Connect Trust Wallet Extension (Legacy)";
-                }
-            }
-        }, 1000);
 
-        // --- Targeted Connection Function ---
+                if (legacy.isMetaMask) {
+                    discoveredProviders.set('legacy-metamask', {
+                        info: { name: 'MetaMask', rdns: 'io.metamask' },
+                        provider: legacy
+                    });
+                }
+
+                if (legacy.isTrust || window.trustwallet) {
+                    const trustProvider = window.trustwallet || legacy;
+                    discoveredProviders.set('legacy-trust', {
+                        info: { name: 'Trust Wallet', rdns: 'com.wallet.crypto.trustapp' },
+                        provider: trustProvider
+                    });
+                }
+
+                updateWalletChoiceButtons();
+            }, 800);
+        }
+
+        // ---------- Connect ----------
         async function connectSpecificWallet(walletName) {
-            debugLog(`--- Starting connection routine explicitly for: ${walletName} ---`, 'info');
-            const targetKey = walletName.toLowerCase();
-            const walletEntry = discoveredProviders.get(targetKey);
+            if (connectionInProgress) return;
 
-            if (!walletEntry) {
-                debugLog(`Error: ${walletName} provider instance was not found in discovered extension map.`, 'error');
+            const predicate = walletName === 'MetaMask' ? isMetaMask : isTrustWallet;
+            const entry = [...discoveredProviders.values()].find(item => predicate(item.info));
+
+            if (!entry) {
+                alert(`${walletName} was not detected. Install or enable the wallet extension, then try again.`);
+                requestWalletDiscovery();
                 return;
             }
 
-            const provider = walletEntry.provider;
+            connectionInProgress = true;
+            updateWalletChoiceButtons();
 
             try {
-                debugLog(`Dispatching 'eth_requestAccounts' specifically to ${walletName}...`, 'info');
-                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                loadingMessage.textContent = `Connecting to ${walletName}…`;
+                switchView(viewLoading);
 
-                if (!accounts || accounts.length === 0) {
-                    throw new Error("Authorization request rejected or empty response.");
+                const accounts = await entry.provider.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                if (!Array.isArray(accounts) || accounts.length === 0) {
+                    throw new Error('No wallet account was returned.');
                 }
 
-                const connectedAccount = accounts[0];
-                debugLog(`Successfully connected ${walletName}!`, 'success');
-                debugLog(`Active Account: ${connectedAccount}`, 'success');
+                connectedProvider = entry.provider;
+                connectedWalletName = walletName;
 
-                const chainId = await provider.request({ method: 'eth_chainId' });
-                debugLog(`Network Chain ID: ${chainId}`, 'info');
+                // FEED is configured for Base Sepolia. We only request a
+                // network switch; no transaction or signature is performed.
+                let chainId = await entry.provider.request({ method: 'eth_chainId' });
 
+                if (String(chainId).toLowerCase() !== BASE_SEPOLIA_CHAIN_ID) {
+                    try {
+                        await entry.provider.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: BASE_SEPOLIA_CHAIN_ID }]
+                        });
+                        chainId = await entry.provider.request({ method: 'eth_chainId' });
+                    } catch (switchError) {
+                        throw new Error('Please switch your wallet to Base Sepolia and try again.');
+                    }
+                }
+
+                loadingMessage.textContent = 'Reading wallet balances…';
+                await processWalletData(entry.provider);
             } catch (err) {
-                debugLog(`Connection failed for ${walletName}: ${err.message}`, 'error');
+                console.error(`${walletName} connection failed:`, err);
+                switchView(viewChoice);
+                alert(`${walletName} connection failed: ${err?.message || 'Unknown error'}`);
+            } finally {
+                connectionInProgress = false;
+                updateWalletChoiceButtons();
             }
         }
+
+        btnMetaMask.addEventListener('click', () => connectSpecificWallet('MetaMask'));
+        btnTrust.addEventListener('click', () => connectSpecificWallet('Trust Wallet'));
+
+        btnProceed.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (!cbTos.checked || connectionInProgress) return;
+
+            switchView(viewChoice);
+            requestWalletDiscovery();
+        });
+
+        document.getElementById('btn-back-wallet-choice').addEventListener('click', () => {
+            if (!connectionInProgress) switchView(viewTos);
+        });
+
+        // ---------- Wallet data ----------
+        async function processWalletData(walletProvider) {
+            const ethersProvider = new ethers.BrowserProvider(walletProvider);
+            const accounts = await ethersProvider.send('eth_accounts', []);
+
+            if (!accounts?.length) throw new Error('No wallet accounts were returned.');
+
+            const feedContract = new ethers.Contract(FEED_CONTRACT, erc20Abi, ethersProvider);
+            const usdcContract = new ethers.Contract(USDC_CONTRACT, erc20Abi, ethersProvider);
+
+            const accountData = [];
+
+            for (const address of accounts) {
+                let ethBal = '0.0000';
+                let feedBal = '0.00';
+                let usdcBal = '0.00';
+
+                // Balance reads are independent. A temporary RPC failure for
+                // one token will not prevent the connected address appearing.
+                try {
+                    ethBal = parseFloat(
+                        ethers.formatEther(await ethersProvider.getBalance(address))
+                    ).toFixed(4);
+                } catch (_) {}
+
+                try {
+                    feedBal = parseFloat(
+                        ethers.formatUnits(await feedContract.balanceOf(address), 18)
+                    ).toFixed(2);
+                } catch (_) {}
+
+                try {
+                    usdcBal = parseFloat(
+                        ethers.formatUnits(await usdcContract.balanceOf(address), 6)
+                    ).toFixed(2);
+                } catch (_) {}
+
+                accountData.push({
+                    address,
+                    eth: ethBal,
+                    feed: feedBal,
+                    usdc: usdcBal,
+                    totalWeight: parseFloat(ethBal) + parseFloat(feedBal) + parseFloat(usdcBal)
+                });
+            }
+
+            accountData.sort((a, b) => b.totalWeight - a.totalWeight);
+            fetchedAccounts = accountData.slice(0, 5);
+            selectedAddresses.clear();
+
+            renderWalletList();
+            switchView(viewWallets);
+        }
+
+        function renderWalletList() {
+            walletListDiv.innerHTML = '';
+
+            fetchedAccounts.forEach((acc) => {
+                const shortAddr = `${acc.address.substring(0, 6)}...${acc.address.substring(acc.address.length - 4)}`;
+
+                const card = document.createElement('div');
+                card.className = "wallet-card bg-white rounded-2xl cursor-pointer overflow-hidden p-4";
+                card.dataset.address = acc.address;
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#6036E1]/20 to-[#D83DC2]/20 flex items-center justify-center shrink-0">
+                                <i class="ph-fill ph-wallet text-[#6036E1] text-xl"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-sm text-gray-900">${shortAddr}</div>
+                                <button type="button" class="text-xs text-[#3A76C4] font-semibold mt-0.5 hover:underline flex items-center gap-1 dropdown-trigger">
+                                    See Balances <i class="ph-bold ph-caret-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-center w-6 h-6 border-2 border-gray-200 rounded-full indicator transition-colors"></div>
+                    </div>
+
+                    <div class="bg-gray-50 border border-gray-100 p-3 rounded-xl mt-3 hidden balance-dropdown">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-white border border-gray-100 p-2 rounded-lg text-center">
+                                <div class="text-[9px] uppercase font-bold text-gray-400">USDC</div>
+                                <div class="font-semibold text-xs mt-1">${acc.usdc}</div>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded-lg text-center shadow-sm">
+                                <div class="text-[9px] uppercase font-bold text-[#D83DC2]">FEED</div>
+                                <div class="font-bold text-xs mt-1 text-gray-900">${acc.feed}</div>
+                            </div>
+                            <div class="bg-white border border-gray-100 p-2 rounded-lg text-center">
+                                <div class="text-[9px] uppercase font-bold text-gray-400">ETH</div>
+                                <div class="font-semibold text-xs mt-1">${acc.eth}</div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                const trigger = card.querySelector('.dropdown-trigger');
+                const dropdown = card.querySelector('.balance-dropdown');
+
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropdown.classList.toggle('hidden');
+                    const icon = trigger.querySelector('i');
+                    icon.classList.toggle('ph-caret-down');
+                    icon.classList.toggle('ph-caret-up');
+                });
+
+                card.addEventListener('click', () => {
+                    const isSelected = selectedAddresses.has(acc.address);
+
+                    if (isSelected) {
+                        selectedAddresses.delete(acc.address);
+                        card.classList.remove('selected');
+                        card.querySelector('.indicator').classList.remove('bg-[#6036E1]', 'border-[#6036E1]');
+                        card.querySelector('.indicator').innerHTML = '';
+                    } else {
+                        if (selectedAddresses.size >= 3) {
+                            alert("You can only activate up to 3 wallets.");
+                            return;
+                        }
+
+                        selectedAddresses.add(acc.address);
+                        card.classList.add('selected');
+                        card.querySelector('.indicator').classList.add('bg-[#6036E1]', 'border-[#6036E1]');
+                        card.querySelector('.indicator').innerHTML = '<i class="ph-bold ph-check text-white text-xs"></i>';
+                    }
+
+                    btnSave.disabled = selectedAddresses.size === 0;
+                    btnSave.querySelector('span').textContent =
+                        `Save ${selectedAddresses.size} Wallet${selectedAddresses.size !== 1 ? 's' : ''} to Profile`;
+                });
+
+                walletListDiv.appendChild(card);
+            });
+        }
+
+        // ---------- Save ----------
+        btnSave.addEventListener('click', async () => {
+            if (!selectedAddresses.size) return;
+
+            switchView(viewSaving);
+
+            const payload = fetchedAccounts.filter(acc => selectedAddresses.has(acc.address));
+
+            try {
+                if (!window.saveWalletsToFirestore) {
+                    throw new Error('Firestore is not ready.');
+                }
+
+                await window.saveWalletsToFirestore(payload);
+
+                document.getElementById('success-message').textContent =
+                    `${payload.length} wallet${payload.length === 1 ? '' : 's'} added to your FEED profile.`;
+
+                switchView(viewSuccess);
+            } catch (err) {
+                console.error("Save error:", err);
+                alert(`Could not save the selected wallets: ${err?.message || 'Unknown error'}`);
+                switchView(viewWallets);
+            }
+        });
+
+        // ---------- Erase all saved wallet data ----------
+        btnErase.addEventListener('click', async () => {
+            if (btnErase.disabled) return;
+
+            const confirmed = confirm(
+                'This will permanently erase all wallet data saved by this FEED setup. Continue?'
+            );
+
+            if (!confirmed) return;
+
+            btnErase.disabled = true;
+            btnErase.textContent = 'Erasing data…';
+            eraseStatus.textContent = '';
+
+            try {
+                if (!window.eraseWalletDataFromFirestore) {
+                    throw new Error('Firestore is not ready.');
+                }
+
+                await window.eraseWalletDataFromFirestore();
+
+                fetchedAccounts = [];
+                selectedAddresses.clear();
+                connectedProvider = null;
+                connectedWalletName = '';
+
+                btnErase.textContent = 'Data erased';
+                eraseStatus.textContent = 'All saved wallet data has been removed from this FEED profile.';
+            } catch (err) {
+                console.error('Erase wallet data error:', err);
+                btnErase.disabled = false;
+                btnErase.textContent = 'Completely erase my wallet data';
+                eraseStatus.textContent = `Could not erase data: ${err?.message || 'Unknown error'}`;
+            }
+        });
+
+        // Initial discovery is harmless and means the chooser is ready quickly.
+        requestWalletDiscovery();
     </script>
 </body>
 </html>
