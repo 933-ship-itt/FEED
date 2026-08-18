@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 Debug Connector (Test Phase)</title>
+    <title>Web3 EIP-6963 Isolated Connector</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -43,8 +43,8 @@
         button:hover { background-color: #1d4ed8; }
         .trust-btn { background-color: #3b82f6; }
         .trust-btn:hover { background-color: #2563eb; }
+        button:disabled { background-color: #475569; cursor: not-allowed; opacity: 0.6; }
         
-        /* Precise Debug Log Terminal Box */
         #debug-console {
             background: #020617;
             border: 1px solid #1e293b;
@@ -67,110 +67,111 @@
 <body>
 
     <div class="container">
-        <h2>🛠️ Wallet Connection Test Suite</h2>
+        <h2>🛠️ EIP-6963 Isolated Wallet Test</h2>
         <p style="color: #94a3b8; font-size: 14px;">Project ID: <code>7d7ef210c61dbe38335f827df3368220</code></p>
         
-        <!-- Action Buttons -->
-        <button onclick="connectInjectedWallet('metamask')">🔗 Connect MetaMask Extension</button>
-        <button class="trust-btn" onclick="connectInjectedWallet('trust')">🔗 Connect Trust Wallet Extension</button>
+        <!-- Isolated Action Buttons -->
+        <button id="metaMaskBtn" onclick="connectSpecificWallet('MetaMask')" disabled>🔗 Connect MetaMask (Waiting for discovery...)</button>
+        <button class="trust-btn" id="trustBtn" onclick="connectSpecificWallet('Trust Wallet')" disabled>🔗 Connect Trust Wallet (Waiting for discovery...)</button>
         
         <!-- Live Debug Output Terminal -->
-        <div id="debug-console">[SYSTEM] Ready for connection tests. Click a button above...</div>
+        <div id="debug-console">[SYSTEM] Initializing EIP-6963 multi-provider listener...</div>
     </div>
 
     <script>
         const PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
+        
+        // Store discovered providers safely by name or RDNS
+        const discoveredProviders = new Map();
 
-        // Precise logger utility that outputs to UI and console simultaneously
         function debugLog(message, type = 'info') {
             const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
             const formattedMsg = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
             
-            // Console output with correct color styling
             if (type === 'error') console.error(formattedMsg);
             else if (type === 'success') console.log('%c ' + formattedMsg, 'color: #4ade80; font-weight: bold;');
             else console.log(formattedMsg);
 
-            // UI Terminal output
             const consoleEl = document.getElementById('debug-console');
             const colorClass = type === 'error' ? 'log-error' : (type === 'success' ? 'log-success' : 'log-info');
             consoleEl.innerHTML += `<div class="${colorClass}">${formattedMsg}</div>`;
-            consoleEl.scrollTop = consoleEl.scrollHeight; // Auto-scroll to bottom
+            consoleEl.scrollTop = consoleEl.scrollHeight;
         }
 
-        // Environment inspection on load
-        window.addEventListener('DOMContentLoaded', () => {
-            debugLog(`Initializing test environment...`, 'info');
-            debugLog(`window.ethereum detected: ${!!window.ethereum}`, window.ethereum ? 'success' : 'error');
-            debugLog(`window.trustwallet detected: ${!!window.trustwallet}`, window.trustwallet ? 'success' : 'info');
+        // --- EIP-6963 Provider Discovery Listener ---
+        window.addEventListener('eip6963:announceProvider', (event) => {
+            const { info, provider } = event.detail;
+            debugLog(`Discovered provider: ${info.name} (RDNS: ${info.rdns})`, 'success');
             
-            if (window.ethereum && window.ethereum.providers) {
-                debugLog(`Found ${window.ethereum.providers.length} injected providers via EIP-6963 / multi-provider setup.`, 'info');
+            discoveredProviders.set(info.name.toLowerCase(), { info, provider });
+
+            // Enable matching UI buttons dynamically based on actual extensions found
+            if (info.name.toLowerCase().includes('metamask')) {
+                const btn = document.getElementById('metaMaskBtn');
+                btn.disabled = false;
+                btn.innerText = "🔗 Connect MetaMask Extension";
+            }
+            if (info.name.toLowerCase().includes('trust')) {
+                const btn = document.getElementById('trustBtn');
+                btn.disabled = false;
+                btn.innerText = "🔗 Connect Trust Wallet Extension";
             }
         });
 
-        // Main Connection Handler for Injected Web Extensions
-        async function connectInjectedWallet(walletType) {
-            debugLog(`--- Starting connection routine for: ${walletType.toUpperCase()} ---`, 'info');
-            let provider = null;
+        // Broadcast request to prompt all browser extensions to announce themselves
+        window.dispatchEvent(new Event('eip6963:requestProvider'));
+
+        // Fallback check after 1 second if EIP-6963 announcements take a moment or legacy injection overrides
+        setTimeout(() => {
+            if (discoveredProviders.size === 0 && window.ethereum) {
+                debugLog("No EIP-6963 announcements captured. Falling back to legacy window.ethereum parsing...", 'info');
+                
+                if (window.ethereum.isMetaMask) {
+                    discoveredProviders.set('metamask', { info: { name: 'MetaMask' }, provider: window.ethereum });
+                    const btn = document.getElementById('metaMaskBtn');
+                    btn.disabled = false;
+                    btn.innerText = "🔗 Connect MetaMask Extension (Legacy)";
+                }
+                if (window.ethereum.isTrust || window.trustwallet) {
+                    const trustProv = window.trustwallet || window.ethereum;
+                    discoveredProviders.set('trust wallet', { info: { name: 'Trust Wallet' }, provider: trustProv });
+                    const btn = document.getElementById('trustBtn');
+                    btn.disabled = false;
+                    btn.innerText = "🔗 Connect Trust Wallet Extension (Legacy)";
+                }
+            }
+        }, 1000);
+
+        // --- Targeted Connection Function ---
+        async function connectSpecificWallet(walletName) {
+            debugLog(`--- Starting connection routine explicitly for: ${walletName} ---`, 'info');
+            const targetKey = walletName.toLowerCase();
+            const walletEntry = discoveredProviders.get(targetKey);
+
+            if (!walletEntry) {
+                debugLog(`Error: ${walletName} provider instance was not found in discovered extension map.`, 'error');
+                return;
+            }
+
+            const provider = walletEntry.provider;
 
             try {
-                if (walletType === 'metamask') {
-                    if (!window.ethereum) {
-                        throw new Error("No window.ethereum object found in browser context. Is MetaMask installed?");
-                    }
-                    
-                    // Isolate MetaMask if multiple extensions (like Phantom/Coinbase/Binance) inject into window.ethereum
-                    if (window.ethereum.providers) {
-                        provider = window.ethereum.providers.find(p => p.isMetaMask);
-                    } else if (window.ethereum.isMetaMask) {
-                        provider = window.ethereum;
-                    }
-
-                    if (!provider) {
-                        throw new Error("MetaMask provider flag 'isMetaMask' not found among injected providers.");
-                    }
-                    debugLog("MetaMask provider target successfully isolated.", 'success');
-
-                } else if (walletType === 'trust') {
-                    // Trust wallet extension can inject under window.trustwallet or window.ethereum with isTrust
-                    if (window.trustwallet) {
-                        provider = window.trustwallet;
-                        debugLog("Detected dedicated window.trustwallet provider.", 'success');
-                    } else if (window.ethereum) {
-                        provider = window.ethereum.providers 
-                            ? window.ethereum.providers.find(p => p.isTrust) 
-                            : (window.ethereum.isTrust ? window.ethereum : null);
-                        
-                        if (provider) {
-                            debugLog("Detected Trust Wallet flag inside window.ethereum stack.", 'success');
-                        }
-                    }
-
-                    if (!provider) {
-                        throw new Error("Trust Wallet extension not found. Please install Trust Wallet browser extension.");
-                    }
-                }
-
-                // Request account access explicitly
-                debugLog(`Dispatching RPC method 'eth_requestAccounts' to ${walletType}...`, 'info');
+                debugLog(`Dispatching 'eth_requestAccounts' specifically to ${walletName}...`, 'info');
                 const accounts = await provider.request({ method: 'eth_requestAccounts' });
 
                 if (!accounts || accounts.length === 0) {
-                    throw new Error("Provider returned an empty account list. Authorization denied by user.");
+                    throw new Error("Authorization request rejected or empty response.");
                 }
 
                 const connectedAccount = accounts[0];
-                debugLog(`Successfully connected wallet address!`, 'success');
+                debugLog(`Successfully connected ${walletName}!`, 'success');
                 debugLog(`Active Account: ${connectedAccount}`, 'success');
 
-                // Optional: Fetch current chain ID for deep diagnostic check
                 const chainId = await provider.request({ method: 'eth_chainId' });
-                debugLog(`Current Network Chain ID: ${chainId}`, 'info');
+                debugLog(`Network Chain ID: ${chainId}`, 'info');
 
             } catch (err) {
-                debugLog(`Connection failed code/message: ${err.message}`, 'error');
-                console.error("Detailed Error Stack:", err);
+                debugLog(`Connection failed for ${walletName}: ${err.message}`, 'error');
             }
         }
     </script>
