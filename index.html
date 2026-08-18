@@ -1934,13 +1934,57 @@
 
             function discoverWallets() {
                 const providers = [];
-                if (window.phantom?.solana?.isPhantom) providers.push({ name:'Phantom', provider:window.phantom.solana });
-                if (window.solflare?.isSolflare) providers.push({ name:'Solflare', provider:window.solflare });
-                if (window.backpack?.isBackpack) providers.push({ name:'Backpack', provider:window.backpack });
-                if (window.solana && !window.phantom?.solana?.isPhantom && !window.solflare?.isSolflare && !window.backpack?.isBackpack) {
-                    providers.push({ name:'Solana Wallet', provider:window.solana });
+                const seen = new Set();
+
+                const add = (name, provider) => {
+                    if (!provider || seen.has(provider)) return;
+                    seen.add(provider);
+                    providers.push({ name, provider });
+                };
+
+                // Phantom can expose its provider directly or through a providers array.
+                const phantomProviders = Array.isArray(window.phantom?.solana?.providers)
+                    ? window.phantom.solana.providers
+                    : [];
+                const phantom = phantomProviders.find(p => p?.isPhantom) || window.phantom?.solana;
+                if (phantom?.isPhantom || phantom?.isPhantom === true) add('Phantom', phantom);
+
+                if (window.solflare?.isSolflare) add('Solflare', window.solflare);
+                if (window.backpack?.isBackpack) add('Backpack', window.backpack);
+
+                // Generic Solana injection.
+                const generic = window.solana;
+                if (generic && !seen.has(generic)) {
+                    const isKnown =
+                        generic.isPhantom === true ||
+                        generic.isSolflare === true ||
+                        generic.isBackpack === true;
+                    if (!isKnown) add('Solana Wallet', generic);
                 }
+
+                // Some environments expose multiple providers through window.solana.providers.
+                if (Array.isArray(generic?.providers)) {
+                    generic.providers.forEach(provider => {
+                        if (provider?.isPhantom) add('Phantom', provider);
+                        else if (provider?.isSolflare) add('Solflare', provider);
+                        else if (provider?.isBackpack) add('Backpack', provider);
+                    });
+                }
+
                 return providers;
+            }
+
+            async function waitForWallets(timeout = 2500) {
+                const started = Date.now();
+                let wallets = discoverWallets();
+
+                // Wallet extensions may inject after the FEED module has loaded.
+                while (!wallets.length && Date.now() - started < timeout) {
+                    await new Promise(resolve => setTimeout(resolve, 150));
+                    wallets = discoverWallets();
+                }
+
+                return wallets;
             }
 
             async function rpcFetch(method, params=[]) {
@@ -1998,11 +2042,10 @@
 
             async function showPicker() {
                 discoveryStatus.textContent = 'Scanning for Solana wallet applications...';
-                await new Promise(resolve => setTimeout(resolve, 250));
-                const list = discoverWallets();
+                const list = await waitForWallets(2500);
                 if (!list.length) {
                     discoveryStatus.textContent = 'No compatible Solana wallet detected.';
-                    showMessage('FEED could not find Phantom, Solflare, Backpack, or another compatible Solana wallet. Please install or unlock one and try again.','error');
+                    showMessage('FEED could not detect a compatible Solana wallet extension. Please install or unlock Phantom, Solflare, Backpack, or another Solana wallet and try again.','error');
                     return;
                 }
 
