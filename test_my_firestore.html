@@ -57,7 +57,6 @@
         .log-info { color: #94a3b8; }
         .log-success { color: #4ade80; }
         .log-error { color: #f87171; }
-        .log-warn { color: #facc15; }
         
         button {
             background: #38bdf8;
@@ -82,15 +81,13 @@
     <div id="overall-status" class="status-badge">Awaiting Start</div>
     
     <div class="log-container" id="terminal">
-        <div class="log-entry log-info">Ready to begin audit. Click "Start Audit" to test Firestore capabilities.</div>
+        <div class="log-entry log-info">Ready to begin audit with the ropay-11bf2 config. Click "Start Audit".</div>
     </div>
     
     <button id="start-btn">Start Audit</button>
 </div>
 
-<!-- Import Firebase as ES Modules -->
 <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { 
         getFirestore, 
@@ -102,44 +99,49 @@
         deleteDoc 
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Your web app's Firebase configuration
+    // UPDATED CONFIG
     const firebaseConfig = {
-      apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-      authDomain: "feed-65b35.firebaseapp.com",
-      projectId: "feed-65b35",
-      storageBucket: "feed-65b35.firebasestorage.app",
-      messagingSenderId: "1085499159984",
-      appId: "1:1085499159984:web:317e0443941085964a5275",
-      measurementId: "G-FVPRRX9X1M"
+      apiKey: "AIzaSyAwHDXO512D3YnAYuKwt44OGLsZR7g8kg4",
+      authDomain: "ropay-11bf2.firebaseapp.com",
+      projectId: "ropay-11bf2",
+      storageBucket: "ropay-11bf2.firebasestorage.app",
+      messagingSenderId: "128573345457",
+      appId: "1:128573345457:web:d2f1fdfb6dc08d932edc90",
+      measurementId: "G-VB6G0KWYP1"
     };
 
-    // UI Elements
     const terminal = document.getElementById('terminal');
     const startBtn = document.getElementById('start-btn');
     const statusBadge = document.getElementById('overall-status');
 
-    // Logging Utility
     function log(message, type = 'info') {
         const div = document.createElement('div');
         div.className = `log-entry log-${type}`;
-        
         const timestamp = new Date().toLocaleTimeString();
         div.textContent = `[${timestamp}] ${message}`;
-        
         terminal.appendChild(div);
         terminal.scrollTop = terminal.scrollHeight;
     }
 
-    // Set Status Utility
     function setStatus(text, type) {
         statusBadge.textContent = text;
         statusBadge.className = `status-badge ${type}`;
     }
 
-    // Main Audit Function
+    // A helper to prevent infinite hanging
+    const withTimeout = (promise, ms, errorMessage) => {
+        let timeoutId;
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+                reject(new Error(errorMessage));
+            }, ms);
+        });
+        return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+    };
+
     async function runAudit() {
         startBtn.disabled = true;
-        terminal.innerHTML = ''; // clear logs
+        terminal.innerHTML = ''; 
         setStatus('Audit Running...', 'running');
         
         log('Initializing Firebase App...', 'info');
@@ -162,15 +164,21 @@
         // STEP 1: CREATE (Write)
         try {
             log('STEP 1/4: Testing CREATE (Write) capabilities...', 'info');
-            const docRef = await addDoc(collection(db, testCollection), {
+            
+            const createPromise = addDoc(collection(db, testCollection), {
                 testMessage: "Audit Test Entry",
                 timestamp: new Date().toISOString(),
                 status: "created"
             });
+
+            // 10-second timeout for the creation step
+            const timeoutMessage = "Connection timed out. Did you click 'Create Database' in the Firestore console? Check your Security Rules.";
+            const docRef = await withTimeout(createPromise, 10000, timeoutMessage);
+            
             testDocId = docRef.id;
             log(`CREATE Success! Document written with ID: ${testDocId}`, 'success');
         } catch (error) {
-            log(`CREATE Failed. Check your Firestore Security Rules! Error: ${error.message}`, 'error');
+            log(`CREATE Failed: ${error.message}`, 'error');
             setStatus('Audit Failed', 'error');
             startBtn.disabled = false;
             return;
@@ -180,11 +188,11 @@
         try {
             log('STEP 2/4: Testing READ capabilities...', 'info');
             const docRef = doc(db, testCollection, testDocId);
-            const docSnap = await getDoc(docRef);
+            const docSnap = await withTimeout(getDoc(docRef), 10000, "Read timed out.");
             
             if (docSnap.exists()) {
                 const data = docSnap.data();
-                log(`READ Success! Retrieved data: ${JSON.stringify(data)}`, 'success');
+                log(`READ Success! Retrieved data.`, 'success');
             } else {
                 throw new Error("Document was not found after creation.");
             }
@@ -199,10 +207,10 @@
         try {
             log('STEP 3/4: Testing UPDATE capabilities...', 'info');
             const docRef = doc(db, testCollection, testDocId);
-            await updateDoc(docRef, {
+            await withTimeout(updateDoc(docRef, {
                 status: "updated",
                 updateTimestamp: new Date().toISOString()
-            });
+            }), 10000, "Update timed out.");
             log('UPDATE Success! Document fields modified successfully.', 'success');
         } catch (error) {
             log(`UPDATE Failed: ${error.message}`, 'error');
@@ -215,9 +223,8 @@
         try {
             log('STEP 4/4: Testing DELETE capabilities...', 'info');
             const docRef = doc(db, testCollection, testDocId);
-            await deleteDoc(docRef);
+            await withTimeout(deleteDoc(docRef), 10000, "Delete timed out.");
             
-            // Verify deletion
             const docSnap = await getDoc(docRef);
             if (!docSnap.exists()) {
                 log('DELETE Success! Document was successfully removed.', 'success');
