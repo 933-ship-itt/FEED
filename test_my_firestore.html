@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firestore Usability Audit</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: #1e293b;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+        }
+        h1 {
+            margin-top: 0;
+            color: #38bdf8;
+            border-bottom: 2px solid #334155;
+            padding-bottom: 1rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            background: #475569;
+            color: #f8fafc;
+        }
+        .status-badge.running { background: #eab308; color: #1c1917; }
+        .status-badge.success { background: #22c55e; color: #ffffff; }
+        .status-badge.error { background: #ef4444; color: #ffffff; }
+        
+        .log-container {
+            background: #000000;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #334155;
+        }
+        .log-entry { margin-bottom: 0.5rem; line-height: 1.4; }
+        .log-info { color: #94a3b8; }
+        .log-success { color: #4ade80; }
+        .log-error { color: #f87171; }
+        .log-warn { color: #facc15; }
+        
+        button {
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+        button:hover { background: #0ea5e9; }
+        button:disabled { background: #475569; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔥 Firestore Connection & CRUD Audit</h1>
+    <div id="overall-status" class="status-badge">Awaiting Start</div>
+    
+    <div class="log-container" id="terminal">
+        <div class="log-entry log-info">Ready to begin audit. Click "Start Audit" to test Firestore capabilities.</div>
+    </div>
+    
+    <button id="start-btn">Start Audit</button>
+</div>
+
+<!-- Import Firebase as ES Modules -->
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { 
+        getFirestore, 
+        collection, 
+        addDoc, 
+        doc, 
+        getDoc, 
+        updateDoc, 
+        deleteDoc 
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+      authDomain: "feed-65b35.firebaseapp.com",
+      projectId: "feed-65b35",
+      storageBucket: "feed-65b35.firebasestorage.app",
+      messagingSenderId: "1085499159984",
+      appId: "1:1085499159984:web:317e0443941085964a5275",
+      measurementId: "G-FVPRRX9X1M"
+    };
+
+    // UI Elements
+    const terminal = document.getElementById('terminal');
+    const startBtn = document.getElementById('start-btn');
+    const statusBadge = document.getElementById('overall-status');
+
+    // Logging Utility
+    function log(message, type = 'info') {
+        const div = document.createElement('div');
+        div.className = `log-entry log-${type}`;
+        
+        const timestamp = new Date().toLocaleTimeString();
+        div.textContent = `[${timestamp}] ${message}`;
+        
+        terminal.appendChild(div);
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    // Set Status Utility
+    function setStatus(text, type) {
+        statusBadge.textContent = text;
+        statusBadge.className = `status-badge ${type}`;
+    }
+
+    // Main Audit Function
+    async function runAudit() {
+        startBtn.disabled = true;
+        terminal.innerHTML = ''; // clear logs
+        setStatus('Audit Running...', 'running');
+        
+        log('Initializing Firebase App...', 'info');
+        let app, db;
+        
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            log('Firebase App and Firestore initialized successfully.', 'success');
+        } catch (error) {
+            log(`Initialization failed: ${error.message}`, 'error');
+            setStatus('Audit Failed', 'error');
+            startBtn.disabled = false;
+            return;
+        }
+
+        const testCollection = "firestore_audit_tests";
+        let testDocId = null;
+
+        // STEP 1: CREATE (Write)
+        try {
+            log('STEP 1/4: Testing CREATE (Write) capabilities...', 'info');
+            const docRef = await addDoc(collection(db, testCollection), {
+                testMessage: "Audit Test Entry",
+                timestamp: new Date().toISOString(),
+                status: "created"
+            });
+            testDocId = docRef.id;
+            log(`CREATE Success! Document written with ID: ${testDocId}`, 'success');
+        } catch (error) {
+            log(`CREATE Failed. Check your Firestore Security Rules! Error: ${error.message}`, 'error');
+            setStatus('Audit Failed', 'error');
+            startBtn.disabled = false;
+            return;
+        }
+
+        // STEP 2: READ
+        try {
+            log('STEP 2/4: Testing READ capabilities...', 'info');
+            const docRef = doc(db, testCollection, testDocId);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                log(`READ Success! Retrieved data: ${JSON.stringify(data)}`, 'success');
+            } else {
+                throw new Error("Document was not found after creation.");
+            }
+        } catch (error) {
+            log(`READ Failed: ${error.message}`, 'error');
+            setStatus('Audit Failed', 'error');
+            startBtn.disabled = false;
+            return;
+        }
+
+        // STEP 3: UPDATE
+        try {
+            log('STEP 3/4: Testing UPDATE capabilities...', 'info');
+            const docRef = doc(db, testCollection, testDocId);
+            await updateDoc(docRef, {
+                status: "updated",
+                updateTimestamp: new Date().toISOString()
+            });
+            log('UPDATE Success! Document fields modified successfully.', 'success');
+        } catch (error) {
+            log(`UPDATE Failed: ${error.message}`, 'error');
+            setStatus('Audit Failed', 'error');
+            startBtn.disabled = false;
+            return;
+        }
+
+        // STEP 4: DELETE
+        try {
+            log('STEP 4/4: Testing DELETE capabilities...', 'info');
+            const docRef = doc(db, testCollection, testDocId);
+            await deleteDoc(docRef);
+            
+            // Verify deletion
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                log('DELETE Success! Document was successfully removed.', 'success');
+            } else {
+                throw new Error("Document still exists after deletion attempt.");
+            }
+        } catch (error) {
+            log(`DELETE Failed: ${error.message}`, 'error');
+            setStatus('Audit Failed', 'error');
+            startBtn.disabled = false;
+            return;
+        }
+
+        // FINISH
+        log('=====================================', 'info');
+        log('🎉 AUDIT COMPLETE: ALL SYSTEMS NOMINAL', 'success');
+        log('Firestore is fully operational, correctly configured, and storing data as expected.', 'success');
+        setStatus('Audit Passed 100%', 'success');
+        startBtn.disabled = false;
+    }
+
+    startBtn.addEventListener('click', runAudit);
+
+</script>
+</body>
+</html>
