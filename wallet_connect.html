@@ -3,140 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 Wallet Connector</title>
+    <title>Web3 Debug Connector (Test Phase)</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0b0f19;
+            color: #38bdf8;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
-        .card {
+        .container {
             background: #1e293b;
+            border: 1px solid #334155;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            max-width: 400px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
             width: 100%;
         }
+        h2 { color: #f8fafc; margin-top: 0; }
         button {
-            background-color: #3b82f6;
+            background-color: #2563eb;
             color: white;
             border: none;
-            padding: 12px 20px;
-            margin: 8px 0;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 12px 18px;
+            margin: 6px 0;
+            border-radius: 6px;
+            font-size: 15px;
             cursor: pointer;
             width: 100%;
+            font-weight: bold;
             transition: background 0.2s;
         }
-        button:hover {
-            background-color: #2563eb;
-        }
-        .secondary {
-            background-color: #475569;
-        }
-        .secondary:hover {
-            background-color: #334155;
-        }
-        #status {
-            margin-top: 15px;
-            font-size: 14px;
+        button:hover { background-color: #1d4ed8; }
+        .trust-btn { background-color: #3b82f6; }
+        .trust-btn:hover { background-color: #2563eb; }
+        
+        /* Precise Debug Log Terminal Box */
+        #debug-console {
+            background: #020617;
+            border: 1px solid #1e293b;
+            color: #4ade80;
+            padding: 12px;
+            border-radius: 6px;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 12px;
+            margin-top: 20px;
+            text-align: left;
+            white-space: pre-wrap;
             word-break: break-all;
-            color: #94a3b8;
         }
+        .log-error { color: #f87171; }
+        .log-info { color: #38bdf8; }
+        .log-success { color: #4ade80; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Connect Your Wallet</h2>
-        <p>Select your preferred wallet provider below:</p>
+    <div class="container">
+        <h2>🛠️ Wallet Connection Test Suite</h2>
+        <p style="color: #94a3b8; font-size: 14px;">Project ID: <code>7d7ef210c61dbe38335f827df3368220</code></p>
         
-        <!-- Native Browser Extension Detection (MetaMask / Trust Wallet injected providers) -->
-        <button onclick="connectInjectedWallet('metamask')">Connect MetaMask (Extension)</button>
-        <button onclick="connectInjectedWallet('trust')">Connect Trust Wallet (Extension)</button>
+        <!-- Action Buttons -->
+        <button onclick="connectInjectedWallet('metamask')">🔗 Connect MetaMask Extension</button>
+        <button class="trust-btn" onclick="connectInjectedWallet('trust')">🔗 Connect Trust Wallet Extension</button>
         
-        <!-- Universal WalletConnect Modal (Supports QR Code & Mobile Deep Linking) -->
-        <button class="secondary" onclick="openWalletConnectModal()">Open WalletConnect Modal</button>
-        
-        <div id="status">Status: Disconnected</div>
+        <!-- Live Debug Output Terminal -->
+        <div id="debug-console">[SYSTEM] Ready for connection tests. Click a button above...</div>
     </div>
 
-    <!-- Load Web3Modal / AppKit via UMD CDN -->
-    <script type="module">
-        import { createAppKit, defaultConfig } from 'https://esm.sh/@reown/appkit@latest'
+    <script>
+        const PROJECT_ID = '7d7ef210c61dbe38335f827df3368220';
 
-        // Your specific Project ID
-        const projectId = '7d7ef210c61dbe38335f827df3368220';
+        // Precise logger utility that outputs to UI and console simultaneously
+        function debugLog(message, type = 'info') {
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+            const formattedMsg = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
+            
+            // Console output with correct color styling
+            if (type === 'error') console.error(formattedMsg);
+            else if (type === 'success') console.log('%c ' + formattedMsg, 'color: #4ade80; font-weight: bold;');
+            else console.log(formattedMsg);
 
-        // Metadata setup
-        const metadata = {
-            name: 'Web3 dApp Example',
-            description: 'Simple Wallet Connector',
-            url: window.location.origin,
-            icons: ['https://avatars.githubusercontent.com/u/37784886']
+            // UI Terminal output
+            const consoleEl = document.getElementById('debug-console');
+            const colorClass = type === 'error' ? 'log-error' : (type === 'success' ? 'log-success' : 'log-info');
+            consoleEl.innerHTML += `<div class="${colorClass}">${formattedMsg}</div>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight; // Auto-scroll to bottom
         }
 
-        // Initialize Reown AppKit Modal
-        const modal = createAppKit({
-            adapters: [],
-            metadata,
-            projectId,
-            features: { analytics: true }
+        // Environment inspection on load
+        window.addEventListener('DOMContentLoaded', () => {
+            debugLog(`Initializing test environment...`, 'info');
+            debugLog(`window.ethereum detected: ${!!window.ethereum}`, window.ethereum ? 'success' : 'error');
+            debugLog(`window.trustwallet detected: ${!!window.trustwallet}`, window.trustwallet ? 'success' : 'info');
+            
+            if (window.ethereum && window.ethereum.providers) {
+                debugLog(`Found ${window.ethereum.providers.length} injected providers via EIP-6963 / multi-provider setup.`, 'info');
+            }
         });
 
-        // Expose modal trigger globally to HTML buttons
-        window.openWalletConnectModal = function() {
-            modal.open();
-        }
-    </script>
-
-    <script>
-        // Direct Browser Extension Detection & Connection Handler
+        // Main Connection Handler for Injected Web Extensions
         async function connectInjectedWallet(walletType) {
-            const statusEl = document.getElementById('status');
+            debugLog(`--- Starting connection routine for: ${walletType.toUpperCase()} ---`, 'info');
             let provider = null;
 
-            // Check injected providers in window.ethereum or window.trustwallet
-            if (walletType === 'metamask') {
-                if (window.ethereum) {
-                    // If multiple providers exist, target MetaMask explicitly if available
-                    provider = window.ethereum.providers ? window.ethereum.providers.find(p => p.isMetaMask) : window.ethereum;
-                    if (!provider?.isMetaMask) {
-                        statusEl.innerText = "Status: MetaMask extension not detected!";
-                        return;
+            try {
+                if (walletType === 'metamask') {
+                    if (!window.ethereum) {
+                        throw new Error("No window.ethereum object found in browser context. Is MetaMask installed?");
+                    }
+                    
+                    // Isolate MetaMask if multiple extensions (like Phantom/Coinbase/Binance) inject into window.ethereum
+                    if (window.ethereum.providers) {
+                        provider = window.ethereum.providers.find(p => p.isMetaMask);
+                    } else if (window.ethereum.isMetaMask) {
+                        provider = window.ethereum;
+                    }
+
+                    if (!provider) {
+                        throw new Error("MetaMask provider flag 'isMetaMask' not found among injected providers.");
+                    }
+                    debugLog("MetaMask provider target successfully isolated.", 'success');
+
+                } else if (walletType === 'trust') {
+                    // Trust wallet extension can inject under window.trustwallet or window.ethereum with isTrust
+                    if (window.trustwallet) {
+                        provider = window.trustwallet;
+                        debugLog("Detected dedicated window.trustwallet provider.", 'success');
+                    } else if (window.ethereum) {
+                        provider = window.ethereum.providers 
+                            ? window.ethereum.providers.find(p => p.isTrust) 
+                            : (window.ethereum.isTrust ? window.ethereum : null);
+                        
+                        if (provider) {
+                            debugLog("Detected Trust Wallet flag inside window.ethereum stack.", 'success');
+                        }
+                    }
+
+                    if (!provider) {
+                        throw new Error("Trust Wallet extension not found. Please install Trust Wallet browser extension.");
                     }
                 }
-            } else if (walletType === 'trust') {
-                if (window.trustwallet) {
-                    provider = window.trustwallet;
-                } else if (window.ethereum && window.ethereum.isTrust) {
-                    provider = window.ethereum;
-                } else {
-                    statusEl.innerText = "Status: Trust Wallet extension not detected!";
-                    return;
-                }
-            }
 
-            if (provider) {
-                try {
-                    statusEl.innerText = "Status: Requesting permission...";
-                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                    const userAccount = accounts[0];
-                    statusEl.innerHTML = `Connected: <span style="color: #4ade80;">${userAccount.substring(0, 6)}...${userAccount.substring(38)}</span>`;
-                } catch (error) {
-                    statusEl.innerText = `Status: Connection rejected (${error.message})`;
+                // Request account access explicitly
+                debugLog(`Dispatching RPC method 'eth_requestAccounts' to ${walletType}...`, 'info');
+                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+
+                if (!accounts || accounts.length === 0) {
+                    throw new Error("Provider returned an empty account list. Authorization denied by user.");
                 }
-            } else {
-                statusEl.innerText = `Status: No Web3 extension found for ${walletType}.`;
+
+                const connectedAccount = accounts[0];
+                debugLog(`Successfully connected wallet address!`, 'success');
+                debugLog(`Active Account: ${connectedAccount}`, 'success');
+
+                // Optional: Fetch current chain ID for deep diagnostic check
+                const chainId = await provider.request({ method: 'eth_chainId' });
+                debugLog(`Current Network Chain ID: ${chainId}`, 'info');
+
+            } catch (err) {
+                debugLog(`Connection failed code/message: ${err.message}`, 'error');
+                console.error("Detailed Error Stack:", err);
             }
         }
     </script>
