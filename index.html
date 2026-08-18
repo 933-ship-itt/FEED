@@ -323,7 +323,7 @@
         }
         #login-view[hidden] { display: none !important; }
         body.login-active > :not(#login-view) { display: none !important; }
-        body.dashboard-active > :not(#dashboard-view):not(#feedWalletModal):not(#feedWalletQuick):not(#feedWalletSettings) { display: none !important; }
+        body.dashboard-active > :not(#dashboard-view) { display: none !important; }
         #dashboard-view[hidden] { display: none !important; }
         .dashboard-shell { background-color:#f8f8fc; background-image:radial-gradient(circle at 100% 0%,rgba(216,61,194,.04),transparent 30%),radial-gradient(circle at 0% 100%,rgba(96,54,225,.04),transparent 30%); overflow-x:hidden; }
         .dashboard-sidebar { overflow:hidden; }
@@ -1488,17 +1488,16 @@
                 <button type="button" data-dashboard-tab="analytics" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-chart-line-up min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Market Analytics</span></button>
                 <button type="button" data-dashboard-tab="leaderboard" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-trophy min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Leaderboard</span></button>
                 <button type="button" data-dashboard-tab="profile" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><span class="flex h-6 w-6 min-w-[24px] items-center justify-center overflow-hidden rounded-full bg-gray-100"><img id="dashboardSidebarAvatar" class="hidden h-full w-full object-cover" alt="Google profile"><i id="dashboardSidebarAvatarFallback" class="ph-bold ph-user text-lg"></i></span><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Profile</span></button>
-                <button type="button" data-dashboard-tab="settings" class="dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50"><i class="ph-bold ph-gear min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Settings</span></button>
             </nav>
             <div class="dashboard-footer"><button type="button" id="dashboardSignOut" class="dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50 hover:text-gray-900"><i class="ph-bold ph-sign-out min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">Sign out</span></button></div>
         </aside>
         <main class="dashboard-main ml-24 min-h-screen px-8 pb-24 pt-12 md:px-12">
             <header class="mx-auto mb-10 flex max-w-[1400px] flex-col justify-between gap-6 md:flex-row md:items-end"><div><div class="mb-3 text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Private workspace</div><h1 id="dashboardHeading" class="font-display text-4xl font-black tracking-tight">Ecosystem Overview</h1><p id="dashboardSubheading" class="mt-2 font-medium text-gray-500">Manage your decentralized assets and liquidity operations.</p></div><div class="flex shrink-0 items-center gap-4 self-start md:self-auto"><div class="hidden items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm sm:flex"><div class="h-2 w-2 rounded-full bg-green-500"></div><span class="text-xs font-semibold tracking-wide text-gray-700">0x••••••••</span></div><button id="dashboardProfileButton" data-dashboard-tab="profile" class="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-1.5 pr-4 shadow-sm hover:border-[#6036E1]/30"><img id="dashboardAvatar" class="h-10 w-10 rounded-xl object-cover" alt="Google profile" hidden><div id="dashboardAvatarFallback" class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-sm font-bold text-white">?</div><div class="hidden text-left sm:block"><div id="dashboardName" class="text-sm font-bold leading-none text-gray-900">Authenticated user</div><div class="mt-1 text-[11px] font-bold uppercase tracking-wider leading-none text-gray-400">Google account</div></div><i class="ph-bold ph-caret-down ml-1 hidden text-gray-400 sm:block"></i></button></div></header>
-            <div id="dashboardOverview" class="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 xl:grid-cols-12"><div class="flex flex-col gap-8 xl:col-span-8"><div class="relative w-full overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#6036E1] via-[#9a3ecb] to-[#D83DC2] p-8 text-white shadow-[0_20px_60px_rgba(96,54,225,.25)] md:p-10"><div class="relative z-10"><div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end"><div><h3 class="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.2em] text-white/80"><i class="ph-fill ph-hexagon"></i> Total $FEED Balance</h3><div id="overviewTotalFeed" class="font-display text-5xl font-black tracking-tight text-emerald-300">0.00 <span class="text-3xl text-emerald-200/80">$FEED</span></div><div class="mt-3 font-semibold tracking-wide text-white/80">≈ $0.00 USD <span class="ml-2 rounded-md bg-black/20 px-2 py-1 text-[10px] uppercase tracking-widest">No market data</span></div></div><div class="flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-4 py-2"><i class="ph-bold ph-minus-circle text-emerald-300"></i><span class="text-sm font-bold">0.0% (24h)</span></div></div><div class="grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-white/30 bg-white/20 lg:grid-cols-2"><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-hexagon text-xl"></i></div><span class="text-lg font-bold">Available $FEED</span></div><div id="overviewAvailableFeed" class="font-display text-2xl font-bold">0.00</div><div id="overviewAvailableFeedStatus" class="mt-1 text-sm font-medium text-white/70">No balance</div></div><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-currency-dollar text-xl"></i></div><span class="text-lg font-bold">USDC Balance</span></div><div id="overviewUsdcBalance" class="font-display text-2xl font-bold">0.00</div><div id="overviewUsdcStatus" class="mt-1 text-sm font-medium text-white/70">≈ $0.00 USD · No balance</div></div></div></div></div><div class="flex justify-start"><button type="button" id="overviewWalletConnectBtn" class="wallet-connect-btn inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-sm"><i class="ph-bold ph-wallet"></i><span>Connect Wallet</span></button></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-8 flex items-center justify-between"><h2 class="font-display text-2xl font-bold">Ledger Transactions</h2><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gray-500">0 records</span></div><div class="rounded-2xl border border-dashed border-gray-200 px-6 py-12 text-center"><i class="ph ph-receipt text-4xl text-gray-300"></i><p class="mt-3 font-semibold text-gray-700">No transactions yet</p><p class="mt-1 text-sm text-gray-400">Transaction history is currently null.</p></div></div></div><div class="flex flex-col gap-8 xl:col-span-4"><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-900 text-white"><i class="ph-bold ph-shield-check text-2xl"></i></div><h2 class="mb-2 font-display text-xl font-bold">Authenticated workspace</h2><p class="text-sm leading-relaxed text-gray-500">Your dashboard is protected by Firebase Authentication and available only while your Google session is active.</p><div class="mt-6 flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"><i class="ph-fill ph-check-circle text-lg"></i> Session verified</div></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Account snapshot</div><div class="mt-5 space-y-4 text-sm"><div class="flex justify-between gap-4"><span class="text-gray-500">Wallet address</span><span id="overviewWalletAddress" class="font-semibold text-right max-w-[12rem] truncate">No wallet</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Transactions</span><span class="font-semibold">0</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Balances</span><span class="font-semibold">0.00</span></div></div></div></div></div>
-            <div id="dashboardProfile" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center"><img id="profileAvatar" class="h-24 w-24 rounded-3xl object-cover shadow-lg" alt="Google profile" hidden><div id="profileAvatarFallback" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-3xl font-black text-white">?</div><div><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Google profile</div><h2 id="profileName" class="mt-2 font-display text-3xl font-black">Authenticated user</h2><p id="profileEmail" class="mt-1 text-gray-500">null</p></div></div><div class="mt-10 grid gap-4 md:grid-cols-2"><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication provider</div><div class="mt-2 font-semibold">Google</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet address</div><div id="profileWalletAddress" class="mt-2 font-semibold break-all">Not connected</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">FEED balance</div><div class="mt-2 font-semibold">0.00</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Transactions</div><div class="mt-2 font-semibold">0</div></div></div><div class="mt-6 flex justify-start"><button type="button" id="profileWalletConnectBtn" class="wallet-connect-btn inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-sm"><i class="ph-bold ph-wallet"></i><span>Connect Wallet</span></button></div></div></div>
+            <div id="dashboardOverview" class="mx-auto grid max-w-[1400px] grid-cols-1 gap-8 xl:grid-cols-12"><div class="flex flex-col gap-8 xl:col-span-8"><div class="relative w-full overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#6036E1] via-[#9a3ecb] to-[#D83DC2] p-8 text-white shadow-[0_20px_60px_rgba(96,54,225,.25)] md:p-10"><div class="relative z-10"><div class="mb-8 flex flex-col justify-between gap-6 sm:flex-row sm:items-end"><div><h3 class="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-[.2em] text-white/80"><i class="ph-fill ph-hexagon"></i> Total $FEED Balance</h3><div class="font-display text-5xl font-black tracking-tight text-emerald-300">0.00 <span class="text-3xl text-emerald-200/80">$FEED</span></div><div class="mt-3 font-semibold tracking-wide text-white/80">≈ $0.00 USD <span class="ml-2 rounded-md bg-black/20 px-2 py-1 text-[10px] uppercase tracking-widest">No market data</span></div></div><div class="flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-4 py-2"><i class="ph-bold ph-minus-circle text-emerald-300"></i><span class="text-sm font-bold">0.0% (24h)</span></div></div><div class="grid grid-cols-1 gap-px overflow-hidden rounded-3xl border border-white/30 bg-white/20 lg:grid-cols-2"><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-hexagon text-xl"></i></div><span class="text-lg font-bold">Available $FEED</span></div><div class="font-display text-2xl font-bold">0.00</div><div class="mt-1 text-sm font-medium text-white/70">No balance</div></div><div class="bg-white/10 p-6"><div class="mb-4 flex items-center gap-3"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20"><i class="ph-fill ph-currency-dollar text-xl"></i></div><span class="text-lg font-bold">USDC Balance</span></div><div class="font-display text-2xl font-bold">0.00</div><div class="mt-1 text-sm font-medium text-white/70">≈ $0.00 USD · No balance</div></div></div></div></div><div class="flex justify-start"><button type="button" id="overviewWalletConnectBtn" class="wallet-connect-btn inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-sm"><i class="ph-bold ph-wallet"></i><span>Connect Wallet</span></button></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-8 flex items-center justify-between"><h2 class="font-display text-2xl font-bold">Ledger Transactions</h2><span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-gray-500">0 records</span></div><div class="rounded-2xl border border-dashed border-gray-200 px-6 py-12 text-center"><i class="ph ph-receipt text-4xl text-gray-300"></i><p class="mt-3 font-semibold text-gray-700">No transactions yet</p><p class="mt-1 text-sm text-gray-400">Transaction history is currently null.</p></div></div></div><div class="flex flex-col gap-8 xl:col-span-4"><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-gray-900 text-white"><i class="ph-bold ph-shield-check text-2xl"></i></div><h2 class="mb-2 font-display text-xl font-bold">Authenticated workspace</h2><p class="text-sm leading-relaxed text-gray-500">Your dashboard is protected by Firebase Authentication and available only while your Google session is active.</p><div class="mt-6 flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"><i class="ph-fill ph-check-circle text-lg"></i> Session verified</div></div><div class="dashboard-glass rounded-[2.5rem] p-8"><div class="text-xs font-bold uppercase tracking-[.18em] text-gray-400">Account snapshot</div><div class="mt-5 space-y-4 text-sm"><div class="flex justify-between gap-4"><span class="text-gray-500">Wallet address</span><span class="font-semibold">0x••••••••</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Transactions</span><span class="font-semibold">0</span></div><div class="flex justify-between gap-4"><span class="text-gray-500">Balances</span><span class="font-semibold">0.00</span></div></div></div></div></div>
+            <div id="dashboardProfile" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center"><img id="profileAvatar" class="h-24 w-24 rounded-3xl object-cover shadow-lg" alt="Google profile" hidden><div id="profileAvatarFallback" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-3xl font-black text-white">?</div><div><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Google profile</div><h2 id="profileName" class="mt-2 font-display text-3xl font-black">Authenticated user</h2><p id="profileEmail" class="mt-1 text-gray-500">null</p></div></div><div class="mt-10 grid gap-4 md:grid-cols-2"><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication provider</div><div class="mt-2 font-semibold">Google</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet address</div><div class="mt-2 font-semibold">null</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">FEED balance</div><div class="mt-2 font-semibold">0.00</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Transactions</div><div class="mt-2 font-semibold">0</div></div></div><div class="mt-6 flex justify-start"><button type="button" id="profileWalletConnectBtn" class="wallet-connect-btn inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-sm"><i class="ph-bold ph-wallet"></i><span>Connect Wallet</span></button></div></div></div>
             <div id="dashboardPlaceholder" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-10 text-center"><i class="ph ph-hourglass text-4xl text-[#6036E1]"></i><h2 class="mt-4 font-display text-2xl font-bold">Coming soon</h2><p class="mt-2 text-gray-500">This authenticated FEED module is being prepared.</p></div></div>
         </main>
-</section>
+    </section>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
@@ -1574,6 +1573,12 @@
 
         function renderDashboardContent() {
             const overview = document.getElementById('dashboardOverview');
+            const balanceValues = overview.querySelectorAll('.font-display');
+            if (balanceValues[0]) balanceValues[0].innerHTML = '0.00 <span class="text-3xl text-emerald-200/80">$FEED</span>';
+            if (balanceValues[1]) balanceValues[1].textContent = '0.00';
+            if (balanceValues[2]) balanceValues[2].textContent = '0.00';
+            const profileBalance = document.querySelector('#dashboardProfile .grid > div:nth-child(3) .mt-2');
+            if (profileBalance) profileBalance.textContent = '0.00';
             const rightColumn = Array.from(overview.children).find(child => child.classList.contains('xl:col-span-4'));
             if (!rightColumn) return;
             rightColumn.innerHTML = `<div class="dashboard-glass rounded-[2.5rem] p-8">
@@ -1637,12 +1642,12 @@
                 await Promise.race([
                     setDoc(userRef, userPayload, { merge: true }),
                     new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('Firestore unavailable')), 2500)
+                        setTimeout(() => reject(new Error('Firestore write timed out')), 3000)
                     )
                 ]);
+                console.log('Firestore write successful');
             } catch (dbError) {
-                // A missing Firestore database should not block the authenticated dashboard.
-                console.info('[FEED] Firestore unavailable; continuing without profile write.');
+                console.warn('Firestore write skipped/timed out:', dbError);
             }
 
             showDashboard(user);
@@ -1667,12 +1672,10 @@
             social: { heading: 'Social Network', subheading: 'Connect, discover, and participate across the FEED community.' },
             analytics: { heading: 'Market Analytics', subheading: 'Review FEED market signals, liquidity, and performance data.' },
             leaderboard: { heading: 'Leaderboard', subheading: 'See community rankings and engagement signals.' },
-            profile: { heading: 'Your Profile', subheading: 'Your Google identity and FEED account snapshot.' },
-            settings: { heading: 'Settings', subheading: 'Manage wallet connections and account controls.' }
+            profile: { heading: 'Your Profile', subheading: 'Your Google identity and FEED account snapshot.' }
         };
 
         document.getElementById('dashboardProfileButton')?.addEventListener('click', () => activateDashboardTab('profile'));
-        window.__feedActivateDashboardTab = activateDashboardTab;
         function activateDashboardTab(tab) {
             if (!dashboardTabMeta[tab]) tab = 'overview';
             activeDashboardTab = tab;
@@ -1684,20 +1687,16 @@
             const overview = document.getElementById('dashboardOverview');
             const profile = document.getElementById('dashboardProfile');
             const placeholder = document.getElementById('dashboardPlaceholder');
-            const settings = document.getElementById('feedWalletSettings');
             overview.classList.toggle('hidden', tab !== 'overview');
             profile.classList.toggle('hidden', tab !== 'profile');
-            placeholder.classList.toggle('hidden', !(tab === 'social' || tab === 'analytics' || tab === 'leaderboard'));
-            settings?.classList.toggle('hidden', tab !== 'settings');
+            placeholder.classList.toggle('hidden', tab === 'overview' || tab === 'profile');
             document.getElementById('dashboardHeading').textContent = dashboardTabMeta[tab].heading;
             document.getElementById('dashboardSubheading').textContent = dashboardTabMeta[tab].subheading;
-            if (tab !== 'overview' && tab !== 'profile' && tab !== 'settings') {
+            if (tab !== 'overview' && tab !== 'profile') {
                 placeholder.querySelector('h2').textContent = dashboardTabMeta[tab].heading;
                 placeholder.querySelector('p').textContent = dashboardTabMeta[tab].subheading;
             }
-            document.dispatchEvent(new CustomEvent('feed:dashboard-tab', { detail: { tab } }));
         }
-        window.__feedActivateDashboardTab = activateDashboardTab;
 
         document.querySelectorAll('[data-dashboard-tab]').forEach(button => {
             button.addEventListener('click', () => activateDashboardTab(button.dataset.dashboardTab));
@@ -1742,695 +1741,948 @@
     </script>
 
 
-    <!-- FEED Solana Devnet wallet layer -->
-    <style id="feed-wallet-layer-styles">
-        #feedWalletModal {
-            position: fixed; inset: 0; z-index: 100000;
-            display: none; align-items: center; justify-content: center;
-            padding: 20px; background: rgba(8,7,15,.55); backdrop-filter: blur(10px);
-        }
-        #feedWalletModal.open { display: flex; }
-        #feedWalletModal .feed-wallet-dialog {
-            width: min(680px, calc(100vw - 32px)); max-height: min(760px, calc(100vh - 32px));
-            overflow: hidden; border-radius: 30px; background: #fff;
-            box-shadow: 0 35px 120px rgba(0,0,0,.28);
-        }
-        #feedWalletModal .feed-wallet-scroll { overflow-y: auto; max-height: calc(100vh - 32px); }
-        body.dashboard-active > #feedWalletModal.open { display: flex !important; }
-        body.dashboard-active > #feedWalletQuick { display: inline-flex !important; }
-        body.dashboard-active > #feedWalletSettings:not(.hidden) { display: block !important; }
+    <!-- FEED Wallet: exact wallet_connect.html experience -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
-        @media (max-width: 767px) {
-            #feedWalletModal { padding: 12px; }
-            #feedWalletModal .feed-wallet-dialog { width: 100%; max-height: calc(100vh - 24px); border-radius: 24px; }
+        :root {
+            --violet: #6036E1;
+            --magenta: #D83DC2;
+            --ink: #0b0b12;
+            --line: #ececf3;
+            --gradient: linear-gradient(to right, #6036E1, #D83DC2);
         }
-        #feedWalletQuick {
-            position: fixed; right: 24px; bottom: 24px; z-index: 5000;
-            display: none; align-items: center; gap: 8px;
-            border-radius: 999px; background: #111018; color: #fff;
-            padding: 12px 16px; font-size: 12px; font-weight: 800;
-            box-shadow: 0 18px 50px rgba(0,0,0,.18);
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background:
+                radial-gradient(circle at 80% 5%, rgba(216,61,194,0.09), transparent 26%),
+                radial-gradient(circle at 10% 12%, rgba(96,54,225,0.09), transparent 24%),
+                #f8f8fc;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        body.dashboard-active #feedWalletQuick { display: inline-flex; }
-        #feedWalletOverview { width:100%; }
-        #feedWalletOverviewGrid { display:grid; gap:16px; grid-template-columns:repeat(1,minmax(0,1fr)); }
-        @media (min-width: 1024px) { #feedWalletOverviewGrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media (min-width: 1280px) { #feedWalletOverviewGrid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-        @media (max-width: 767px) { #feedWalletQuick { right:16px; bottom:16px; } }
+
+        .font-display {
+            font-family: 'Archivo', sans-serif;
+        }
+
+        .text-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .bg-gradient-custom {
+            background: var(--gradient);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+        }
+
+        .bg-gradient-custom:hover:not(:disabled) {
+            opacity: 0.95;
+            transform: translateY(-1px);
+            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .premium-card {
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 18px 60px rgba(23, 18, 43, 0.06);
+        }
+
+        .wallet-card {
+            border: 1px solid var(--line);
+            transition: all 0.2s ease;
+        }
+
+        .wallet-card:hover {
+            border-color: rgba(96,54,225,0.45);
+            box-shadow: 0 8px 24px rgba(96,54,225,0.08);
+        }
+
+        .wallet-card.selected {
+            border-color: var(--violet);
+            background: rgba(96,54,225,0.04);
+            box-shadow: 0 8px 24px rgba(96,54,225,0.1);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid rgba(96,54,225,0.1);
+            border-top-color: var(--violet);
+            border-right-color: var(--magenta);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d1d6;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .custom-checkbox:checked {
+            background: var(--gradient);
+            border-color: transparent;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .wallet-choice {
+            border: 1px solid var(--line);
+            background: white;
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .wallet-choice:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: var(--violet);
+            box-shadow: 0 10px 28px rgba(96,54,225,.12);
+        }
+
+        .wallet-choice:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .success-ring {
+            width: 78px;
+            height: 78px;
+            border-radius: 999px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #34d399, #10b981);
+            box-shadow: 0 14px 35px rgba(16,185,129,.25);
+            animation: successPop .55s cubic-bezier(.2,.8,.2,1) both;
+        }
+
+        .success-ring i {
+            animation: successCheck .45s .15s ease both;
+        }
+
+        @keyframes successPop {
+            0% {
+                opacity: 0;
+                transform: scale(.55);
+            }
+            70% {
+                transform: scale(1.08);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes successCheck {
+            from {
+                opacity: 0;
+                transform: scale(.4) rotate(-15deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .zero-balance {
+            color: #6b7280;
+        }
     </style>
+    <style id="feed-wallet-dashboard-bridge-style">
+        #feedWalletModalExact { position:fixed; inset:0; z-index:100000; display:none; align-items:center; justify-content:center; padding:24px; background:rgba(11,11,18,.48); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+        #feedWalletModalExact.open { display:flex; }
+        #feedWalletModalExact > .feed-wallet-shell { position:relative; width:min(760px,100%); max-height:calc(100vh - 48px); overflow:auto; }
+        #feedWalletExactClose { position:absolute; top:12px; right:12px; z-index:20; width:42px; height:42px; border-radius:14px; background:rgba(255,255,255,.92); border:1px solid #ececf3; display:flex; align-items:center; justify-content:center; color:#6b7280; box-shadow:0 8px 24px rgba(23,18,43,.08); }
+        body.dashboard-active > #feedWalletModalExact.open { display:flex!important; }
+        @media(max-width:640px){#feedWalletModalExact{padding:12px}#feedWalletModalExact>.feed-wallet-shell{max-height:calc(100vh - 24px);border-radius:24px}}
+    </style>
+    <div id="feedWalletModalExact" aria-hidden="true" role="dialog" aria-modal="true" aria-label="FEED Wallet">
+        <div class="feed-wallet-shell">
+            <button id="feedWalletExactClose" type="button" aria-label="Close wallet connection"><i class="ph-bold ph-x text-xl"></i></button>
+<div class="w-full max-w-xl mx-auto premium-card rounded-3xl p-8 md:p-10 relative overflow-hidden">
 
-    <div id="feedWalletModal" aria-hidden="true" role="dialog">
-        <div class="feed-wallet-dialog">
-            <div class="feed-wallet-scroll">
-                <div class="flex items-start justify-between gap-6 border-b border-gray-100 p-6 md:p-8">
-                    <div>
-                        <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-black text-white">
-                            <i class="ph-bold ph-wallet text-2xl"></i>
-                        </div>
-                        <div class="text-[10px] font-bold uppercase tracking-[.2em] text-[#6036E1]">FEED Wallet</div>
-                        <h2 class="mt-2 font-display text-2xl font-black tracking-tight text-gray-900">Connect a Solana wallet</h2>
-                        <p class="mt-2 max-w-xl text-sm leading-relaxed text-gray-500">Choose a compatible Solana wallet. FEED reads public account balances only and does not request transactions.</p>
-                    </div>
-                    <button id="feedWalletClose" type="button" class="rounded-xl p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close"><i class="ph-bold ph-x text-xl"></i></button>
-                </div>
+    <i class="ph-fill ph-cube absolute -top-10 -right-10 text-[180px] text-[#6036E1] opacity-5 pointer-events-none"></i>
 
-                <div class="p-6 md:p-8">
-                    <div id="feedWalletTosStage">
-                        <div class="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-sm leading-relaxed text-gray-500">
-                            By connecting your wallet, you are accessing the decentralized FEED protocol. Asset custody remains on your device, the supplied wallet layer uses Solana Devnet, and FEED does not receive or manage your private keys.
-                        </div>
-                        <label id="feedWalletTosLabel" class="mt-5 flex cursor-pointer items-center gap-3 rounded-xl p-2 hover:bg-gray-50">
-                            <input type="checkbox" id="feedWalletTosCheckbox" class="custom-checkbox shrink-0">
-                            <span class="text-sm font-semibold text-gray-700">I agree to the Terms of Service</span>
-                        </label>
-                        <button id="feedWalletProceed" type="button" disabled class="mt-4 w-full rounded-2xl bg-gradient-custom px-5 py-3.5 text-sm font-bold text-white shadow-lg disabled:cursor-not-allowed disabled:opacity-40">Proceed to Connect</button>
-                    </div>
-
-                    <div id="feedWalletChoiceStage" class="hidden">
-                        <div class="text-center">
-                            <h3 class="font-display text-xl font-bold">Connect a Wallet</h3>
-                            <p class="mt-1 text-sm text-gray-500">FEED will detect compatible Solana wallets on this device.</p>
-                        </div>
-                        <button id="feedWalletDiscover" type="button" class="mt-7 w-full rounded-2xl bg-gradient-custom px-5 py-3.5 font-bold text-white shadow-lg">Connect Wallet</button>
-                        <div id="feedWalletDiscoveryStatus" class="mt-4 text-center text-xs text-gray-400"></div>
-                        <button id="feedWalletBack" type="button" class="mt-4 w-full text-sm font-semibold text-gray-500 hover:text-gray-900">Back</button>
-                    </div>
-
-                    <div id="feedWalletLoadingStage" class="hidden py-8 text-center">
-                        <div class="spinner mx-auto mb-6"></div>
-                        <h3 class="font-display text-lg font-bold">Scanning Solana Devnet Account</h3>
-                        <p id="feedWalletLoadingMessage" class="mt-2 text-sm text-gray-500">Reading account details...</p>
-                    </div>
-
-                    <div id="feedWalletResultStage" class="hidden">
-                        <div class="text-center">
-                            <h3 class="font-display text-xl font-bold">Solana Devnet Account</h3>
-                            <p class="mt-1 text-sm text-gray-500">Your connected account balance snapshot is displayed below.</p>
-                        </div>
-                        <div id="feedWalletSummary" class="mt-6 rounded-2xl border border-gray-100 bg-gray-50 p-4"></div>
-                        <div id="feedWalletResultList" class="mt-4 space-y-3"></div>
-                        <button id="feedWalletDone" type="button" class="mt-6 w-full rounded-2xl bg-gradient-custom px-5 py-3.5 font-bold text-white shadow-lg">Done</button>
-                        <button id="feedWalletConnectAnother" type="button" class="mt-4 w-full text-sm font-semibold text-gray-500 hover:text-gray-900">Connect Another</button>
-                    </div>
-
-                    <div id="feedWalletMessage" class="mt-4 hidden rounded-2xl px-4 py-3 text-sm"></div>
-                </div>
-            </div>
-        </div>
+    <div class="text-center mb-8">
+        <img
+            class="h-12 w-12 mx-auto rounded-xl object-contain mb-4 shadow-sm"
+            src="https://i.postimg.cc/W18WjK3V/image-(1).png"
+            alt="FEED"
+        >
+        <h1 class="font-display text-2xl font-black tracking-tight">
+            F<span class="text-gradient">EE</span>D Access
+        </h1>
     </div>
 
+    <!-- STATE 1: Terms -->
+    <div id="view-tos" class="view-section active fade-in">
+
+        <h2 class="text-lg font-bold mb-3">
+            Asset Protocol Agreement
+        </h2>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm text-gray-500 h-40 overflow-y-auto mb-6 leading-relaxed">
+            By connecting your wallet, you are accessing the decentralized FEED protocol.
+            You agree that:
+
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+                <li>Asset custody remains entirely on your device.</li>
+                <li>You are interacting with automated programs on Solana Devnet.</li>
+                <li>The protocol does not hold or manage your keys.</li>
+                <li>You accept full responsibility for verifying network data and transactions.</li>
+            </ul>
+        </div>
+
+        <label
+            id="tos-label"
+            class="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition mb-6"
+        >
+            <input
+                type="checkbox"
+                id="tos-checkbox"
+                class="custom-checkbox shrink-0"
+            >
+
+            <span class="text-sm font-medium text-gray-700 select-none">
+                I agree to the Terms of Service
+            </span>
+        </label>
+
+        <button
+            type="button"
+            id="btn-proceed"
+            disabled
+            class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center"
+        >
+            Proceed to Connect
+        </button>
+    </div>
+
+
+    <!-- STATE 2: Wallet Choice -->
+    <div id="view-wallet-choice" class="view-section fade-in">
+
+        <div class="text-center mb-7">
+
+            <h2 class="text-xl font-bold font-display">
+                Connect a Wallet
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                FEED will detect compatible Solana wallets on this device
+                and let you choose one.
+            </p>
+
+        </div>
+
+        <button
+            id="btn-discover-wallets"
+            type="button"
+            class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg"
+        >
+            Connect Wallet
+        </button>
+
+        <button
+            id="btn-back-wallet-choice"
+            type="button"
+            class="w-full mt-5 text-sm font-semibold text-gray-500 hover:text-gray-900"
+        >
+            Back
+        </button>
+
+        <div
+            id="wallet-discovery-status"
+            class="text-xs text-gray-400 text-center mt-4"
+        ></div>
+
+    </div>
+
+
+    <!-- STATE 3: Loading -->
+    <div id="view-loading" class="view-section fade-in text-center py-10">
+
+        <div class="spinner mx-auto mb-6"></div>
+
+        <h2 class="text-lg font-bold">
+            Scanning Solana Devnet Account
+        </h2>
+
+        <p
+            id="loading-message"
+            class="text-sm text-gray-500 mt-2"
+        >
+            Reading account details...
+        </p>
+
+    </div>
+
+
+    <!-- STATE 4: Wallet Results -->
+    <div id="view-wallets" class="view-section fade-in">
+
+        <div class="text-center mb-6">
+
+            <h2 class="text-xl font-bold font-display">
+                Solana Devnet Account
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Your connected account balance snapshot is displayed below.
+            </p>
+
+        </div>
+
+        <div
+            id="wallet-summary"
+            class="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-5"
+        ></div>
+
+        <div
+            id="wallet-list"
+            class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1"
+        ></div>
+
+        <button
+            id="btn-done"
+            type="button"
+            class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center"
+        >
+            Done
+        </button>
+
+        <button
+            id="btn-scan-again"
+            type="button"
+            class="w-full mt-4 text-sm font-semibold text-gray-500 hover:text-gray-900"
+        >
+            Connect Another
+        </button>
+
+    </div>
+
+
+    <!-- STATE 5: Complete -->
+    <div id="view-success" class="view-section fade-in text-center py-8">
+
+        <div class="success-ring">
+            <i class="ph-bold ph-check text-white text-4xl"></i>
+        </div>
+
+        <h2 class="font-display text-2xl font-black">
+            Scan complete
+        </h2>
+
+        <p
+            id="success-message"
+            class="text-gray-500 text-sm mt-2 px-4 leading-relaxed"
+        >
+            The exposed Solana Devnet account was scanned successfully.
+        </p>
+
+        <button
+            id="btn-return"
+            type="button"
+            class="w-full mt-7 bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg"
+        >
+            Return to Accounts
+        </button>
+
+    </div>
+
+</div>
+        </div>
+    </div>
     <div id="feedWalletSettings" class="mx-auto hidden max-w-[900px]"></div>
 
-    <button id="feedWalletQuick" type="button">
-        <i class="ph-bold ph-wallet"></i>
-        <span id="feedWalletQuickText">Connect wallet</span>
-    </button>
 
-    <script type="module">
-        import { getApps } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+<!-- Terms controls -->
+<script>
+(() => {
 
-        (() => {
-            const firebaseApp = getApps()[0];
-            if (!firebaseApp) {
-                console.error('[FEED] Wallet layer: Firebase app is not initialized.');
-                return;
-            }
+    const cb = document.getElementById('tos-checkbox');
+    const label = document.getElementById('tos-label');
+    const button = document.getElementById('btn-proceed');
 
-            const auth = getAuth(firebaseApp);
-            let db = null;
-            let firestoreAvailable = true;
-            try { db = getFirestore(firebaseApp); } catch (error) { firestoreAvailable = false; }
-            const walletLocalKey = uid => `feed-wallets:${uid}`;
+    if (!cb || !label || !button) return;
 
-            const RPC_URL = 'https://api.devnet.solana.com';
-            const DEVNET_GENESIS_HASH = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
-            const FEED_MINT = '4ABhqKCR7PuLzR4wobQnxQMhg2mcPbHcnpkeDjaomgJy';
-            const USDC_MINT = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
-            const MAX_SAVED = 3;
-            const OP_TIMEOUT = 15000;
+    const sync = () => {
+        button.disabled = !cb.checked;
+        button.setAttribute(
+            'aria-disabled',
+            String(!cb.checked)
+        );
+    };
 
-            const $ = id => document.getElementById(id);
-            const modal = $('feedWalletModal');
-            const tosStage = $('feedWalletTosStage');
-            const choiceStage = $('feedWalletChoiceStage');
-            const loadingStage = $('feedWalletLoadingStage');
-            const resultStage = $('feedWalletResultStage');
-            const message = $('feedWalletMessage');
-            const tosCheckbox = $('feedWalletTosCheckbox');
-            const proceed = $('feedWalletProceed');
-            const discoverButton = $('feedWalletDiscover');
-            const discoveryStatus = $('feedWalletDiscoveryStatus');
-            const loadingMessage = $('feedWalletLoadingMessage');
-            const resultList = $('feedWalletResultList');
-            const summary = $('feedWalletSummary');
-            const quickText = $('feedWalletQuickText');
+    cb.addEventListener('change', sync);
 
-            let linkedWallets = [];
-            let currentUid = null;
-            let currentProvider = null;
-            let busy = false;
+    label.addEventListener(
+        'click',
+        () => requestAnimationFrame(sync)
+    );
 
-            const esc = value => String(value ?? '').replace(/[&<>"']/g, character => ({
-                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
-            })[character]);
+    sync();
 
-            const short = address => address ? `${address.slice(0, 6)}…${address.slice(-4)}` : 'No wallet';
+})();
+</script>
+<!-- Solana Wallet Scanner -->
+<script type="module">
 
-            function setModalStage(name) {
-                [tosStage, choiceStage, loadingStage, resultStage].forEach(stage => stage?.classList.add('hidden'));
-                ({tos:tosStage, choice:choiceStage, loading:loadingStage, result:resultStage}[name])?.classList.remove('hidden');
-            }
+const RPC_URL = 'https://api.devnet.solana.com';
+const DEVNET_GENESIS_HASH = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
+const FEED_MINT = '4ABhqKCR7PuLzR4wobQnxQMhg2mcPbHcnpkeDjaomgJy';
+const USDC_MINT = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
 
-            function showMessage(text, type='info') {
-                const styles = {
-                    info: 'border border-blue-100 bg-blue-50 text-blue-700',
-                    success: 'border border-emerald-100 bg-emerald-50 text-emerald-700',
-                    error: 'border border-red-100 bg-red-50 text-red-700',
-                    warning: 'border border-amber-100 bg-amber-50 text-amber-700'
-                };
-                message.className = `mt-4 rounded-2xl px-4 py-3 text-sm ${styles[type] || styles.info}`;
-                message.textContent = text;
-                message.classList.remove('hidden');
-            }
+const OP_TIMEOUT = 15000;
 
-            function clearMessage() {
-                message.className = 'mt-4 hidden rounded-2xl px-4 py-3 text-sm';
-                message.textContent = '';
-            }
 
-            function openModal() {
-                modal.classList.add('open');
-                modal.setAttribute('aria-hidden','false');
-                clearMessage();
-                setModalStage('tos');
-            }
+/* ---------------------------------------------------------
+   DOM
+--------------------------------------------------------- */
 
-            function closeModal() {
-                modal.classList.remove('open');
-                modal.setAttribute('aria-hidden','true');
-            }
+const $ = id => document.getElementById(id);
 
-            function discoverWallets() {
-                const providers = [];
-                const seen = new Set();
+const views = {
+    tos: $('view-tos'),
+    choice: $('view-wallet-choice'),
+    loading: $('view-loading'),
+    wallets: $('view-wallets'),
+    success: $('view-success')
+};
 
-                const add = (name, provider) => {
-                    if (!provider || seen.has(provider)) return;
-                    seen.add(provider);
-                    providers.push({ name, provider });
-                };
+const cb = $('tos-checkbox');
+const btnProceed = $('btn-proceed');
+const btnDiscover = $('btn-discover-wallets');
+const btnBack = $('btn-back-wallet-choice');
+const discoveryStatus = $('wallet-discovery-status');
+const loadingMessage = $('loading-message');
+const walletList = $('wallet-list');
+const walletSummary = $('wallet-summary');
+const btnDone = $('btn-done');
+const btnScanAgain = $('btn-scan-again');
+const btnReturn = $('btn-return');
+const successMessage = $('success-message');
 
-                // Phantom can expose its provider directly or through a providers array.
-                const phantomProviders = Array.isArray(window.phantom?.solana?.providers)
-                    ? window.phantom.solana.providers
-                    : [];
-                const phantom = phantomProviders.find(p => p?.isPhantom) || window.phantom?.solana;
-                if (phantom?.isPhantom || phantom?.isPhantom === true) add('Phantom', phantom);
+/* ---------------------------------------------------------
+   State
+--------------------------------------------------------- */
 
-                if (window.solflare?.isSolflare) add('Solflare', window.solflare);
-                if (window.backpack?.isBackpack) add('Backpack', window.backpack);
+let fetchedAccounts = [];
+let busy = false;
+window.__feedWalletRuntime = window.__feedWalletRuntime || {};
+let activeProviderEntry = null;
 
-                // Generic Solana injection.
-                const generic = window.solana;
-                if (generic && !seen.has(generic)) {
-                    const isKnown =
-                        generic.isPhantom === true ||
-                        generic.isSolflare === true ||
-                        generic.isBackpack === true;
-                    if (!isKnown) add('Solana Wallet', generic);
-                }
+/* ---------------------------------------------------------
+   Helpers
+--------------------------------------------------------- */
 
-                // Some environments expose multiple providers through window.solana.providers.
-                if (Array.isArray(generic?.providers)) {
-                    generic.providers.forEach(provider => {
-                        if (provider?.isPhantom) add('Phantom', provider);
-                        else if (provider?.isSolflare) add('Solflare', provider);
-                        else if (provider?.isBackpack) add('Backpack', provider);
-                    });
-                }
+function esc(value) {
+    return String(value ?? '')
+        .replace(
+            /[&<>"']/g,
+            character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[character]
+        );
+}
 
-                return providers;
-            }
+function switchView(view) {
+    Object.values(views)
+        .forEach(v => v.classList.remove('active'));
+    view.classList.add('active');
+}
 
-            async function waitForWallets(timeout = 2500) {
-                const started = Date.now();
-                let wallets = discoverWallets();
+function toast(title, message, type = 'info', details = '') {
+    let root = $('feed-toast-root');
+    if (!root) {
+        root = document.createElement('div');
+        root.id = 'feed-toast-root';
+        root.className = 'fixed top-4 right-4 z-[10000] w-[min(480px,calc(100vw-2rem))] space-y-3';
+        document.body.appendChild(root);
+    }
 
-                // Wallet extensions may inject after the FEED module has loaded.
-                while (!wallets.length && Date.now() - started < timeout) {
-                    await new Promise(resolve => setTimeout(resolve, 150));
-                    wallets = discoverWallets();
-                }
+    const border = {
+        info: 'border-blue-200',
+        success: 'border-green-200',
+        warning: 'border-amber-200',
+        error: 'border-red-200'
+    }[type] || 'border-blue-200';
 
-                return wallets;
-            }
+    const node = document.createElement('div');
+    node.className = `bg-white ${border} border rounded-2xl shadow-xl p-4 fade-in`;
+    node.innerHTML = `
+        <div class="flex items-start gap-3">
+            <div class="flex-1">
+                <div class="font-bold text-sm text-gray-900">${esc(title)}</div>
+                <div class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${esc(message)}</div>
+                ${details ? `
+                    <details class="mt-2">
+                        <summary class="text-xs font-semibold text-gray-500 cursor-pointer">Technical details</summary>
+                        <pre class="text-[10px] text-gray-500 whitespace-pre-wrap break-all mt-2 max-h-48 overflow-auto">${esc(details)}</pre>
+                    </details>
+                ` : ''}
+            </div>
+            <button type="button" class="text-gray-400 hover:text-gray-800 text-xl leading-none">&times;</button>
+        </div>
+    `;
 
-            async function rpcFetch(method, params=[]) {
-                const response = await fetch(RPC_URL, {
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({jsonrpc:'2.0', id:1, method, params})
-                });
-                if (!response.ok) throw new Error(`RPC HTTP Error: ${response.status}`);
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message || 'RPC error');
-                return data.result;
-            }
+    node.querySelector('button').onclick = () => node.remove();
+    root.appendChild(node);
+    if (type !== 'error') {
+        setTimeout(() => node.remove(), 7500);
+    }
+}
 
-            function timed(promise, label) {
-                return Promise.race([
-                    promise,
-                    new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${OP_TIMEOUT}ms.`)), OP_TIMEOUT))
-                ]);
-            }
+function timed(promise, label) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+            setTimeout(() => reject(new Error(`${label} timed out after ${OP_TIMEOUT}ms.`)), OP_TIMEOUT);
+        })
+    ]);
+}
 
-            async function getSolBalance(address) {
-                const result = await rpcFetch('getBalance',[address]);
-                return (result.value / 1e9).toFixed(4);
-            }
 
-            async function getTokenBalance(address,mint) {
-                const result = await rpcFetch('getTokenAccountsByOwner',[address,{mint},{encoding:'jsonParsed'}]);
-                if (result.value?.length) {
-                    const amount = result.value[0].account.data.parsed.info.tokenAmount.uiAmount;
-                    return Number(amount ?? 0).toFixed(2);
-                }
-                return '0.00';
-            }
+/* ---------------------------------------------------------
+   JSON-RPC Methods
+--------------------------------------------------------- */
 
-            async function verifyDevnet() {
-                const genesis = await rpcFetch('getGenesisHash');
-                if (genesis !== DEVNET_GENESIS_HASH) throw new Error('Solana Devnet verification failed.');
-            }
+async function rpcFetch(method, params = []) {
+    const response = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method,
+            params
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error(`RPC HTTP Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.error) {
+        throw new Error(`RPC Error: ${data.error.message}`);
+    }
+    
+    return data.result;
+}
 
-            function syncTerms() {
-                proceed.disabled = !tosCheckbox.checked;
-            }
+async function verifyDevnet() {
+    const genesis = await rpcFetch('getGenesisHash');
+    if (genesis !== DEVNET_GENESIS_HASH) {
+        throw new Error(`Genesis Hash mismatch! Expected Devnet (${DEVNET_GENESIS_HASH}) but got ${genesis}.`);
+    }
+}
 
-            tosCheckbox?.addEventListener('change', syncTerms);
-            $('feedWalletTosLabel')?.addEventListener('click', () => requestAnimationFrame(syncTerms));
-            $('feedWalletClose')?.addEventListener('click', closeModal);
-            $('feedWalletBack')?.addEventListener('click', () => { if (!busy) setModalStage('tos'); });
-            $('feedWalletDone')?.addEventListener('click', () => closeModal());
-            $('feedWalletConnectAnother')?.addEventListener('click', () => { if (!busy) setModalStage('choice'); });
-            modal?.addEventListener('click', event => { if (event.target === modal) closeModal(); });
-            document.addEventListener('keydown', event => {
-                if (event.key === 'Escape' && modal && modal.classList.contains('open')) closeModal();
-            });
+async function getSolBalance(address) {
+    const result = await rpcFetch('getBalance', [address]);
+    return (result.value / 1e9).toFixed(4); // Convert lamports to SOL
+}
 
-            async function showPicker() {
-                discoveryStatus.textContent = 'Scanning for Solana wallet applications...';
-                const list = await waitForWallets(2500);
-                if (!list.length) {
-                    discoveryStatus.textContent = 'No compatible Solana wallet detected.';
-                    showMessage('FEED could not detect a compatible Solana wallet extension. Please install or unlock Phantom, Solflare, Backpack, or another Solana wallet and try again.','error');
-                    return;
-                }
+async function getTokenBalance(address, mint) {
+    const result = await rpcFetch('getTokenAccountsByOwner', [
+        address,
+        { mint: mint },
+        { encoding: 'jsonParsed' }
+    ]);
+    
+    if (result.value && result.value.length > 0) {
+        // Find the account balance from parsed JSON
+        const amount = result.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+        return amount.toFixed(2);
+    }
+    return '0.00';
+}
 
-                const overlay = document.createElement('div');
-                overlay.className = 'fixed inset-0 z-[100001] flex items-center justify-center bg-black/40 p-5 backdrop-blur-sm';
-                overlay.innerHTML = `
-                    <div class="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
-                        <div class="mb-5 flex items-start justify-between gap-4">
-                            <div><h3 class="font-display text-xl font-bold">Choose a Wallet</h3><p class="mt-1 text-sm text-gray-500">Select your Solana wallet to connect.</p></div>
-                            <button type="button" data-close class="rounded-xl p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900"><i class="ph-bold ph-x text-xl"></i></button>
-                        </div>
-                        <div class="space-y-3">
-                            ${list.map((wallet,index) => `<button type="button" data-wallet-index="${index}" class="flex w-full items-center justify-between rounded-2xl border border-gray-200 p-4 text-left transition hover:-translate-y-0.5 hover:border-[#6036E1] hover:bg-gray-50"><div class="font-bold text-gray-900">${esc(wallet.name)}</div><span class="text-sm font-semibold text-[#6036E1]">Connect</span></button>`).join('')}
-                        </div>
-                        <p class="mt-5 text-[11px] text-gray-400">FEED only reads the public account exposed by the wallet. No transaction or transfer is requested.</p>
-                    </div>`;
-                document.body.appendChild(overlay);
 
-                const close = () => overlay.remove();
-                overlay.querySelector('[data-close]')?.addEventListener('click', close);
-                overlay.querySelectorAll('[data-wallet-index]').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const entry = list[Number(button.dataset.walletIndex)];
-                        close();
-                        await connect(entry);
-                    });
-                });
-            }
+/* ---------------------------------------------------------
+   Discover Solana Wallets
+--------------------------------------------------------- */
 
-            async function connect(entry) {
-                if (busy || linkedWallets.length >= MAX_SAVED) {
-                    if (linkedWallets.length >= MAX_SAVED) showMessage('You can connect up to 3 wallets under one Google account. Remove a wallet in Settings before adding another.','warning');
-                    return;
-                }
-                busy = true;
-                discoverButton.disabled = true;
-                try {
-                    clearMessage();
-                    await entry.provider.connect();
-                    if (!entry.provider.publicKey) throw new Error('Wallet connected but did not provide a public key.');
-                    const address = entry.provider.publicKey.toString();
+function discoverWallets() {
+    const providers = [];
 
-                    if (linkedWallets.some(wallet => wallet.address === address)) {
-                        showMessage('That wallet is already connected to this Google account.','warning');
-                        return;
-                    }
+    if (window.phantom?.solana?.isPhantom) {
+        providers.push({ name: 'Phantom', provider: window.phantom.solana });
+    }
+    if (window.solflare?.isSolflare) {
+        providers.push({ name: 'Solflare', provider: window.solflare });
+    }
+    if (window.backpack?.isBackpack) {
+        providers.push({ name: 'Backpack', provider: window.backpack });
+    }
+    if (window.solana && !window.phantom?.solana?.isPhantom && !window.solflare?.isSolflare) {
+        providers.push({ name: 'Solana Wallet', provider: window.solana });
+    }
 
-                    currentProvider = entry.provider;
-                    loadingMessage.textContent = `Reading ${entry.name} account ${short(address)}…`;
-                    setModalStage('loading');
+    return providers;
+}
 
-                    const wallet = await readWallet(address, entry.name);
-                    linkedWallets.push(wallet);
-                    linkedWallets = linkedWallets.slice(0, MAX_SAVED);
-                    await persist();
-                    renderAllWalletUI();
-                    renderWalletResult(wallet);
-                    setModalStage('result');
-                    showMessage('Wallet connected and linked to your Google profile.','success');
-                } catch (error) {
-                    console.error('[FEED] Wallet connection failure', error);
-                    showMessage(error?.message || 'Wallet connection failed.','error');
-                    setModalStage('choice');
-                } finally {
-                    busy = false;
-                    discoverButton.disabled = false;
-                }
-            }
+async function handleDiscovery() {
+    discoveryStatus.textContent = 'Scanning for Solana wallet applications...';
 
-            async function readWallet(address, providerName) {
-                const row = { address, provider:providerName, sol:'0.0000', feed:'0.00', usdc:'0.00', network:'Solana Devnet', connectedAt:Date.now(), updatedAt:Date.now() };
-                try { await timed(verifyDevnet(),'RPC Genesis Check'); } catch(e) { row.warning = `Network: ${e.message}`; }
-                try { row.sol = await timed(getSolBalance(address),'SOL Balance'); } catch(e) { row.warning = `${row.warning ? row.warning+' ' : ''}SOL: ${e.message}`; }
-                try { row.feed = await timed(getTokenBalance(address,FEED_MINT),'$FEED Balance'); } catch(e) { row.warning = `${row.warning ? row.warning+' ' : ''}$FEED: ${e.message}`; }
-                try { row.usdc = await timed(getTokenBalance(address,USDC_MINT),'USDC Balance'); } catch(e) { row.warning = `${row.warning ? row.warning+' ' : ''}USDC: ${e.message}`; }
-                return row;
-            }
+    // Brief delay to simulate and ensure browser injection completes
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const list = discoverWallets();
 
-            async function persist() {
-                if (!currentUid) return;
-                localStorage.setItem(walletLocalKey(currentUid), JSON.stringify(linkedWallets));
-                if (!firestoreAvailable || !db) return;
-                try {
-                    await Promise.race([
-                        setDoc(doc(db,'users',currentUid), { wallets:linkedWallets }, { merge:true }),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore unavailable')), 2500))
-                    ]);
-                } catch (error) {
-                    firestoreAvailable = false;
-                    console.info('[FEED] Firestore unavailable; wallet state is being kept locally until Firestore is enabled.');
-                }
-            }
+    if (!list.length) {
+        discoveryStatus.textContent = 'No compatible Solana wallet detected.';
+        toast(
+            'No wallet detected',
+            'FEED could not find a Solana wallet extension (like Phantom or Solflare). Please install or unlock your wallet and refresh.',
+            'error'
+        );
+        return null;
+    }
 
-            async function loadUserWallets(user) {
-                currentUid = user?.uid || null;
-                linkedWallets = [];
-                if (!currentUid) return;
-                const localSaved = (() => {
-                    try { return JSON.parse(localStorage.getItem(walletLocalKey(currentUid)) || '[]'); } catch (_) { return []; }
-                })();
-                if (Array.isArray(localSaved)) linkedWallets = localSaved.filter(w => w?.address).slice(0,MAX_SAVED);
-                if (firestoreAvailable && db) {
-                    try {
-                        const snapshot = await getDoc(doc(db,'users',currentUid));
-                        const saved = snapshot.exists() && Array.isArray(snapshot.data()?.wallets) ? snapshot.data().wallets : null;
-                        if (Array.isArray(saved)) {
-                            linkedWallets = saved.filter(w => w?.address).slice(0,MAX_SAVED);
-                            localStorage.setItem(walletLocalKey(currentUid), JSON.stringify(linkedWallets));
-                        }
-                    } catch (error) {
-                        firestoreAvailable = false;
-                        console.info('[FEED] Firestore is not provisioned; using local wallet state.');
-                    }
-                }
-                await refreshBalances(true);
-                renderAllWalletUI();
-            }
+    discoveryStatus.textContent = `${list.length} Solana wallet${list.length === 1 ? '' : 's'} detected.`;
+    return list;
+}
 
-            async function refreshBalances(quiet=false) {
-                if (!linkedWallets.length) {
-                    renderAllWalletUI();
-                    return;
-                }
-                try {
-                    const fresh = await Promise.all(linkedWallets.map(w => readWallet(w.address,w.provider || 'Wallet')));
-                    linkedWallets = fresh.slice(0,MAX_SAVED);
-                    if (!quiet) await persist();
-                    renderAllWalletUI();
-                } catch (error) {
-                    console.warn('[FEED] Wallet refresh failed:', error);
-                }
-            }
 
-            async function disconnectWallet(address) {
-                const target = linkedWallets.find(wallet => wallet.address === address);
-                linkedWallets = linkedWallets.filter(wallet => wallet.address !== address);
-                if (target?.provider && currentProvider?.disconnect && currentProvider.publicKey?.toString() === address) {
-                    try { await currentProvider.disconnect(); } catch (_) {}
-                }
-                await persist();
-                renderAllWalletUI();
-            }
+/* ---------------------------------------------------------
+   Wallet picker
+--------------------------------------------------------- */
 
-            async function disconnectAll() {
-                if (!linkedWallets.length) return;
-                linkedWallets = [];
-                try { await currentProvider?.disconnect?.(); } catch (_) {}
-                await persist();
-                renderAllWalletUI();
-            }
+async function showPicker() {
+    const list = await handleDiscovery();
+    if (!list) return;
 
-            function renderWalletResult(wallet) {
-                summary.innerHTML = `
-                    <div class="grid grid-cols-3 gap-3 text-center">
-                        <div><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">NETWORK</div><div class="mt-1 font-bold text-[#6036E1]">DEVNET</div></div>
-                        <div class="border-x border-gray-200"><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">WALLET</div><div class="mt-1 font-bold">${esc(wallet.provider)}</div></div>
-                        <div><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">$FEED</div><div class="mt-1 font-bold">${esc(wallet.feed)}</div></div>
-                    </div>`;
-                resultList.innerHTML = `
-                    <div class="rounded-2xl border border-gray-200 bg-white p-4">
-                        <div class="font-mono text-xs font-semibold break-all text-gray-700">${esc(wallet.address)}</div>
-                        <div class="mt-4 grid grid-cols-3 gap-2">
-                            <div class="rounded-xl bg-gray-50 p-3 text-center"><div class="text-[9px] uppercase font-bold text-gray-400">SOL</div><div class="mt-1 text-sm font-bold">${esc(wallet.sol)}</div></div>
-                            <div class="rounded-xl bg-gray-50 p-3 text-center"><div class="text-[9px] uppercase font-bold text-[#D83DC2]">$FEED</div><div class="mt-1 text-sm font-bold">${esc(wallet.feed)}</div></div>
-                            <div class="rounded-xl bg-gray-50 p-3 text-center"><div class="text-[9px] uppercase font-bold text-blue-500">USDC</div><div class="mt-1 text-sm font-bold">${esc(wallet.usdc)}</div></div>
-                        </div>
-                        ${wallet.warning ? `<div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-3 text-xs text-amber-700">${esc(wallet.warning)}</div>` : ''}
-                    </div>`;
-            }
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[10001] bg-black/40 backdrop-blur-sm flex items-center justify-center p-5';
+    overlay.innerHTML = `
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 fade-in">
+            <div class="flex items-start justify-between mb-5">
+                <div>
+                    <h2 class="text-xl font-bold font-display">Choose a Wallet</h2>
+                    <p class="text-sm text-gray-500 mt-1">Select your Solana wallet to connect.</p>
+                </div>
+                <button id="close-picker" class="text-gray-400 hover:text-gray-900 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-3">
+                ${list.map((wallet, index) => `
+                    <button type="button" data-i="${index}" class="w-full border border-gray-200 hover:border-[#6036E1] hover:bg-gray-50 rounded-2xl p-4 text-left flex items-center justify-between gap-4 transition">
+                        <div class="font-bold text-gray-900">${esc(wallet.name)}</div>
+                        <span class="text-sm font-semibold text-[#6036E1]">Connect</span>
+                    </button>
+                `).join('')}
+            </div>
+            <p class="text-[11px] text-gray-400 mt-5">FEED only reads the account exposed. No transaction or transfer is requested.</p>
+        </div>
+    `;
 
-            function walletCard(wallet,index, compact=false) {
-                const name = wallet.provider || 'Wallet';
-                return `
-                    <div class="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0">
-                                <div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">${esc(name)} · Solana Devnet</div>
-                                <div class="mt-2 font-display text-lg font-black">Wallet ${index+1}</div>
-                                <div class="mt-1 truncate font-mono text-xs text-gray-400" title="${esc(wallet.address)}">${esc(short(wallet.address))}</div>
-                            </div>
-                            <div class="rounded-full bg-emerald-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-700">Connected</div>
-                        </div>
-                        <div class="mt-5 grid grid-cols-3 gap-3">
-                            <div class="rounded-2xl bg-gray-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-gray-400">SOL</div><div class="mt-2 font-display text-lg font-bold">${esc(wallet.sol)}</div></div>
-                            <div class="rounded-2xl bg-violet-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-violet-500">$FEED</div><div class="mt-2 font-display text-lg font-bold">${esc(wallet.feed)}</div></div>
-                            <div class="rounded-2xl bg-blue-50 p-3"><div class="text-[9px] font-bold uppercase tracking-wider text-blue-500">USDC</div><div class="mt-2 font-display text-lg font-bold">${esc(wallet.usdc)}</div></div>
-                        </div>
-                        <div class="mt-4 flex items-center justify-between text-[10px] text-gray-400">
-                            <span>Public address only</span>
-                            <button type="button" data-disconnect-wallet="${esc(wallet.address)}" class="font-bold text-red-600 hover:text-red-700">Disconnect</button>
-                        </div>
-                    </div>`;
-            }
+    document.body.appendChild(overlay);
 
-            function renderOverviewWallets() {
-                const overview = $('dashboardOverview');
-                const left = overview?.querySelector('.xl\\:col-span-8');
-                if (!left) return;
-                let section = $('feedWalletOverview');
-                if (!section) {
-                    section = document.createElement('section');
-                    section.id = 'feedWalletOverview';
-                    section.className = 'dashboard-glass rounded-[2.5rem] p-6 md:p-8';
-                    const ledger = Array.from(left.children).find(el => el.querySelector?.('.ph-receipt'));
-                    left.insertBefore(section, ledger || null);
-                }
+    const close = () => overlay.remove();
+    overlay.querySelector('#close-picker').onclick = close;
 
-                const totals = linkedWallets.reduce((acc,w) => ({
-                    feed: acc.feed + Number(w.feed || 0),
-                    usdc: acc.usdc + Number(w.usdc || 0),
-                    sol: acc.sol + Number(w.sol || 0)
-                }), {feed:0,usdc:0,sol:0});
+    overlay.querySelectorAll('[data-i]').forEach(button => {
+        button.onclick = async () => {
+            const entry = list[Number(button.dataset.i)];
+            close();
+            await connect(entry);
+        };
+    });
+}
 
-                $('overviewTotalFeed')?.replaceChildren(document.createTextNode(totals.feed.toFixed(2)+' '), Object.assign(document.createElement('span'), {className:'text-3xl text-emerald-200/80', textContent:'$FEED'}));
-                $('overviewAvailableFeed') && ($('overviewAvailableFeed').textContent = totals.feed.toFixed(2));
-                $('overviewAvailableFeedStatus') && ($('overviewAvailableFeedStatus').textContent = linkedWallets.length ? `${linkedWallets.length} connected wallet${linkedWallets.length===1?'':'s'}` : 'No balance');
-                $('overviewUsdcBalance') && ($('overviewUsdcBalance').textContent = totals.usdc.toFixed(2));
-                $('overviewUsdcStatus') && ($('overviewUsdcStatus').textContent = linkedWallets.length ? `≈ $${totals.usdc.toFixed(2)} USD · ${linkedWallets.length} wallet${linkedWallets.length===1?'':'s'}` : '≈ $0.00 USD · No balance');
-                $('dashboardWalletHeader') && ($('dashboardWalletHeader').textContent = linkedWallets[0] ? `${linkedWallets[0].provider} · ${short(linkedWallets[0].address)}` : 'No wallet');
-                $('overviewWalletAddress') && ($('overviewWalletAddress').textContent = linkedWallets[0] ? short(linkedWallets[0].address) : 'No wallet');
-                const profileAddress = $('profileWalletAddress');
-                if (profileAddress) profileAddress.textContent = linkedWallets[0] ? `${linkedWallets[0].provider} · ${short(linkedWallets[0].address)}` : 'Not connected';
 
-                section.innerHTML = `
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                        <div>
-                            <div class="text-[10px] font-bold uppercase tracking-[.18em] text-gray-400">Connected wallet</div>
-                            <h2 class="mt-2 font-display text-2xl font-black">${linkedWallets.length ? 'Wallet balances' : 'No wallet connected'}</h2>
-                            <p class="mt-1 text-sm text-gray-500">${linkedWallets.length ? 'Your Solana Devnet wallet appears here under the main balance overview.' : 'Connect a compatible Solana wallet to populate your FEED account.'}</p>
-                        </div>
-                        <button id="feedOverviewConnect" type="button" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">${linkedWallets.length ? (linkedWallets.length < MAX_SAVED ? 'Add wallet' : 'Manage wallets') : 'Connect Wallet'}</button>
-                    </div>
-                    <div id="feedWalletOverviewGrid" class="mt-6"></div>`;
-                const grid = section.querySelector('#feedWalletOverviewGrid');
-                if (!linkedWallets.length) {
-                    grid.innerHTML = `<div class="rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-6 py-10 text-center">
-                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#6036E1] shadow-sm"><i class="ph-bold ph-wallet text-2xl"></i></div>
-                        <div class="mt-4 font-display font-bold">Connect your wallet</div>
-                        <p class="mx-auto mt-1 max-w-md text-sm text-gray-500">Your connected wallet will become its own balance card here.</p>
-                    </div>`;
-                } else {
-                    linkedWallets.forEach((wallet,index) => {
-                        const wrapper = document.createElement('div');
-                        wrapper.innerHTML = walletCard(wallet,index);
-                        grid.appendChild(wrapper.firstElementChild);
-                    });
-                }
-                section.querySelector('#feedOverviewConnect')?.addEventListener('click', openModal);
-                section.querySelectorAll('[data-disconnect-wallet]').forEach(btn => btn.addEventListener('click', () => disconnectWallet(btn.dataset.disconnectWallet)));
-            }
+/* ---------------------------------------------------------
+   Connect wallet
+--------------------------------------------------------- */
 
-            function renderProfileWallets() {
-                const profile = $('dashboardProfile');
-                if (!profile) return;
-                let section = $('feedWalletProfile');
-                if (!section) {
-                    section = document.createElement('div');
-                    section.id = 'feedWalletProfile';
-                    section.className = 'mt-8 rounded-[2.5rem] border border-gray-100 bg-white/80 p-6 md:p-8';
-                    profile.appendChild(section);
-                }
-                section.innerHTML = `
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                        <div><div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#6036E1]">Wallet identity</div><h3 class="mt-2 font-display text-2xl font-black">Connected wallets</h3><p class="mt-1 text-sm text-gray-500">${linkedWallets.length ? 'These wallets are linked to your Google-authenticated FEED profile.' : 'No wallet is connected to this profile yet.'}</p></div>
-                        <button id="feedProfileConnect" type="button" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">${linkedWallets.length < MAX_SAVED ? 'Connect Wallet' : 'Manage in Settings'}</button>
-                    </div>
-                    <div class="mt-5 space-y-3">
-                        ${linkedWallets.length ? linkedWallets.map((wallet,index)=>walletCard(wallet,index,true)).join('') : `<div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-500">Your profile will update as soon as a wallet is linked.</div>`}
-                    </div>`;
-                section.querySelector('#feedProfileConnect')?.addEventListener('click', () => linkedWallets.length < MAX_SAVED ? openModal() : activateSettings());
-                section.querySelectorAll('[data-disconnect-wallet]').forEach(btn => btn.addEventListener('click', () => disconnectWallet(btn.dataset.disconnectWallet)));
-            }
+async function connect(entry) {
+    if (busy) return;
+    busy = true;
+    activeProviderEntry = entry;
+    window.__feedWalletRuntime.providerEntry = entry;
+    btnDiscover.disabled = true;
 
-            function renderSettings() {
-                const settings = $('feedWalletSettings');
-                if (!settings) return;
-                settings.innerHTML = `
-                    <div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10">
-                        <div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Settings</div>
-                        <h2 class="mt-3 font-display text-3xl font-black">Wallet connections</h2>
-                        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">Manage the Solana wallet addresses linked to this Google-authenticated FEED profile.</p>
-                        <div class="mt-8 rounded-3xl border border-gray-200 bg-white p-6">
-                            <div class="flex items-start justify-between gap-4">
-                                <div><div class="font-display text-lg font-bold">Connected wallets</div><p class="mt-1 text-sm text-gray-500">You can keep up to 3 public wallet connections on this profile.</p></div>
-                                <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-500">${linkedWallets.length}/${MAX_SAVED}</span>
-                            </div>
-                            <div class="mt-6 space-y-3">
-                                ${linkedWallets.length ? linkedWallets.map((wallet,index)=>`
-                                    <div class="rounded-2xl border border-gray-200 p-4">
-                                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                            <div class="min-w-0"><div class="flex items-center gap-2"><span class="font-semibold">Wallet ${index+1}</span><span class="rounded-full bg-violet-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-violet-600">${esc(wallet.provider || 'Wallet')}</span><span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-700">Connected</span></div><div class="mt-1 break-all font-mono text-xs text-gray-500">${esc(wallet.address)}</div></div>
-                                            <button type="button" data-setting-disconnect="${esc(wallet.address)}" class="rounded-xl border border-red-200 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-50">Disconnect</button>
-                                        </div>
-                                        <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-                                            <div class="rounded-xl bg-gray-50 p-3"><div class="text-[9px] uppercase font-bold text-gray-400">SOL</div><div class="mt-1 text-sm font-bold">${esc(wallet.sol)}</div></div>
-                                            <div class="rounded-xl bg-violet-50 p-3"><div class="text-[9px] uppercase font-bold text-violet-500">$FEED</div><div class="mt-1 text-sm font-bold">${esc(wallet.feed)}</div></div>
-                                            <div class="rounded-xl bg-blue-50 p-3"><div class="text-[9px] uppercase font-bold text-blue-500">USDC</div><div class="mt-1 text-sm font-bold">${esc(wallet.usdc)}</div></div>
-                                        </div>
-                                    </div>`).join('') : `<div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-7 text-center text-sm text-gray-500">No wallets are currently linked.</div>`}
-                            </div>
-                            <div class="mt-6 flex flex-wrap gap-3">
-                                ${linkedWallets.length < MAX_SAVED ? `<button id="feedSettingsAdd" type="button" class="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">Connect Wallet</button>` : ''}
-                                ${linkedWallets.length ? `<button id="feedSettingsDisconnectAll" type="button" class="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">Disconnect all</button>` : ''}
-                            </div>
-                        </div>
-                        <div class="mt-4 rounded-2xl bg-gray-50 p-5 text-xs leading-relaxed text-gray-500">Disconnecting here removes the wallet association from your FEED profile and calls the wallet provider's disconnect method when supported. It does not transfer funds or alter anything on-chain.</div>
-                    </div>`;
-                settings.querySelector('#feedSettingsAdd')?.addEventListener('click', openModal);
-                settings.querySelectorAll('[data-setting-disconnect]').forEach(btn => btn.addEventListener('click', () => disconnectWallet(btn.dataset.settingDisconnect)));
-                settings.querySelector('#feedSettingsDisconnectAll')?.addEventListener('click', async () => {
-                    if (!window.confirm('Disconnect all wallets from this Google account?')) return;
-                    await disconnectAll();
-                });
-            }
+    try {
+        toast('Connecting wallet', `Requesting account access from ${entry.name}. Approve the request in the selected wallet application.`);
 
-            function renderAllWalletUI() {
-                renderOverviewWallets();
-                renderProfileWallets();
-                renderSettings();
-                quickText.textContent = linkedWallets.length ? `${linkedWallets.length}/${MAX_SAVED} wallets` : 'Connect wallet';
-            }
+        await entry.provider.connect();
+        
+        if (!entry.provider.publicKey) {
+            throw new Error("Wallet connected but did not provide a public key.");
+        }
+        
+        const address = entry.provider.publicKey.toString();
 
-            function activateSettings() {
-                if (typeof window.__feedActivateDashboardTab === 'function') window.__feedActivateDashboardTab('settings');
-                else document.querySelector('[data-dashboard-tab="settings"]')?.click();
-            }
-            window.__feedActivateDashboardTab = window.__feedActivateDashboardTab || activateSettings;
+        loadingMessage.textContent = `Verifying Devnet and querying balances for ${address.slice(0, 4)}...${address.slice(-4)}`;
+        switchView(views.loading);
 
-            proceed?.addEventListener('click', async event => {
-                event.preventDefault();
-                if (!tosCheckbox.checked || busy) return;
-                setModalStage('choice');
-                await showPicker();
-            });
-            discoverButton?.addEventListener('click', showPicker);
-            $('overviewWalletConnectBtn')?.addEventListener('click', openModal);
-            $('profileWalletConnectBtn')?.addEventListener('click', openModal);
-            document.addEventListener('click', event => {
-                const button = event.target.closest?.('#overviewWalletConnectBtn, #profileWalletConnectBtn, #feedWalletQuick');
-                if (!button) return;
-                event.preventDefault();
-                openModal();
-            });
-            quickText && $('feedWalletQuick')?.addEventListener('click', openModal);
+        await loadWalletData(address, entry.name);
+        window.__feedWalletRuntime.account = fetchedAccounts[0] || null;
+        document.dispatchEvent(new CustomEvent('feed:wallet-connected', { detail: fetchedAccounts[0] || null }));
 
-            async function handleDashboardTab(event) {
-                if (event.detail?.tab === 'settings') renderSettings();
-            }
-            document.addEventListener('feed:dashboard-tab', handleDashboardTab);
+    } catch (error) {
+        console.error('[FEED] Wallet connection failure', error);
+        toast(
+            'Connection failed',
+            error?.message || 'Unknown wallet connection error',
+            'error'
+        );
+        switchView(views.choice);
+    } finally {
+        busy = false;
+        btnDiscover.disabled = false;
+    }
+}
 
-            async function loadCurrentUser(user) {
-                currentUid = user?.uid || null;
-                if (!currentUid) {
-                    linkedWallets = [];
-                    renderAllWalletUI();
-                    return;
-                }
-                await loadUserWallets(user);
-            }
 
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    loadCurrentUser(user);
-                    if (!window.__feedWalletRefreshTimer) {
-                        window.__feedWalletRefreshTimer = setInterval(() => {
-                            if (document.body.classList.contains('dashboard-active') && linkedWallets.length) refreshBalances(true);
-                        }, 45000);
-                    }
-                    setTimeout(() => renderAllWalletUI(), 500);
-                } else {
-                    currentUid = null;
-                    linkedWallets = [];
-                    closeModal();
-                    renderAllWalletUI();
-                    if (window.__feedWalletRefreshTimer) {
-                        clearInterval(window.__feedWalletRefreshTimer);
-                        window.__feedWalletRefreshTimer = null;
-                    }
-                }
-            });
+/* ---------------------------------------------------------
+   Load account data
+--------------------------------------------------------- */
 
-            window.addEventListener('feed:open-wallet', openModal);
-            document.addEventListener('feed:open-wallet', openModal);
-        })();
-    </script>
+async function loadWalletData(address, providerName) {
+    fetchedAccounts = [];
+
+    const row = {
+        address,
+        sol: '0.0000',
+        feed: '0.00',
+        usdc: '0.00',
+        provider: providerName,
+        warnings: []
+    };
+
+    try {
+        await timed(verifyDevnet(), 'RPC Genesis Check');
+    } catch(e) {
+        row.warnings.push(`Network: ${e.message}`);
+    }
+
+    try {
+        row.sol = await timed(getSolBalance(address), 'SOL Balance');
+    } catch (error) {
+        row.warnings.push(`SOL: ${error.message}`);
+    }
+
+    try {
+        row.feed = await timed(getTokenBalance(address, FEED_MINT), '$FEED Balance');
+    } catch (error) {
+        row.warnings.push(`$FEED: ${error.message}`);
+    }
+    
+    try {
+        row.usdc = await timed(getTokenBalance(address, USDC_MINT), 'USDC Balance');
+    } catch (error) {
+        row.warnings.push(`USDC: ${error.message}`);
+    }
+
+    fetchedAccounts.push(row);
+    renderWallets();
+    switchView(views.wallets);
+
+    const warnings = row.warnings.length;
+
+    toast(
+        'Account scan complete',
+        `Solana Devnet account loaded successfully.`,
+        warnings ? 'warning' : 'success',
+        warnings ? `${address}: ${row.warnings.join('; ')}` : ''
+    );
+}
+
+
+/* ---------------------------------------------------------
+   Render accounts
+--------------------------------------------------------- */
+
+function renderWallets() {
+    walletList.innerHTML = '';
+    
+    // We only display 1 account connected at a time
+    const account = fetchedAccounts[0];
+
+    walletSummary.innerHTML = `
+        <div class="grid grid-cols-3 gap-3">
+            <div class="text-center">
+                <div class="text-[9px] uppercase font-bold text-gray-400">NETWORK</div>
+                <div class="font-bold text-lg mt-1 text-[#6036E1]">DEVNET</div>
+            </div>
+            <div class="text-center border-x border-gray-100">
+                <div class="text-[9px] uppercase font-bold text-gray-400">WALLET</div>
+                <div class="font-bold text-lg mt-1">${account.provider}</div>
+            </div>
+             <div class="text-center">
+                <div class="text-[9px] uppercase font-bold text-gray-400">$FEED</div>
+                <div class="font-bold text-lg mt-1">${account.feed}</div>
+            </div>
+        </div>
+    `;
+
+    const card = document.createElement('div');
+    card.className = 'wallet-card bg-white rounded-2xl overflow-hidden p-4';
+    
+    const isZeroFeed = Number(account.feed) === 0 && !account.warnings.some(w => w.startsWith('$FEED:'));
+
+    card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+                <div class="font-bold text-sm text-gray-900 break-all">${esc(account.address)}</div>
+            </div>
+            ${isZeroFeed ? `<span class="shrink-0 text-[9px] font-bold uppercase tracking-wide bg-gray-100 text-gray-500 px-2 py-1 rounded-full">0 FEED</span>` : ''}
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 mt-4">
+            <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
+                <div class="text-[9px] uppercase font-bold text-gray-400">SOL</div>
+                <div class="font-semibold text-xs mt-1">${esc(account.sol)}</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
+                <div class="text-[9px] uppercase font-bold text-[#D83DC2]">$FEED</div>
+                <div class="font-bold text-xs mt-1 ${isZeroFeed ? 'zero-balance' : ''}">${esc(account.feed)}</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
+                <div class="text-[9px] uppercase font-bold text-blue-500">USDC</div>
+                <div class="font-bold text-xs mt-1">${esc(account.usdc)}</div>
+            </div>
+        </div>
+
+        ${account.warnings.length ? `<div class="mt-3 bg-amber-50 border border-amber-100 rounded-lg p-2 text-[10px] text-amber-700">${esc(account.warnings.join(' '))}</div>` : ''}
+    `;
+
+    walletList.appendChild(card);
+}
+
+
+/* ---------------------------------------------------------
+   Navigation
+--------------------------------------------------------- */
+
+btnProceed.onclick = async event => {
+    event.preventDefault();
+    if (!cb.checked || busy) return;
+    switchView(views.choice);
+    await showPicker();
+};
+
+btnDiscover.onclick = showPicker;
+
+btnBack.onclick = () => {
+    if (!busy) switchView(views.tos);
+};
+
+/* ---------------------------------------------------------
+   Done
+--------------------------------------------------------- */
+
+btnDone.onclick = () => {
+    successMessage.textContent = `The Solana Devnet account was scanned successfully.`;
+    switchView(views.success);
+    window.__feedWalletRuntime.account = fetchedAccounts[0] || null;
+    document.dispatchEvent(new CustomEvent('feed:wallet-connected', { detail: fetchedAccounts[0] || null }));
+};
+
+/* ---------------------------------------------------------
+   Scan again
+--------------------------------------------------------- */
+
+btnScanAgain.onclick = async () => {
+    if (busy) return;
+    switchView(views.choice);
+    await showPicker();
+};
+
+/* ---------------------------------------------------------
+   Return to account results
+--------------------------------------------------------- */
+
+btnReturn.onclick = () => {
+    switchView(views.wallets);
+};
+
+</script>
+
+<script>
+(() => {
+ const modal=document.getElementById('feedWalletModalExact');
+ const open=()=>{modal?.classList.add('open');modal?.setAttribute('aria-hidden','false');};
+ const close=()=>{modal?.classList.remove('open');modal?.setAttribute('aria-hidden','true');};
+ document.addEventListener('click',e=>{const b=e.target.closest?.('#overviewWalletConnectBtn,#profileWalletConnectBtn,[data-feed-wallet-open]');if(!b)return;e.preventDefault();open();},true);
+ document.getElementById('feedWalletExactClose')?.addEventListener('click',close);
+ modal?.addEventListener('click',e=>{if(e.target===modal)close();});
+ window.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal?.classList.contains('open'))close();});
+ function set(id,v){const x=document.getElementById(id);if(x)x.textContent=v;}
+ function addr(a){return a?`${a.slice(0,4)}…${a.slice(-4)}`:'No wallet';}
+ function renderSettings(a){const s=document.getElementById('feedWalletSettings');if(!s)return;s.innerHTML=`<div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Settings</div><h2 class="mt-3 font-display text-3xl font-black">Wallet connection</h2><p class="mt-2 text-sm leading-relaxed text-gray-500">Manage the Solana wallet connected to this FEED profile.</p><div class="mt-8 rounded-3xl border border-gray-200 bg-white p-6">${a?`<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><div class="font-display text-lg font-bold">${a.provider||'Solana Wallet'}</div><div class="mt-1 break-all font-mono text-xs text-gray-500">${a.address}</div></div><button id="feedWalletDisconnect" type="button" class="rounded-xl border border-red-200 px-4 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">Disconnect</button></div><div class="mt-5 grid grid-cols-3 gap-2 text-center"><div class="rounded-xl bg-gray-50 p-3"><div class="text-[9px] font-bold uppercase text-gray-400">SOL</div><div class="mt-1 text-sm font-bold">${a.sol}</div></div><div class="rounded-xl bg-violet-50 p-3"><div class="text-[9px] font-bold uppercase text-violet-500">$FEED</div><div class="mt-1 text-sm font-bold">${a.feed}</div></div><div class="rounded-xl bg-blue-50 p-3"><div class="text-[9px] font-bold uppercase text-blue-500">USDC</div><div class="mt-1 text-sm font-bold">${a.usdc}</div></div></div>`:'<div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center"><div class="font-semibold text-gray-700">No wallet connected</div><button data-feed-wallet-open type="button" class="mt-4 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white">Connect Wallet</button></div>'}</div></div>`;s.querySelector('#feedWalletDisconnect')?.addEventListener('click',async()=>{try{await window.__feedWalletRuntime?.providerEntry?.provider?.disconnect?.()}catch{}window.__feedWalletRuntime={};localStorage.removeItem('feed:last-wallet');set('overviewWalletAddress','No wallet');set('profileWalletAddress','Not connected');set('overviewAvailableFeed','0.00');set('overviewUsdcBalance','0.00');const t=document.getElementById('overviewTotalFeed');if(t)t.innerHTML='0.00 <span class="text-3xl text-emerald-200/80">$FEED</span>';document.getElementById('feedWalletOverview')?.remove();renderSettings(null);});}
+ function renderOverview(a){const ov=document.getElementById('dashboardOverview');if(!ov)return;const left=ov.querySelector('.xl\\:col-span-8');if(!left)return;let c=document.getElementById('feedWalletOverview');if(!c){c=document.createElement('div');c.id='feedWalletOverview';c.className='dashboard-glass rounded-[2.5rem] p-8';const balance=left.firstElementChild;if(balance)balance.insertAdjacentElement('afterend',c);else left.prepend(c);}c.innerHTML=`<div class="mb-6 flex items-start justify-between gap-4"><div><div class="text-xs font-bold uppercase tracking-[.18em] text-[#6036E1]">Connected Wallet</div><h2 class="mt-2 font-display text-2xl font-black">${a.provider||'Solana Wallet'}</h2><p class="mt-1 break-all text-xs text-gray-500">${a.address}</p></div><span class="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700">DEVNET</span></div><div class="grid gap-3 sm:grid-cols-3"><div class="rounded-2xl bg-gray-50 p-4 text-center"><div class="text-[9px] font-bold uppercase text-gray-400">SOL</div><div class="mt-2 font-display text-xl font-bold">${a.sol}</div></div><div class="rounded-2xl bg-violet-50 p-4 text-center"><div class="text-[9px] font-bold uppercase text-violet-500">$FEED</div><div class="mt-2 font-display text-xl font-bold">${a.feed}</div></div><div class="rounded-2xl bg-blue-50 p-4 text-center"><div class="text-[9px] font-bold uppercase text-blue-500">USDC</div><div class="mt-2 font-display text-xl font-bold">${a.usdc}</div></div></div>`;}
+ function render(a){window.__feedWalletRuntime.account=a;localStorage.setItem('feed:last-wallet',JSON.stringify(a));set('overviewWalletAddress',addr(a.address));set('profileWalletAddress',a.address||'Not connected');const pb=document.getElementById('profileWalletConnectBtn');if(pb)pb.innerHTML='<i class="ph-bold ph-arrows-clockwise"></i><span>Refresh Wallet</span>';const ob=document.getElementById('overviewWalletConnectBtn');if(ob)ob.innerHTML='<i class="ph-bold ph-wallet"></i><span>Refresh Wallet</span>';set('overviewAvailableFeed',a.feed||'0.00');set('overviewUsdcBalance',a.usdc||'0.00');const t=document.getElementById('overviewTotalFeed');if(t)t.innerHTML=`${a.feed||'0.00'} <span class="text-3xl text-emerald-200/80">$FEED</span>`;renderOverview(a);renderSettings(a);}
+ document.addEventListener('feed:wallet-connected',e=>{if(e.detail)render(e.detail);});
+ function ensure(){const nav=document.querySelector('.dashboard-sidebar nav');if(!nav||nav.querySelector('[data-feed-settings-tab]'))return;const b=document.createElement('button');b.type='button';b.dataset.feedSettingsTab='true';b.className='dashboard-tab dashboard-nav-item flex w-full items-center rounded-2xl py-4 text-left text-gray-500 hover:bg-gray-50';b.innerHTML='<i class="ph-bold ph-gear min-w-[24px] text-2xl"></i><span class="dashboard-label ml-5 whitespace-nowrap font-semibold opacity-0 transition-opacity group-hover:opacity-100">Settings</span>';b.onclick=()=>{['dashboardOverview','dashboardProfile','dashboardPlaceholder'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));document.getElementById('feedWalletSettings')?.classList.remove('hidden');document.getElementById('dashboardHeading').textContent='Settings';document.getElementById('dashboardSubheading').textContent='Manage wallet connections and account controls.';renderSettings(window.__feedWalletRuntime.account||null);};nav.appendChild(b);}
+ ensure();window.addEventListener('load',ensure);document.addEventListener('DOMContentLoaded',ensure);
+ try{const s=localStorage.getItem('feed:last-wallet');if(s)render(JSON.parse(s));}catch{}
+})();
+</script>
 
     <!-- Routing / Hash handling (unchanged) -->
     <script>
