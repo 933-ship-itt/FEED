@@ -1497,7 +1497,19 @@
             <div id="dashboardProfile" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-8 md:p-10"><div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center"><img id="profileAvatar" class="h-24 w-24 rounded-3xl object-cover shadow-lg" alt="Google profile" hidden><div id="profileAvatarFallback" class="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-[#6036E1] to-[#D83DC2] text-3xl font-black text-white">?</div><div><div class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Google profile</div><h2 id="profileName" class="mt-2 font-display text-3xl font-black">Authenticated user</h2><p id="profileEmail" class="mt-1 text-gray-500">null</p></div></div><div class="mt-10 grid gap-4 md:grid-cols-2"><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication provider</div><div class="mt-2 font-semibold">Google</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Wallet address</div><div class="mt-2 font-semibold">null</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">FEED balance</div><div class="mt-2 font-semibold">0.00</div></div><div class="rounded-2xl bg-gray-50 p-5"><div class="text-xs font-bold uppercase tracking-wider text-gray-400">Transactions</div><div class="mt-2 font-semibold">0</div></div></div><div class="mt-6 flex justify-start"><button type="button" id="profileWalletConnectBtn" class="wallet-connect-btn inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold shadow-sm"><i class="ph-bold ph-wallet"></i><span>Connect Wallet</span></button></div></div></div>
             <div id="dashboardPlaceholder" class="mx-auto hidden max-w-[900px]"><div class="dashboard-glass rounded-[2.5rem] p-10 text-center"><i class="ph ph-hourglass text-4xl text-[#6036E1]"></i><h2 class="mt-4 font-display text-2xl font-bold">Coming soon</h2><p class="mt-2 text-gray-500">This authenticated FEED module is being prepared.</p></div></div>
         </main>
-
+        <div id="walletConnectModal" class="wallet-connect-modal-backdrop" hidden aria-hidden="true">
+            <div class="wallet-connect-modal p-8 md:p-10" role="dialog" aria-modal="true" aria-labelledby="walletConnectModalTitle">
+                <div class="flex items-start justify-between gap-6">
+                    <div>
+                        <div class="wallet-connect-icon mb-6 flex items-center justify-center bg-black text-white"><i class="ph-bold ph-wallet"></i></div>
+                        <h2 id="walletConnectModalTitle" class="wallet-connect-title font-display font-black text-gray-900">Wallet Connect</h2>
+                        <p class="wallet-connect-message mt-4 text-gray-500">Wallet connection is currently under development. This feature will be available in a future update.</p>
+                    </div>
+                    <button type="button" id="walletConnectModalClose" class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-gray-100 hover:text-gray-900" aria-label="Close"><i class="ph-bold ph-x text-xl"></i></button>
+                </div>
+                <button type="button" id="walletConnectModalOk" class="wallet-connect-btn wallet-connect-ok mt-8 w-full rounded-2xl px-6 py-4 font-bold">Okay</button>
+            </div>
+        </div>
     </section>
 
     <script type="module">
@@ -1518,14 +1530,14 @@
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-  apiKey: "AIzaSyBfYbcZE-mo8-q3QCx-zEsPFmQv9dhiTFA",
-  authDomain: "feedz-1eccd.firebaseapp.com",
-  projectId: "feedz-1eccd",
-  storageBucket: "feedz-1eccd.firebasestorage.app",
-  messagingSenderId: "1050913203503",
-  appId: "1:1050913203503:web:057b7d3691e150925b2dda",
-  measurementId: "G-CB76WQ2KPL"
-};
+            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+            authDomain: "feed-65b35.firebaseapp.com",
+            projectId: "feed-65b35",
+            storageBucket: "feed-65b35.firebasestorage.app",
+            messagingSenderId: "1085499159984",
+            appId: "1:1085499159984:web:317e0443941085964a5275",
+            measurementId: "G-FVPRRX9X1M"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -1677,33 +1689,25 @@
         };
 
         document.getElementById('dashboardProfileButton')?.addEventListener('click', () => activateDashboardTab('profile'));
-        // Wait for wallet module to be ready before binding buttons
-        function bindWalletButtons() {
-            const btnOverview = document.getElementById('overviewWalletConnectBtn');
-            const btnProfile = document.getElementById('profileWalletConnectBtn');
-            
-            if (btnOverview && window.FEEDWalletReady) {
-                btnOverview.addEventListener('click', () => {
-                    if (window.FEEDWallet?.open) {
-                        window.FEEDWallet.open();
-                    }
-                });
-            }
-            if (btnProfile && window.FEEDWalletReady) {
-                btnProfile.addEventListener('click', () => {
-                    if (window.FEEDWallet?.open) {
-                        window.FEEDWallet.open();
-                    }
-                });
-            }
-        }
-        
-        // Bind buttons when DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', bindWalletButtons);
-        } else {
-            bindWalletButtons();
-        }
+        const walletConnectModal = document.getElementById('walletConnectModal');
+        const walletConnectClose = () => {
+            walletConnectModal.hidden = true;
+            walletConnectModal.setAttribute('aria-hidden', 'true');
+        };
+        const walletConnectOpen = () => {
+            walletConnectModal.hidden = false;
+            walletConnectModal.setAttribute('aria-hidden', 'false');
+        };
+        document.getElementById('overviewWalletConnectBtn')?.addEventListener('click', walletConnectOpen);
+        document.getElementById('profileWalletConnectBtn')?.addEventListener('click', walletConnectOpen);
+        document.getElementById('walletConnectModalClose')?.addEventListener('click', walletConnectClose);
+        document.getElementById('walletConnectModalOk')?.addEventListener('click', walletConnectClose);
+        walletConnectModal?.addEventListener('click', (event) => {
+            if (event.target === walletConnectModal) walletConnectClose();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && walletConnectModal && !walletConnectModal.hidden) walletConnectClose();
+        });
 
 
         function activateDashboardTab(tab) {
@@ -1864,7 +1868,7 @@
     <script type="module">
         import { getApps } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, arrayRemove, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         (() => {
             const firebaseApp = getApps()[0];
@@ -2048,9 +2052,7 @@
 
             async function persist() {
                 if (!currentUid) return;
-                // Store only addresses in connected_wallets array
-                const addresses = linkedWallets.map(w => typeof w === 'string' ? w : w.address);
-                await setDoc(doc(db, 'users', currentUid), { connected_wallets: addresses }, { merge: true });
+                await setDoc(doc(db, 'users', currentUid), { wallets: linkedWallets }, { merge: true });
             }
 
             function renderCandidates() {
@@ -2162,59 +2164,31 @@
 
             saveButton?.addEventListener('click', async () => {
                 if (!currentUid || !selected.size) return;
-                
-                // Authentication check
-                if (!auth.currentUser) {
-                    showMessage('Please sign in with Google before connecting a wallet.', 'error');
-                    return;
-                }
-
                 try {
                     saveButton.disabled = true;
+                    showMessage('Reading Base Sepolia balances…');
                     const chosen = candidates.filter(c => selected.has(c.address.toLowerCase()));
-                    const chosenAddresses = chosen.map(c => c.address.toLowerCase());
+                    const balances = await readBalances(chosen.map(c => c.address));
 
-                    showMessage('Verifying and saving wallets…');
-
-                    // Atomic transaction to ensure 3-wallet limit and no duplicates
-                    await runTransaction(db, async (transaction) => {
-                        const userRef = doc(db, 'users', currentUid);
-                        const userSnap = await transaction.get(userRef);
-                        const userData = userSnap.exists() ? userSnap.data() : {};
-                        
-                        // Get current addresses
-                        let existingAddresses = Array.isArray(userData.connected_wallets) ? userData.connected_wallets : [];
-                        existingAddresses = existingAddresses.map(a => a.toLowerCase());
-
-                        // Check 3-wallet limit
-                        if (existingAddresses.length >= MAX_SAVED) {
-                            throw new Error('You have reached the maximum of 3 connected wallets.');
-                        }
-
-                        // Find duplicates
-                        const duplicates = chosenAddresses.filter(addr => 
-                            existingAddresses.some(existing => existing === addr)
-                        );
-                        if (duplicates.length) {
-                            throw new Error(`This wallet is already connected to your FEED account: ${duplicates[0]}`);
-                        }
-
-                        // Check total won't exceed 3
-                        if (existingAddresses.length + chosenAddresses.length > MAX_SAVED) {
-                            throw new Error(`Adding ${chosenAddresses.length} wallet(s) would exceed the maximum of 3. Please remove some wallets first.`);
-                        }
-
-                        // Add new addresses to existing array
-                        const newAddresses = [...existingAddresses, ...chosenAddresses];
-                        transaction.set(userRef, { connected_wallets: newAddresses }, { merge: true });
+                    chosen.forEach((candidate, index) => {
+                        linkedWallets.push({
+                            address: candidate.address,
+                            provider: candidate.providerName,
+                            chainId: CHAIN_ID,
+                            connectedAt: Date.now(),
+                            lastUsed: Date.now(),
+                            ...balances[index]
+                        });
                     });
 
-                    showMessage('Wallets saved successfully!', 'success');
+                    linkedWallets = linkedWallets.slice(0, MAX_SAVED);
+                    await persist();
+                    await refreshBalances(true);
                     hideModal();
                     renderAllWalletUI();
                 } catch (error) {
                     console.error(error);
-                    showMessage(error?.message || 'We couldn\'t save this wallet. Please try again.', 'error');
+                    showMessage(error?.message || 'Could not save the selected wallets.', 'error');
                     saveButton.disabled = selected.size === 0;
                 }
             });
@@ -2236,29 +2210,9 @@
             }
 
             async function removeWallet(address) {
-                if (!auth.currentUser) return;
-                
-                try {
-                    const normalizedAddress = address.toLowerCase();
-                    
-                    // Use atomic arrayRemove to safely remove the address
-                    await setDoc(
-                        doc(db, 'users', auth.currentUser.uid),
-                        { connected_wallets: arrayRemove(normalizedAddress) },
-                        { merge: true }
-                    );
-
-                    // If this was the active WalletConnect provider, disconnect it
-                    if (walletConnectProvider?.disconnect) {
-                        try {
-                            await walletConnectProvider.disconnect();
-                        } catch (e) {
-                            console.warn('WalletConnect disconnect failed:', e);
-                        }
-                    }
-                } catch (error) {
-                    console.error('Failed to remove wallet:', error);
-                }
+                linkedWallets = linkedWallets.filter(w => w.address.toLowerCase() !== address.toLowerCase());
+                await persist();
+                renderAllWalletUI();
             }
 
             async function replaceWallet(address) {
@@ -2472,78 +2426,23 @@
                 quickText.textContent = linkedWallets.length ? `${linkedWallets.length}/3 wallets` : 'Connect wallet';
             }
 
-            let walletUnsubscribe = null;
-
             async function loadUserWallets(user) {
                 currentUid = user?.uid || null;
                 linkedWallets = [];
-                
-                // Unsubscribe from previous listener if any
-                if (walletUnsubscribe) {
-                    walletUnsubscribe();
-                    walletUnsubscribe = null;
-                }
-
                 if (!currentUid) return;
 
                 try {
-                    // Set up real-time listener
-                    walletUnsubscribe = onSnapshot(
-                        doc(db, 'users', currentUid),
-                        async (snap) => {
-                            if (!snap.exists()) {
-                                linkedWallets = [];
-                                renderAllWalletUI();
-                                return;
-                            }
+                    const snap = await getDoc(doc(db, 'users', currentUid));
+                    const saved = snap.exists() && Array.isArray(snap.data()?.wallets) ? snap.data().wallets : [];
+                    linkedWallets = saved.slice(0, MAX_SAVED);
+                    await refreshBalances(true);
+                    renderAllWalletUI();
 
-                            const data = snap.data();
-                            
-                            // Read from canonical connected_wallets field
-                            let addresses = Array.isArray(data.connected_wallets) ? data.connected_wallets : [];
-                            
-                            // Handle migration from old wallets field
-                            if (!addresses.length && Array.isArray(data.wallets)) {
-                                const legacyWallets = data.wallets;
-                                addresses = legacyWallets
-                                    .slice(0, MAX_SAVED)
-                                    .map(w => typeof w === 'string' ? w : w.address)
-                                    .filter(addr => addr);
-                                
-                                // Migrate to new field (only once)
-                                if (addresses.length) {
-                                    await setDoc(doc(db, 'users', currentUid), { connected_wallets: addresses }, { merge: true });
-                                }
-                            }
-
-                            // Transform addresses to wallet objects and refresh balances
-                            if (addresses.length) {
-                                const balances = await readBalances(addresses);
-                                linkedWallets = addresses.slice(0, MAX_SAVED).map((address, index) => ({
-                                    address,
-                                    provider: 'Wallet',
-                                    chainId: CHAIN_ID,
-                                    ...(balances[index] || { eth: '0', feed: '0', usdc: '0', updatedAt: Date.now() })
-                                }));
-                            } else {
-                                linkedWallets = [];
-                            }
-
-                            renderAllWalletUI();
-                        },
-                        (error) => {
-                            console.warn('Wallet real-time listener failed:', error);
-                            linkedWallets = [];
-                            renderAllWalletUI();
-                        }
-                    );
-
-                    // Trigger initial prompt if no wallets
-                    window.setTimeout(() => {
-                        if (document.body.classList.contains('dashboard-active') && !linkedWallets.length) {
-                            showModal();
-                        }
-                    }, 800);
+                    if (!linkedWallets.length) {
+                        window.setTimeout(() => {
+                            if (document.body.classList.contains('dashboard-active')) showModal();
+                        }, 800);
+                    }
                 } catch (error) {
                     console.warn('Wallet state load failed:', error);
                     renderAllWalletUI();
@@ -2565,26 +2464,6 @@
                     if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; }
                 }
             });
-
-            // Canonical wallet API
-            window.FEEDWallet = {
-                open: () => {
-                    if (!auth.currentUser) {
-                        showMessage('Please sign in with Google before connecting a wallet.', 'error');
-                        showModal();
-                        return;
-                    }
-                    showModal();
-                },
-                close: hideModal,
-                connectBrowser: () => document.getElementById('feedWalletInjected')?.click(),
-                connectWalletConnect: () => document.getElementById('feedWalletQR')?.click(),
-                disconnect: removeWallet,
-                refresh: refreshBalances
-            };
-
-            // Signal that the wallet system is ready
-            window.FEEDWalletReady = true;
         })();
     </script>
 
