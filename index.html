@@ -323,7 +323,7 @@
         }
         #login-view[hidden] { display: none !important; }
         body.login-active > :not(#login-view) { display: none !important; }
-        body.dashboard-active > :not(#dashboard-view) { display: none !important; }
+        body.dashboard-active > :not(#dashboard-view):not(#feedWalletModal):not(#feedWalletQuick):not(#feedWalletSettings) { display: none !important; }
         #dashboard-view[hidden] { display: none !important; }
         .dashboard-shell { background-color:#f8f8fc; background-image:radial-gradient(circle at 100% 0%,rgba(216,61,194,.04),transparent 30%),radial-gradient(circle at 0% 100%,rgba(96,54,225,.04),transparent 30%); overflow-x:hidden; }
         .dashboard-sidebar { overflow:hidden; }
@@ -1518,14 +1518,14 @@
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
-  apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
-  authDomain: "feed-65b35.firebaseapp.com",
-  projectId: "feed-65b35",
-  storageBucket: "feed-65b35.firebasestorage.app",
-  messagingSenderId: "1085499159984",
-  appId: "1:1085499159984:web:317e0443941085964a5275",
-  measurementId: "G-FVPRRX9X1M"
-};
+            apiKey: "AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU",
+            authDomain: "feed-65b35.firebaseapp.com",
+            projectId: "feed-65b35",
+            storageBucket: "feed-65b35.firebasestorage.app",
+            messagingSenderId: "1085499159984",
+            appId: "1:1085499159984:web:317e0443941085964a5275",
+            measurementId: "G-FVPRRX9X1M"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -1637,12 +1637,12 @@
                 await Promise.race([
                     setDoc(userRef, userPayload, { merge: true }),
                     new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('Firestore write timed out')), 3000)
+                        setTimeout(() => reject(new Error('Firestore unavailable')), 2500)
                     )
                 ]);
-                console.log('Firestore write successful');
             } catch (dbError) {
-                console.warn('Firestore write skipped/timed out:', dbError);
+                // A missing Firestore database should not block the authenticated dashboard.
+                console.info('[FEED] Firestore unavailable; continuing without profile write.');
             }
 
             showDashboard(user);
@@ -1756,6 +1756,10 @@
             box-shadow: 0 35px 120px rgba(0,0,0,.28);
         }
         #feedWalletModal .feed-wallet-scroll { overflow-y: auto; max-height: calc(100vh - 32px); }
+        body.dashboard-active > #feedWalletModal.open { display: flex !important; }
+        body.dashboard-active > #feedWalletQuick { display: inline-flex !important; }
+        body.dashboard-active > #feedWalletSettings:not(.hidden) { display: block !important; }
+
         @media (max-width: 767px) {
             #feedWalletModal { padding: 12px; }
             #feedWalletModal .feed-wallet-dialog { width: 100%; max-height: calc(100vh - 24px); border-radius: 24px; }
@@ -1775,7 +1779,7 @@
         @media (max-width: 767px) { #feedWalletQuick { right:16px; bottom:16px; } }
     </style>
 
-    <div id="feedWalletModal" aria-hidden="true">
+    <div id="feedWalletModal" aria-hidden="true" role="dialog">
         <div class="feed-wallet-dialog">
             <div class="feed-wallet-scroll">
                 <div class="flex items-start justify-between gap-6 border-b border-gray-100 p-6 md:p-8">
@@ -1855,7 +1859,10 @@
             }
 
             const auth = getAuth(firebaseApp);
-            const db = getFirestore(firebaseApp);
+            let db = null;
+            let firestoreAvailable = true;
+            try { db = getFirestore(firebaseApp); } catch (error) { firestoreAvailable = false; }
+            const walletLocalKey = uid => `feed-wallets:${uid}`;
 
             const RPC_URL = 'https://api.devnet.solana.com';
             const DEVNET_GENESIS_HASH = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
@@ -2076,23 +2083,42 @@
 
             async function persist() {
                 if (!currentUid) return;
-                await setDoc(doc(db,'users',currentUid), { wallets:linkedWallets }, { merge:true });
+                localStorage.setItem(walletLocalKey(currentUid), JSON.stringify(linkedWallets));
+                if (!firestoreAvailable || !db) return;
+                try {
+                    await Promise.race([
+                        setDoc(doc(db,'users',currentUid), { wallets:linkedWallets }, { merge:true }),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore unavailable')), 2500))
+                    ]);
+                } catch (error) {
+                    firestoreAvailable = false;
+                    console.info('[FEED] Firestore unavailable; wallet state is being kept locally until Firestore is enabled.');
+                }
             }
 
             async function loadUserWallets(user) {
                 currentUid = user?.uid || null;
                 linkedWallets = [];
                 if (!currentUid) return;
-                try {
-                    const snapshot = await getDoc(doc(db,'users',currentUid));
-                    const saved = snapshot.exists() && Array.isArray(snapshot.data()?.wallets) ? snapshot.data().wallets : [];
-                    linkedWallets = saved.filter(w => w?.address).slice(0,MAX_SAVED);
-                    await refreshBalances(true);
-                    renderAllWalletUI();
-                } catch (error) {
-                    console.warn('[FEED] Wallet state load failed:', error);
-                    renderAllWalletUI();
+                const localSaved = (() => {
+                    try { return JSON.parse(localStorage.getItem(walletLocalKey(currentUid)) || '[]'); } catch (_) { return []; }
+                })();
+                if (Array.isArray(localSaved)) linkedWallets = localSaved.filter(w => w?.address).slice(0,MAX_SAVED);
+                if (firestoreAvailable && db) {
+                    try {
+                        const snapshot = await getDoc(doc(db,'users',currentUid));
+                        const saved = snapshot.exists() && Array.isArray(snapshot.data()?.wallets) ? snapshot.data().wallets : null;
+                        if (Array.isArray(saved)) {
+                            linkedWallets = saved.filter(w => w?.address).slice(0,MAX_SAVED);
+                            localStorage.setItem(walletLocalKey(currentUid), JSON.stringify(linkedWallets));
+                        }
+                    } catch (error) {
+                        firestoreAvailable = false;
+                        console.info('[FEED] Firestore is not provisioned; using local wallet state.');
+                    }
                 }
+                await refreshBalances(true);
+                renderAllWalletUI();
             }
 
             async function refreshBalances(quiet=false) {
@@ -2314,6 +2340,12 @@
             discoverButton?.addEventListener('click', showPicker);
             $('overviewWalletConnectBtn')?.addEventListener('click', openModal);
             $('profileWalletConnectBtn')?.addEventListener('click', openModal);
+            document.addEventListener('click', event => {
+                const button = event.target.closest?.('#overviewWalletConnectBtn, #profileWalletConnectBtn, #feedWalletQuick');
+                if (!button) return;
+                event.preventDefault();
+                openModal();
+            });
             quickText && $('feedWalletQuick')?.addEventListener('click', openModal);
 
             async function handleDashboardTab(event) {
