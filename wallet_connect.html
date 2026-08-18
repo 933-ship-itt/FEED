@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FEED | Solana Wallet Connection</title>
-    <link rel="icon" type="image/png" href="https://i.postimg.cc/W18WjK3V/image-(1).png" />
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <script src="https://unpkg.com/@phosphor-icons/web">
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEED | Wallet Connection Setup</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/W18WjK3V/image-(1).png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -24,8 +22,8 @@
         body {
             font-family: 'Inter', sans-serif;
             background:
-                radial-gradient(circle at 80% 5%, rgba(216, 61, 194, 0.09), transparent 26%),
-                radial-gradient(circle at 10% 12%, rgba(96, 54, 225, 0.09), transparent 24%),
+                radial-gradient(circle at 80% 5%, rgba(216,61,194,0.09), transparent 26%),
+                radial-gradient(circle at 10% 12%, rgba(96,54,225,0.09), transparent 24%),
                 #f8f8fc;
             color: var(--ink);
             min-height: 100vh;
@@ -53,7 +51,7 @@
         .bg-gradient-custom:hover:not(:disabled) {
             opacity: 0.95;
             transform: translateY(-1px);
-            box-shadow: 0 16px 35px rgba(96, 54, 225, 0.22);
+            box-shadow: 0 16px 35px rgba(96,54,225,0.22);
         }
 
         button:disabled {
@@ -66,7 +64,7 @@
 
         .premium-card {
             border: 1px solid var(--line);
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255,255,255,0.88);
             backdrop-filter: blur(18px);
             box-shadow: 0 18px 60px rgba(23, 18, 43, 0.06);
         }
@@ -77,21 +75,21 @@
         }
 
         .wallet-card:hover {
-            border-color: rgba(96, 54, 225, 0.45);
-            box-shadow: 0 8px 24px rgba(96, 54, 225, 0.08);
+            border-color: rgba(96,54,225,0.45);
+            box-shadow: 0 8px 24px rgba(96,54,225,0.08);
         }
 
         .wallet-card.selected {
             border-color: var(--violet);
-            background: rgba(96, 54, 225, 0.04);
-            box-shadow: 0 8px 24px rgba(96, 54, 225, 0.1);
+            background: rgba(96,54,225,0.04);
+            box-shadow: 0 8px 24px rgba(96,54,225,0.1);
         }
 
         .spinner {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            border: 3px solid rgba(96, 54, 225, 0.1);
+            border: 3px solid rgba(96,54,225,0.1);
             border-top-color: var(--violet);
             border-right-color: var(--magenta);
             animation: spin 1s linear infinite;
@@ -161,7 +159,7 @@
         .wallet-choice:hover:not(:disabled) {
             transform: translateY(-2px);
             border-color: var(--violet);
-            box-shadow: 0 10px 28px rgba(96, 54, 225, .12);
+            box-shadow: 0 10px 28px rgba(96,54,225,.12);
         }
 
         .wallet-choice:disabled {
@@ -178,8 +176,8 @@
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, #34d399, #10b981);
-            box-shadow: 0 14px 35px rgba(16, 185, 129, .25);
-            animation: successPop .55s cubic-bezier(.2, .8, .2, 1) both;
+            box-shadow: 0 14px 35px rgba(16,185,129,.25);
+            animation: successPop .55s cubic-bezier(.2,.8,.2,1) both;
         }
 
         .success-ring i {
@@ -214,580 +212,706 @@
         .zero-balance {
             color: #6b7280;
         }
-
-        .token-badge {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            padding: 2px 10px;
-            border-radius: 999px;
-            background: #f3f4f6;
-            color: #4b5563;
-        }
-
-        .token-badge.sol {
-            background: #e5f0ff;
-            color: #2563eb;
-        }
-        .token-badge.feed {
-            background: #f0e7ff;
-            color: #6036E1;
-        }
-        .token-badge.usdc {
-            background: #e0f7f0;
-            color: #0b8a6b;
-        }
     </style>
 </head>
 
 <body class="p-6">
 
-    <div class="w-full max-w-xl mx-auto premium-card rounded-3xl p-8 md:p-10 relative overflow-hidden">
+<div class="w-full max-w-xl mx-auto premium-card rounded-3xl p-8 md:p-10 relative overflow-hidden">
 
-        <i class="ph-fill ph-cube absolute -top-10 -right-10 text-[180px] text-[#6036E1] opacity-5 pointer-events-none"></i>
+    <i class="ph-fill ph-cube absolute -top-10 -right-10 text-[180px] text-[#6036E1] opacity-5 pointer-events-none"></i>
 
-        <div class="text-center mb-8">
-            <img class="h-12 w-12 mx-auto rounded-xl object-contain mb-4 shadow-sm"
+    <div class="text-center mb-8">
+        <img
+            class="h-12 w-12 mx-auto rounded-xl object-contain mb-4 shadow-sm"
             src="https://i.postimg.cc/W18WjK3V/image-(1).png"
-            alt="FEED" />
-            <h1 class="font-display text-2xl font-black tracking-tight">
-                F<span class="text-gradient">EE</span>D · Solana
-            </h1>
+            alt="FEED"
+        >
+        <h1 class="font-display text-2xl font-black tracking-tight">
+            F<span class="text-gradient">EE</span>D Access
+        </h1>
+    </div>
+
+    <!-- STATE 1: Terms -->
+    <div id="view-tos" class="view-section active fade-in">
+
+        <h2 class="text-lg font-bold mb-3">
+            Asset Protocol Agreement
+        </h2>
+
+        <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm text-gray-500 h-40 overflow-y-auto mb-6 leading-relaxed">
+            By connecting your wallet, you are accessing the decentralized FEED protocol.
+            You agree that:
+
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+                <li>Asset custody remains entirely on your device.</li>
+                <li>You are interacting with automated programs on Solana Devnet.</li>
+                <li>The protocol does not hold or manage your keys.</li>
+                <li>You accept full responsibility for verifying network data and transactions.</li>
+            </ul>
         </div>
 
-        <!-- STATE 1: Terms -->
-        <div id="view-tos" class="view-section active fade-in">
-            <h2 class="text-lg font-bold mb-3">Asset Protocol Agreement</h2>
-            <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-sm text-gray-500 h-40 overflow-y-auto mb-6 leading-relaxed">
-                By connecting your wallet, you are accessing the decentralized FEED protocol on Solana devnet.
-                You agree that:
-                <ul class="list-disc pl-5 mt-2 space-y-1">
-                    <li>Asset custody remains entirely on your device.</li>
-                    <li>You are interacting with automated smart contracts on Solana devnet.</li>
-                    <li>The protocol does not hold or manage your keys.</li>
-                    <li>You accept full responsibility for verifying network data and transactions.</li>
-                </ul>
-            </div>
-            <label id="tos-label" class="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition mb-6">
-                <input type="checkbox" id="tos-checkbox" class="custom-checkbox shrink-0" />
-                <span class="text-sm font-medium text-gray-700 select-none">
-                    I agree to the Terms of Service
-                </span>
-            </label>
-            <button type="button" id="btn-proceed" disabled class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center">
-                Proceed to Connect
-            </button>
-        </div>
+        <label
+            id="tos-label"
+            class="flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition mb-6"
+        >
+            <input
+                type="checkbox"
+                id="tos-checkbox"
+                class="custom-checkbox shrink-0"
+            >
 
-        <!-- STATE 2: Wallet Choice -->
-        <div id="view-wallet-choice" class="view-section fade-in">
-            <div class="text-center mb-7">
-                <h2 class="text-xl font-bold font-display">Connect a Solana Wallet</h2>
-                <p class="text-sm text-gray-500 mt-1">
-                    FEED will detect compatible Solana wallet applications on this device.
-                </p>
-            </div>
+            <span class="text-sm font-medium text-gray-700 select-none">
+                I agree to the Terms of Service
+            </span>
+        </label>
 
-            <button id="btn-discover-wallets" type="button" class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg">
-                Connect Wallet
-            </button>
+        <button
+            type="button"
+            id="btn-proceed"
+            disabled
+            class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center"
+        >
+            Proceed to Connect
+        </button>
+    </div>
 
-            <button id="btn-back-wallet-choice" type="button" class="w-full mt-5 text-sm font-semibold text-gray-500 hover:text-gray-900">
-                Back
-            </button>
 
-            <div id="wallet-discovery-status" class="text-xs text-gray-400 text-center mt-4"></div>
-        </div>
+    <!-- STATE 2: Wallet Choice -->
+    <div id="view-wallet-choice" class="view-section fade-in">
 
-        <!-- STATE 3: Loading -->
-        <div id="view-loading" class="view-section fade-in text-center py-10">
-            <div class="spinner mx-auto mb-6"></div>
-            <h2 class="text-lg font-bold">Scanning Solana Devnet</h2>
-            <p id="loading-message" class="text-sm text-gray-500 mt-2">
-                Querying SOL, $FEED, and USDC balances...
+        <div class="text-center mb-7">
+
+            <h2 class="text-xl font-bold font-display">
+                Connect a Wallet
+            </h2>
+
+            <p class="text-sm text-gray-500 mt-1">
+                FEED will detect compatible Solana wallets on this device
+                and let you choose one.
             </p>
+
         </div>
 
-        <!-- STATE 4: Wallet Results -->
-        <div id="view-wallets" class="view-section fade-in">
-            <div class="text-center mb-6">
-                <h2 class="text-xl font-bold font-display">Solana Account</h2>
-                <p class="text-sm text-gray-500 mt-1">
-                    SOL, $FEED, and USDC balances on devnet.
-                </p>
-            </div>
+        <button
+            id="btn-discover-wallets"
+            type="button"
+            class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg"
+        >
+            Connect Wallet
+        </button>
 
-            <div id="wallet-summary" class="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-5"></div>
+        <button
+            id="btn-back-wallet-choice"
+            type="button"
+            class="w-full mt-5 text-sm font-semibold text-gray-500 hover:text-gray-900"
+        >
+            Back
+        </button>
 
-            <div id="wallet-list" class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1"></div>
-
-            <button id="btn-done" type="button" class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center">
-                Done
-            </button>
-
-            <button id="btn-scan-again" type="button" class="w-full mt-4 text-sm font-semibold text-gray-500 hover:text-gray-900">
-                Scan Again
-            </button>
-        </div>
-
-        <!-- STATE 5: Complete -->
-        <div id="view-success" class="view-section fade-in text-center py-8">
-            <div class="success-ring">
-                <i class="ph-bold ph-check text-white text-4xl"></i>
-            </div>
-            <h2 class="font-display text-2xl font-black">Scan complete</h2>
-            <p id="success-message" class="text-gray-500 text-sm mt-2 px-4 leading-relaxed">
-                The Solana devnet account was scanned successfully.
-            </p>
-            <button id="btn-return" type="button" class="w-full mt-7 bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg">
-                Return to Accounts
-            </button>
-        </div>
+        <div
+            id="wallet-discovery-status"
+            class="text-xs text-gray-400 text-center mt-4"
+        ></div>
 
     </div>
 
-    <!-- Terms controls -->
-    <script>
-        (() => {
-            const cb = document.getElementById('tos-checkbox');
-            const label = document.getElementById('tos-label');
-            const button = document.getElementById('btn-proceed');
-            if (!cb || !label || !button) return;
-            const sync = () => {
-                button.disabled = !cb.checked;
-                button.setAttribute('aria-disabled', String(!cb.checked));
-            };
-            cb.addEventListener('change', sync);
-            label.addEventListener('click', () => requestAnimationFrame(sync));
-            sync();
-        })();
-    </script>
 
-    <!-- Solana Wallet Scanner -->
-    <script type="importmap">
-        {
-            "imports": {
-                "@solana/web3.js": "https://esm.sh/@solana/web3.js@1.87.6",
-                "@solana/spl-token": "https://esm.sh/@solana/spl-token@0.3.9"
-            }
-        }
-    </script>
+    <!-- STATE 3: Loading -->
+    <div id="view-loading" class="view-section fade-in text-center py-10">
 
-    <script type="module">
-        // ─── Imports ───────────────────────────────────────────────────────────
-        import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
-        import { getAssociatedTokenAddress, getTokenAccountBalance } from '@solana/spl-token';
+        <div class="spinner mx-auto mb-6"></div>
 
-        // ─── Constants ────────────────────────────────────────────────────────
-        const RPC_URL = 'https://api.devnet.solana.com';
-        const FEED_MINT = '4ABhqKCR7PuLzR4wobQnxQMhg2mcPbHcnpkeDjaomgJy';
-        const USDC_MINT = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
-        const DEVNET_GENESIS = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
-        const CAIP2_CHAIN_ID = `solana:${DEVNET_GENESIS}`;
+        <h2 class="text-lg font-bold">
+            Scanning Solana Devnet Account
+        </h2>
 
-        const OP_TIMEOUT = 15000;
+        <p
+            id="loading-message"
+            class="text-sm text-gray-500 mt-2"
+        >
+            Reading account details...
+        </p>
 
-        // ─── DOM refs ─────────────────────────────────────────────────────────
-        const $ = (id) => document.getElementById(id);
+    </div>
 
-        const views = {
-            tos: $('view-tos'),
-            choice: $('view-wallet-choice'),
-            loading: $('view-loading'),
-            wallets: $('view-wallets'),
-            success: $('view-success'),
-        };
 
-        const cb = $('tos-checkbox');
-        const btnProceed = $('btn-proceed');
-        const btnDiscover = $('btn-discover-wallets');
-        const btnBack = $('btn-back-wallet-choice');
-        const discoveryStatus = $('wallet-discovery-status');
-        const loadingMessage = $('loading-message');
-        const walletList = $('wallet-list');
-        const walletSummary = $('wallet-summary');
-        const btnDone = $('btn-done');
-        const btnScanAgain = $('btn-scan-again');
-        const btnReturn = $('btn-return');
-        const successMessage = $('success-message');
+    <!-- STATE 4: Wallet Results -->
+    <div id="view-wallets" class="view-section fade-in">
 
-        let fetchedAccounts = [];
-        let busy = false;
-        let connection = null;
+        <div class="text-center mb-6">
 
-        // ─── Helpers ──────────────────────────────────────────────────────────
-        function esc(value) {
-            return String(value ?? '')
-                .replace(/[&<>"']/g, (ch) => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                })[ch]);
-        }
+            <h2 class="text-xl font-bold font-display">
+                Solana Devnet Account
+            </h2>
 
-        function switchView(view) {
-            Object.values(views).forEach((v) => v.classList.remove('active'));
-            view.classList.add('active');
-        }
+            <p class="text-sm text-gray-500 mt-1">
+                Your connected account balance snapshot is displayed below.
+            </p>
 
-        function toast(title, message, type = 'info', details = '') {
-            let root = $('feed-toast-root');
-            if (!root) {
-                root = document.createElement('div');
-                root.id = 'feed-toast-root';
-                root.className = 'fixed top-4 right-4 z-[10000] w-[min(480px,calc(100vw-2rem))] space-y-3';
-                document.body.appendChild(root);
-            }
-            const border = {
-                info: 'border-blue-200',
-                success: 'border-green-200',
-                warning: 'border-amber-200',
-                error: 'border-red-200'
-            } [type] || 'border-blue-200';
-            const node = document.createElement('div');
-            node.className = `bg-white ${border} border rounded-2xl shadow-xl p-4 fade-in`;
-            node.innerHTML = `
-                <div class="flex items-start gap-3">
-                    <div class="flex-1">
-                        <div class="font-bold text-sm text-gray-900">${esc(title)}</div>
-                        <div class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${esc(message)}</div>
-                        ${details ? `<details class="mt-2"><summary class="text-xs font-semibold text-gray-500 cursor-pointer">Technical details</summary><pre class="text-[10px] text-gray-500 whitespace-pre-wrap break-all mt-2 max-h-48 overflow-auto">${esc(details)}</pre></details>` : ''}
-                    </div>
-                    <button type="button" class="text-gray-400 hover:text-gray-800 text-xl leading-none">&times;</button>
+        </div>
+
+        <div
+            id="wallet-summary"
+            class="bg-gray-50 border border-gray-100 rounded-2xl p-4 mb-5"
+        ></div>
+
+        <div
+            id="wallet-list"
+            class="space-y-3 mb-6 max-h-80 overflow-y-auto pr-1"
+        ></div>
+
+        <button
+            id="btn-done"
+            type="button"
+            class="w-full bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg text-center"
+        >
+            Done
+        </button>
+
+        <button
+            id="btn-scan-again"
+            type="button"
+            class="w-full mt-4 text-sm font-semibold text-gray-500 hover:text-gray-900"
+        >
+            Connect Another
+        </button>
+
+    </div>
+
+
+    <!-- STATE 5: Complete -->
+    <div id="view-success" class="view-section fade-in text-center py-8">
+
+        <div class="success-ring">
+            <i class="ph-bold ph-check text-white text-4xl"></i>
+        </div>
+
+        <h2 class="font-display text-2xl font-black">
+            Scan complete
+        </h2>
+
+        <p
+            id="success-message"
+            class="text-gray-500 text-sm mt-2 px-4 leading-relaxed"
+        >
+            The exposed Solana Devnet account was scanned successfully.
+        </p>
+
+        <button
+            id="btn-return"
+            type="button"
+            class="w-full mt-7 bg-gradient-custom text-white py-3.5 rounded-2xl font-semibold shadow-lg"
+        >
+            Return to Accounts
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- Terms controls -->
+<script>
+(() => {
+
+    const cb = document.getElementById('tos-checkbox');
+    const label = document.getElementById('tos-label');
+    const button = document.getElementById('btn-proceed');
+
+    if (!cb || !label || !button) return;
+
+    const sync = () => {
+        button.disabled = !cb.checked;
+        button.setAttribute(
+            'aria-disabled',
+            String(!cb.checked)
+        );
+    };
+
+    cb.addEventListener('change', sync);
+
+    label.addEventListener(
+        'click',
+        () => requestAnimationFrame(sync)
+    );
+
+    sync();
+
+})();
+</script>
+
+
+<!-- Solana Wallet Scanner -->
+<script type="module">
+
+const RPC_URL = 'https://api.devnet.solana.com';
+const DEVNET_GENESIS_HASH = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1';
+const FEED_MINT = '4ABhqKCR7PuLzR4wobQnxQMhg2mcPbHcnpkeDjaomgJy';
+const USDC_MINT = '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
+
+const OP_TIMEOUT = 15000;
+
+
+/* ---------------------------------------------------------
+   DOM
+--------------------------------------------------------- */
+
+const $ = id => document.getElementById(id);
+
+const views = {
+    tos: $('view-tos'),
+    choice: $('view-wallet-choice'),
+    loading: $('view-loading'),
+    wallets: $('view-wallets'),
+    success: $('view-success')
+};
+
+const cb = $('tos-checkbox');
+const btnProceed = $('btn-proceed');
+const btnDiscover = $('btn-discover-wallets');
+const btnBack = $('btn-back-wallet-choice');
+const discoveryStatus = $('wallet-discovery-status');
+const loadingMessage = $('loading-message');
+const walletList = $('wallet-list');
+const walletSummary = $('wallet-summary');
+const btnDone = $('btn-done');
+const btnScanAgain = $('btn-scan-again');
+const btnReturn = $('btn-return');
+const successMessage = $('success-message');
+
+/* ---------------------------------------------------------
+   State
+--------------------------------------------------------- */
+
+let fetchedAccounts = [];
+let busy = false;
+
+/* ---------------------------------------------------------
+   Helpers
+--------------------------------------------------------- */
+
+function esc(value) {
+    return String(value ?? '')
+        .replace(
+            /[&<>"']/g,
+            character => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            })[character]
+        );
+}
+
+function switchView(view) {
+    Object.values(views)
+        .forEach(v => v.classList.remove('active'));
+    view.classList.add('active');
+}
+
+function toast(title, message, type = 'info', details = '') {
+    let root = $('feed-toast-root');
+    if (!root) {
+        root = document.createElement('div');
+        root.id = 'feed-toast-root';
+        root.className = 'fixed top-4 right-4 z-[10000] w-[min(480px,calc(100vw-2rem))] space-y-3';
+        document.body.appendChild(root);
+    }
+
+    const border = {
+        info: 'border-blue-200',
+        success: 'border-green-200',
+        warning: 'border-amber-200',
+        error: 'border-red-200'
+    }[type] || 'border-blue-200';
+
+    const node = document.createElement('div');
+    node.className = `bg-white ${border} border rounded-2xl shadow-xl p-4 fade-in`;
+    node.innerHTML = `
+        <div class="flex items-start gap-3">
+            <div class="flex-1">
+                <div class="font-bold text-sm text-gray-900">${esc(title)}</div>
+                <div class="text-sm text-gray-600 mt-1 whitespace-pre-wrap">${esc(message)}</div>
+                ${details ? `
+                    <details class="mt-2">
+                        <summary class="text-xs font-semibold text-gray-500 cursor-pointer">Technical details</summary>
+                        <pre class="text-[10px] text-gray-500 whitespace-pre-wrap break-all mt-2 max-h-48 overflow-auto">${esc(details)}</pre>
+                    </details>
+                ` : ''}
+            </div>
+            <button type="button" class="text-gray-400 hover:text-gray-800 text-xl leading-none">&times;</button>
+        </div>
+    `;
+
+    node.querySelector('button').onclick = () => node.remove();
+    root.appendChild(node);
+    if (type !== 'error') {
+        setTimeout(() => node.remove(), 7500);
+    }
+}
+
+function timed(promise, label) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => {
+            setTimeout(() => reject(new Error(`${label} timed out after ${OP_TIMEOUT}ms.`)), OP_TIMEOUT);
+        })
+    ]);
+}
+
+
+/* ---------------------------------------------------------
+   JSON-RPC Methods
+--------------------------------------------------------- */
+
+async function rpcFetch(method, params = []) {
+    const response = await fetch(RPC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method,
+            params
+        })
+    });
+    
+    if (!response.ok) {
+        throw new Error(`RPC HTTP Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.error) {
+        throw new Error(`RPC Error: ${data.error.message}`);
+    }
+    
+    return data.result;
+}
+
+async function verifyDevnet() {
+    const genesis = await rpcFetch('getGenesisHash');
+    if (genesis !== DEVNET_GENESIS_HASH) {
+        throw new Error(`Genesis Hash mismatch! Expected Devnet (${DEVNET_GENESIS_HASH}) but got ${genesis}.`);
+    }
+}
+
+async function getSolBalance(address) {
+    const result = await rpcFetch('getBalance', [address]);
+    return (result.value / 1e9).toFixed(4); // Convert lamports to SOL
+}
+
+async function getTokenBalance(address, mint) {
+    const result = await rpcFetch('getTokenAccountsByOwner', [
+        address,
+        { mint: mint },
+        { encoding: 'jsonParsed' }
+    ]);
+    
+    if (result.value && result.value.length > 0) {
+        // Find the account balance from parsed JSON
+        const amount = result.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+        return amount.toFixed(2);
+    }
+    return '0.00';
+}
+
+
+/* ---------------------------------------------------------
+   Discover Solana Wallets
+--------------------------------------------------------- */
+
+function discoverWallets() {
+    const providers = [];
+
+    if (window.phantom?.solana?.isPhantom) {
+        providers.push({ name: 'Phantom', provider: window.phantom.solana });
+    }
+    if (window.solflare?.isSolflare) {
+        providers.push({ name: 'Solflare', provider: window.solflare });
+    }
+    if (window.backpack?.isBackpack) {
+        providers.push({ name: 'Backpack', provider: window.backpack });
+    }
+    if (window.solana && !window.phantom?.solana?.isPhantom && !window.solflare?.isSolflare) {
+        providers.push({ name: 'Solana Wallet', provider: window.solana });
+    }
+
+    return providers;
+}
+
+async function handleDiscovery() {
+    discoveryStatus.textContent = 'Scanning for Solana wallet applications...';
+
+    // Brief delay to simulate and ensure browser injection completes
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const list = discoverWallets();
+
+    if (!list.length) {
+        discoveryStatus.textContent = 'No compatible Solana wallet detected.';
+        toast(
+            'No wallet detected',
+            'FEED could not find a Solana wallet extension (like Phantom or Solflare). Please install or unlock your wallet and refresh.',
+            'error'
+        );
+        return null;
+    }
+
+    discoveryStatus.textContent = `${list.length} Solana wallet${list.length === 1 ? '' : 's'} detected.`;
+    return list;
+}
+
+
+/* ---------------------------------------------------------
+   Wallet picker
+--------------------------------------------------------- */
+
+async function showPicker() {
+    const list = await handleDiscovery();
+    if (!list) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[10001] bg-black/40 backdrop-blur-sm flex items-center justify-center p-5';
+    overlay.innerHTML = `
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 fade-in">
+            <div class="flex items-start justify-between mb-5">
+                <div>
+                    <h2 class="text-xl font-bold font-display">Choose a Wallet</h2>
+                    <p class="text-sm text-gray-500 mt-1">Select your Solana wallet to connect.</p>
                 </div>
-            `;
-            node.querySelector('button').onclick = () => node.remove();
-            root.appendChild(node);
-            if (type !== 'error') setTimeout(() => node.remove(), 7500);
-        }
+                <button id="close-picker" class="text-gray-400 hover:text-gray-900 text-2xl">&times;</button>
+            </div>
+            <div class="space-y-3">
+                ${list.map((wallet, index) => `
+                    <button type="button" data-i="${index}" class="w-full border border-gray-200 hover:border-[#6036E1] hover:bg-gray-50 rounded-2xl p-4 text-left flex items-center justify-between gap-4 transition">
+                        <div class="font-bold text-gray-900">${esc(wallet.name)}</div>
+                        <span class="text-sm font-semibold text-[#6036E1]">Connect</span>
+                    </button>
+                `).join('')}
+            </div>
+            <p class="text-[11px] text-gray-400 mt-5">FEED only reads the account exposed. No transaction or transfer is requested.</p>
+        </div>
+    `;
 
-        function timed(promise, label) {
-            return Promise.race([
-                promise,
-                new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error(`${label} timed out after ${OP_TIMEOUT}ms.`)), OP_TIMEOUT)
-                ),
-            ]);
-        }
+    document.body.appendChild(overlay);
 
-        // ─── Wallet detection ────────────────────────────────────────────────
-        function detectSolanaWallets() {
-            const found = [];
-            const seen = new Set();
+    const close = () => overlay.remove();
+    overlay.querySelector('#close-picker').onclick = close;
 
-            const add = (provider, name, icon = '') => {
-                if (!provider) return;
-                const key = provider.publicKey?.toBase58?.() || provider.constructor?.name || name;
-                if (seen.has(key)) return;
-                seen.add(key);
-                found.push({ name, provider, icon });
-            };
-
-            // Primary window.solana
-            if (window.solana) {
-                let name = 'Solana Wallet';
-                if (window.solana.isPhantom) name = 'Phantom';
-                else if (window.solana.isSolflare) name = 'Solflare';
-                else if (window.solana.isBackpack) name = 'Backpack';
-                else if (window.solana.isLedger) name = 'Ledger';
-                add(window.solana, name);
-            }
-
-            // Explicit providers
-            if (window.phantom?.solana && window.phantom.solana !== window.solana) {
-                add(window.phantom.solana, 'Phantom');
-            }
-            if (window.solflare?.solana && window.solflare.solana !== window.solana) {
-                add(window.solflare.solana, 'Solflare');
-            }
-            if (window.backpack?.solana && window.backpack.solana !== window.solana) {
-                add(window.backpack.solana, 'Backpack');
-            }
-
-            return found;
-        }
-
-        // ─── Balance queries ──────────────────────────────────────────────────
-        async function queryBalances(publicKey) {
-            if (!connection) {
-                connection = new Connection(RPC_URL, 'confirmed');
-            }
-
-            const pubKey = typeof publicKey === 'string' ? new PublicKey(publicKey) : publicKey;
-            const address = pubKey.toBase58();
-
-            const result = {
-                address,
-                sol: 0,
-                feed: 0,
-                usdc: 0,
-                warnings: [],
-            };
-
-            // SOL balance
-            try {
-                const lamports = await timed(connection.getBalance(pubKey), 'SOL balance');
-                result.sol = lamports / LAMPORTS_PER_SOL;
-            } catch (err) {
-                result.warnings.push(`SOL: ${err.message}`);
-            }
-
-            // Token helper
-            async function getTokenBalance(mintAddress, label) {
-                try {
-                    const mint = new PublicKey(mintAddress);
-                    const ata = await getAssociatedTokenAddress(mint, pubKey);
-                    const balance = await timed(connection.getTokenAccountBalance(ata), `${label} balance`);
-                    return balance.value.uiAmount || 0;
-                } catch (err) {
-                    // If the token account doesn't exist, balance is 0.
-                    if (err.message?.includes('could not find account')) return 0;
-                    result.warnings.push(`${label}: ${err.message}`);
-                    return 0;
-                }
-            }
-
-            // FEED
-            result.feed = await getTokenBalance(FEED_MINT, '$FEED');
-
-            // USDC
-            result.usdc = await getTokenBalance(USDC_MINT, 'USDC');
-
-            return result;
-        }
-
-        // ─── Connect wallet ──────────────────────────────────────────────────
-        async function connectWallet(provider, name) {
-            if (busy) return;
-            busy = true;
-            btnDiscover.disabled = true;
-
-            try {
-                toast('Connecting wallet', `Requesting connection from ${name}. Approve in your wallet.`);
-
-                // Request connection
-                const resp = await timed(provider.connect({ onlyIfTrusted: false }), 'Wallet connection');
-                const publicKey = resp.publicKey;
-
-                if (!publicKey) throw new Error('Wallet did not return a public key.');
-
-                const address = publicKey.toBase58();
-
-                loadingMessage.textContent = `Scanning ${address} for SOL, $FEED, and USDC balances…`;
-                switchView(views.loading);
-
-                // Query balances
-                const data = await queryBalances(publicKey);
-
-                // Build account row
-                fetchedAccounts = [{
-                    address: data.address,
-                    sol: data.sol.toFixed(6),
-                    feed: data.feed.toFixed(2),
-                    usdc: data.usdc.toFixed(2),
-                    provider: name,
-                    warnings: data.warnings,
-                }];
-
-                renderWallets();
-                switchView(views.wallets);
-
-                const warnCount = data.warnings.length;
-                toast(
-                    'Scan complete',
-                    `Account ${data.address.slice(0, 6)}…${data.address.slice(-4)} — SOL: ${data.sol.toFixed(4)}, $FEED: ${data.feed.toFixed(2)}, USDC: ${data.usdc.toFixed(2)}`,
-                    warnCount ? 'warning' : 'success',
-                    data.warnings.join('\n')
-                );
-
-            } catch (error) {
-                console.error('[FEED] Connection error', error);
-                toast(
-                    'Wallet connection failed',
-                    error?.message || 'Unknown error',
-                    'error',
-                    `Provider: ${name}\nError: ${error?.message || 'Unknown'}\nCode: ${error?.code ?? 'None'}\n${error?.stack || ''}`
-                );
-                switchView(views.choice);
-            } finally {
-                busy = false;
-                btnDiscover.disabled = false;
-            }
-        }
-
-        // ─── Render results ──────────────────────────────────────────────────
-        function renderWallets() {
-            walletList.innerHTML = '';
-            if (!fetchedAccounts.length) {
-                walletList.innerHTML = `<p class="text-sm text-gray-500 text-center py-4">No accounts found.</p>`;
-                walletSummary.innerHTML = '';
-                return;
-            }
-
-            const acc = fetchedAccounts[0];
-            const hasWarnings = acc.warnings?.length > 0;
-
-            walletSummary.innerHTML = `
-                <div class="grid grid-cols-4 gap-2">
-                    <div class="text-center"><div class="text-[9px] uppercase font-bold text-gray-400">SOL</div><div class="font-bold text-sm mt-1">${esc(acc.sol)}</div></div>
-                    <div class="text-center"><div class="text-[9px] uppercase font-bold text-[#6036E1]">$FEED</div><div class="font-bold text-sm mt-1 ${Number(acc.feed) === 0 ? 'zero-balance' : ''}">${esc(acc.feed)}</div></div>
-                    <div class="text-center"><div class="text-[9px] uppercase font-bold text-[#0b8a6b]">USDC</div><div class="font-bold text-sm mt-1 ${Number(acc.usdc) === 0 ? 'zero-balance' : ''}">${esc(acc.usdc)}</div></div>
-                    <div class="text-center"><div class="text-[9px] uppercase font-bold text-gray-400">Network</div><div class="font-bold text-[10px] mt-1 text-gray-500">Devnet</div></div>
-                </div>
-            `;
-
-            const card = document.createElement('div');
-            card.className = 'wallet-card bg-white rounded-2xl overflow-hidden p-4';
-
-            const isZeroFeed = Number(acc.feed) === 0;
-            const isZeroUsdc = Number(acc.usdc) === 0;
-
-            card.innerHTML = `
-                <div class="flex items-start justify-between gap-3">
-                    <div class="min-w-0">
-                        <div class="font-bold text-sm text-gray-900 break-all">${esc(acc.address)}</div>
-                        <div class="text-xs text-gray-500 mt-1">${esc(acc.provider)} · Solana Devnet</div>
-                    </div>
-                    <span class="shrink-0 text-[9px] font-bold uppercase tracking-wide bg-gray-100 text-gray-500 px-2 py-1 rounded-full">${CAIP2_CHAIN_ID}</span>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2 mt-3">
-                    <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
-                        <div class="text-[9px] uppercase font-bold text-blue-600">SOL</div>
-                        <div class="font-semibold text-sm mt-1">${esc(acc.sol)}</div>
-                    </div>
-                    <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
-                        <div class="text-[9px] uppercase font-bold text-[#6036E1]">$FEED</div>
-                        <div class="font-bold text-sm mt-1 ${isZeroFeed ? 'zero-balance' : ''}">${esc(acc.feed)}</div>
-                    </div>
-                    <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
-                        <div class="text-[9px] uppercase font-bold text-[#0b8a6b]">USDC</div>
-                        <div class="font-bold text-sm mt-1 ${isZeroUsdc ? 'zero-balance' : ''}">${esc(acc.usdc)}</div>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap gap-1.5 mt-3">
-                    <span class="token-badge sol">SOL</span>
-                    <span class="token-badge feed">$FEED</span>
-                    <span class="token-badge usdc">USDC</span>
-                    <span class="token-badge" style="background:#e5e7eb;color:#374151;">Devnet</span>
-                </div>
-
-                ${hasWarnings ? `<div class="mt-3 bg-amber-50 border border-amber-100 rounded-lg p-2 text-[10px] text-amber-700">${esc(acc.warnings.join(' '))}</div>` : ''}
-            `;
-
-            walletList.appendChild(card);
-        }
-
-        // ─── Show wallet picker ──────────────────────────────────────────────
-        async function showPicker() {
-            const wallets = detectSolanaWallets();
-
-            if (!wallets.length) {
-                discoveryStatus.textContent = 'No Solana wallet detected. Please install Phantom, Solflare, or another Solana wallet.';
-                toast(
-                    'No wallet detected',
-                    'Install Phantom, Solflare, or another Solana wallet extension and refresh.',
-                    'error',
-                    `window.solana: ${!!window.solana}\nNavigator: ${navigator.userAgent}`
-                );
-                return;
-            }
-
-            discoveryStatus.textContent = `${wallets.length} Solana wallet${wallets.length === 1 ? '' : 's'} detected.`;
-
-            // If only one, connect directly
-            if (wallets.length === 1) {
-                await connectWallet(wallets[0].provider, wallets[0].name);
-                return;
-            }
-
-            // Show picker overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'fixed inset-0 z-[10001] bg-black/40 backdrop-blur-sm flex items-center justify-center p-5';
-
-            overlay.innerHTML = `
-                <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 fade-in">
-                    <div class="flex items-start justify-between mb-5">
-                        <div>
-                            <h2 class="text-xl font-bold font-display">Choose a Wallet</h2>
-                            <p class="text-sm text-gray-500 mt-1">Select a Solana wallet to connect.</p>
-                        </div>
-                        <button id="close-picker" class="text-gray-400 hover:text-gray-900 text-2xl">&times;</button>
-                    </div>
-                    <div class="space-y-3">
-                        ${wallets.map((w, i) => `
-                            <button type="button" data-i="${i}" class="w-full border border-gray-200 hover:border-[#6036E1] hover:bg-gray-50 rounded-2xl p-4 text-left flex items-center justify-between gap-4 transition">
-                                <div>
-                                    <div class="font-bold text-gray-900">${esc(w.name)}</div>
-                                    <div class="text-xs text-gray-500 mt-1">Solana wallet provider</div>
-                                </div>
-                                <span class="text-sm font-semibold text-[#6036E1]">Connect</span>
-                            </button>
-                        `).join('')}
-                    </div>
-                    <p class="text-[11px] text-gray-400 mt-5">FEED reads your public address and queries on-chain balances. No transaction is ever submitted.</p>
-                </div>
-            `;
-
-            document.body.appendChild(overlay);
-
-            const close = () => overlay.remove();
-            overlay.querySelector('#close-picker').onclick = close;
-
-            overlay.querySelectorAll('[data-i]').forEach((btn) => {
-                btn.onclick = async () => {
-                    const idx = Number(btn.dataset.i);
-                    const entry = wallets[idx];
-                    close();
-                    await connectWallet(entry.provider, entry.name);
-                };
-            });
-        }
-
-        // ─── Navigation ──────────────────────────────────────────────────────
-        btnProceed.onclick = async (e) => {
-            e.preventDefault();
-            if (!cb.checked || busy) return;
-            switchView(views.choice);
-            await showPicker();
+    overlay.querySelectorAll('[data-i]').forEach(button => {
+        button.onclick = async () => {
+            const entry = list[Number(button.dataset.i)];
+            close();
+            await connect(entry);
         };
+    });
+}
 
-        btnDiscover.onclick = showPicker;
 
-        btnBack.onclick = () => {
-            if (!busy) switchView(views.tos);
-        };
+/* ---------------------------------------------------------
+   Connect wallet
+--------------------------------------------------------- */
 
-        btnDone.onclick = () => {
-            const count = fetchedAccounts.length;
-            successMessage.textContent =
-                `${count} Solana devnet account${count === 1 ? '' : 's'} scanned. SOL, $FEED, and USDC balances displayed. No wallet profile or record was created.`;
-            switchView(views.success);
-        };
+async function connect(entry) {
+    if (busy) return;
+    busy = true;
+    btnDiscover.disabled = true;
 
-        btnScanAgain.onclick = async () => {
-            if (busy) return;
-            switchView(views.choice);
-            await showPicker();
-        };
+    try {
+        toast('Connecting wallet', `Requesting account access from ${entry.name}. Approve the request in the selected wallet application.`);
 
-        btnReturn.onclick = () => {
-            switchView(views.wallets);
-        };
+        await entry.provider.connect();
+        
+        if (!entry.provider.publicKey) {
+            throw new Error("Wallet connected but did not provide a public key.");
+        }
+        
+        const address = entry.provider.publicKey.toString();
 
-        // ─── Init ─────────────────────────────────────────────────────────────
-        // Pre-warm connection
-        connection = new Connection(RPC_URL, 'confirmed');
+        loadingMessage.textContent = `Verifying Devnet and querying balances for ${address.slice(0, 4)}...${address.slice(-4)}`;
+        switchView(views.loading);
 
-        // If a wallet is already connected, we could auto-detect, but we let the user click.
-        console.log('[FEED] Solana scanner ready. Devnet genesis:', DEVNET_GENESIS);
-        console.log('[FEED] FEED mint:', FEED_MINT);
-        console.log('[FEED] USDC mint:', USDC_MINT);
-    </script>
+        await loadWalletData(address, entry.name);
+
+    } catch (error) {
+        console.error('[FEED] Wallet connection failure', error);
+        toast(
+            'Connection failed',
+            error?.message || 'Unknown wallet connection error',
+            'error'
+        );
+        switchView(views.choice);
+    } finally {
+        busy = false;
+        btnDiscover.disabled = false;
+    }
+}
+
+
+/* ---------------------------------------------------------
+   Load account data
+--------------------------------------------------------- */
+
+async function loadWalletData(address, providerName) {
+    fetchedAccounts = [];
+
+    const row = {
+        address,
+        sol: '0.0000',
+        feed: '0.00',
+        usdc: '0.00',
+        provider: providerName,
+        warnings: []
+    };
+
+    try {
+        await timed(verifyDevnet(), 'RPC Genesis Check');
+    } catch(e) {
+        row.warnings.push(`Network: ${e.message}`);
+    }
+
+    try {
+        row.sol = await timed(getSolBalance(address), 'SOL Balance');
+    } catch (error) {
+        row.warnings.push(`SOL: ${error.message}`);
+    }
+
+    try {
+        row.feed = await timed(getTokenBalance(address, FEED_MINT), '$FEED Balance');
+    } catch (error) {
+        row.warnings.push(`$FEED: ${error.message}`);
+    }
+    
+    try {
+        row.usdc = await timed(getTokenBalance(address, USDC_MINT), 'USDC Balance');
+    } catch (error) {
+        row.warnings.push(`USDC: ${error.message}`);
+    }
+
+    fetchedAccounts.push(row);
+    renderWallets();
+    switchView(views.wallets);
+
+    const warnings = row.warnings.length;
+
+    toast(
+        'Account scan complete',
+        `Solana Devnet account loaded successfully.`,
+        warnings ? 'warning' : 'success',
+        warnings ? `${address}: ${row.warnings.join('; ')}` : ''
+    );
+}
+
+
+/* ---------------------------------------------------------
+   Render accounts
+--------------------------------------------------------- */
+
+function renderWallets() {
+    walletList.innerHTML = '';
+    
+    // We only display 1 account connected at a time
+    const account = fetchedAccounts[0];
+
+    walletSummary.innerHTML = `
+        <div class="grid grid-cols-3 gap-3">
+            <div class="text-center">
+                <div class="text-[9px] uppercase font-bold text-gray-400">NETWORK</div>
+                <div class="font-bold text-lg mt-1 text-[#6036E1]">DEVNET</div>
+            </div>
+            <div class="text-center border-x border-gray-100">
+                <div class="text-[9px] uppercase font-bold text-gray-400">WALLET</div>
+                <div class="font-bold text-lg mt-1">${account.provider}</div>
+            </div>
+             <div class="text-center">
+                <div class="text-[9px] uppercase font-bold text-gray-400">$FEED</div>
+                <div class="font-bold text-lg mt-1">${account.feed}</div>
+            </div>
+        </div>
+    `;
+
+    const card = document.createElement('div');
+    card.className = 'wallet-card bg-white rounded-2xl overflow-hidden p-4';
+    
+    const isZeroFeed = Number(account.feed) === 0 && !account.warnings.some(w => w.startsWith('$FEED:'));
+
+    card.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+                <div class="font-bold text-sm text-gray-900 break-all">${esc(account.address)}</div>
+            </div>
+            ${isZeroFeed ? `<span class="shrink-0 text-[9px] font-bold uppercase tracking-wide bg-gray-100 text-gray-500 px-2 py-1 rounded-full">0 FEED</span>` : ''}
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 mt-4">
+            <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
+                <div class="text-[9px] uppercase font-bold text-gray-400">SOL</div>
+                <div class="font-semibold text-xs mt-1">${esc(account.sol)}</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
+                <div class="text-[9px] uppercase font-bold text-[#D83DC2]">$FEED</div>
+                <div class="font-bold text-xs mt-1 ${isZeroFeed ? 'zero-balance' : ''}">${esc(account.feed)}</div>
+            </div>
+            <div class="bg-gray-50 border border-gray-100 p-2 rounded-lg text-center">
+                <div class="text-[9px] uppercase font-bold text-blue-500">USDC</div>
+                <div class="font-bold text-xs mt-1">${esc(account.usdc)}</div>
+            </div>
+        </div>
+
+        ${account.warnings.length ? `<div class="mt-3 bg-amber-50 border border-amber-100 rounded-lg p-2 text-[10px] text-amber-700">${esc(account.warnings.join(' '))}</div>` : ''}
+    `;
+
+    walletList.appendChild(card);
+}
+
+
+/* ---------------------------------------------------------
+   Navigation
+--------------------------------------------------------- */
+
+btnProceed.onclick = async event => {
+    event.preventDefault();
+    if (!cb.checked || busy) return;
+    switchView(views.choice);
+    await showPicker();
+};
+
+btnDiscover.onclick = showPicker;
+
+btnBack.onclick = () => {
+    if (!busy) switchView(views.tos);
+};
+
+/* ---------------------------------------------------------
+   Done
+--------------------------------------------------------- */
+
+btnDone.onclick = () => {
+    successMessage.textContent = `The Solana Devnet account was scanned successfully.`;
+    switchView(views.success);
+};
+
+/* ---------------------------------------------------------
+   Scan again
+--------------------------------------------------------- */
+
+btnScanAgain.onclick = async () => {
+    if (busy) return;
+    switchView(views.choice);
+    await showPicker();
+};
+
+/* ---------------------------------------------------------
+   Return to account results
+--------------------------------------------------------- */
+
+btnReturn.onclick = () => {
+    switchView(views.wallets);
+};
+
+</script>
 
 </body>
 </html>
