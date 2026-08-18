@@ -1,3 +1,8 @@
+nect.html
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1677,13 +1682,14 @@
         };
 
         document.getElementById('dashboardProfileButton')?.addEventListener('click', () => activateDashboardTab('profile'));
-        const walletConnectOpen = () => {
-            if (typeof window.feedOpenWalletModal === 'function') {
-                window.feedOpenWalletModal();
-            } else {
-                console.warn('[FEED] Wallet layer is not ready yet.');
-            }
-        };
+        function walletConnectOpen() {
+            const modal = document.getElementById('feedWalletModal');
+            if (!modal) return;
+            modal.hidden = false;
+            modal.setAttribute('aria-hidden', 'false');
+            document.getElementById('feedWalletConnectStage')?.classList.remove('hidden');
+            document.getElementById('feedWalletCandidatesStage')?.classList.add('hidden');
+        }
         document.getElementById('overviewWalletConnectBtn')?.addEventListener('click', walletConnectOpen);
         document.getElementById('profileWalletConnectBtn')?.addEventListener('click', walletConnectOpen);
 
