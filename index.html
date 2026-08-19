@@ -769,6 +769,14 @@
         .firestore-badge i {
             font-size: 10px;
         }
+        .firestore-badge.online {
+            border-color: rgba(52, 211, 153, 0.4);
+            color: #34d399;
+        }
+        .firestore-badge.offline {
+            border-color: rgba(251, 191, 36, 0.4);
+            color: #fbbf24;
+        }
     </style>
 </head>
 
@@ -1579,7 +1587,7 @@
                     &lt;/linearGradient&gt;
                 &lt;/defs&gt;
                 &lt;text x=&quot;50%&quot; y=&quot;45%&quot; text-anchor=&quot;middle&quot; dominant-baseline=&quot;middle&quot; class=&quot;final-feed-text&quot; id=&quot;feedFinalText&quot; clip-path=&quot;inset(100% 0% 0% 0%)&quot;&gt;
-                    &lt;tspan fill=&quot;#000&quot;&gt;F&lt;/tspan&gt;&lt;tspan fill=&quot;url(#svgGrad)&quot;&gt;EE&lt;/tspan&gt;&lt;tspan fill=&quot;#000&quot;&gt;D&lt;/tspan&gt;
+                    &lt;tspan fill=&quot;#000&quot;&gt;F&lt;/tspan&gt;&lt;tspan fill=&quot;url(#svgGrad)&quot;&gt;EE&lt;/span&gt;&lt;tspan fill=&quot;#000&quot;&gt;D&lt;/tspan&gt;
                 &lt;/text&gt;
                 &lt;text x=&quot;50%&quot; y=&quot;85%&quot; text-anchor=&quot;middle&quot; class=&quot;sub-url-path&quot; id=&quot;urlLayer&quot;&gt;SOCIAL • CHAT • ASSET ACCESS&lt;/text&gt;
             &lt;/svg&gt;
@@ -1754,7 +1762,7 @@
 
             <main class="dashboard-main ml-24 min-h-screen px-8 pb-24 pt-12 md:px-12">
                 <header class="mx-auto mb-10 flex max-w-[1400px] flex-col justify-between gap-6 md:flex-row md:items-end">
-                    <div><div class="mb-3 flex items-center gap-3"><span class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Private workspace</span><span class="firestore-badge"><i class="ph-bold ph-database"></i> Firestore</span></div><h1 id="dashboardHeading" class="font-display text-4xl font-black tracking-tight">Ecosystem Overview</h1><p id="dashboardSubheading" class="mt-2 font-medium text-gray-500">Manage your decentralized assets and liquidity operations.</p></div>
+                    <div><div class="mb-3 flex items-center gap-3"><span class="text-xs font-bold uppercase tracking-[.2em] text-[#6036E1]">Private workspace</span><span class="firestore-badge online" id="firestoreStatusBadge"><i class="ph-bold ph-database"></i> Firestore</span></div><h1 id="dashboardHeading" class="font-display text-4xl font-black tracking-tight">Ecosystem Overview</h1><p id="dashboardSubheading" class="mt-2 font-medium text-gray-500">Manage your decentralized assets and liquidity operations.</p></div>
                     <div class="flex shrink-0 items-center gap-4 self-start md:self-auto">
                         <div class="hidden items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm sm:flex">
                             <div class="h-2 w-2 rounded-full bg-green-500"></div>
@@ -1939,7 +1947,7 @@
     ============================================================ -->
     <script>
         /* ============================================================
-           APP_CONFIG — Single source of truth for environment & network
+           APP_CONFIG — Updated with new Firebase config (ropay-11bf2)
            ============================================================ */
         const APP_CONFIG = Object.freeze({
             environment: 'development',
@@ -1950,13 +1958,13 @@
                 usdcMint: '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
             },
             firebase: {
-                apiKey: 'AIzaSyBxWL2LIcibm6-NftEZMcs7SkhGjoQ9GpU',
-                authDomain: 'feed-65b35.firebaseapp.com',
-                projectId: 'feed-65b35',
-                storageBucket: 'feed-65b35.firebasestorage.app',
-                messagingSenderId: '1085499159984',
-                appId: '1:1085499159984:web:317e0443941085964a5275',
-                measurementId: 'G-FVPRRX9X1M'
+                apiKey: 'AIzaSyAwHDXO512D3YnAYuKwt44OGLsZR7g8kg4',
+                authDomain: 'ropay-11bf2.firebaseapp.com',
+                projectId: 'ropay-11bf2',
+                storageBucket: 'ropay-11bf2.firebasestorage.app',
+                messagingSenderId: '128573345457',
+                appId: '1:128573345457:web:d2f1fdfb6dc08d932edc90',
+                measurementId: 'G-VB6G0KWYP1'
             },
             limits: {
                 maxWallets: 3,
@@ -2010,7 +2018,8 @@
                 profileAvatar: document.getElementById('profileAvatar'),
                 profileAvatarFallback: document.getElementById('profileAvatarFallback'),
                 signOut: document.getElementById('dashboardSignOut'),
-                profileButton: document.getElementById('dashboardProfileButton')
+                profileButton: document.getElementById('dashboardProfileButton'),
+                firestoreBadge: document.getElementById('firestoreStatusBadge')
             },
             login: {
                 container: document.getElementById('login-container'),
@@ -2080,6 +2089,20 @@
                         window.__feed.auth = auth;
                         window.__feed.db = db;
 
+                        // Update Firestore status badge
+                        const badge = DOM.dashboard.firestoreBadge;
+                        if (badge) {
+                            db.collection('_test').doc('ping').get()
+                                .then(() => {
+                                    badge.className = 'firestore-badge online';
+                                    badge.innerHTML = '<i class="ph-bold ph-database"></i> Firestore';
+                                })
+                                .catch(() => {
+                                    badge.className = 'firestore-badge offline';
+                                    badge.innerHTML = '<i class="ph-bold ph-warning"></i> Offline mode';
+                                });
+                        }
+
                         auth.onAuthStateChanged(user => {
                             if (user) {
                                 APP_STATE.auth.status = 'authenticated';
@@ -2139,7 +2162,7 @@
                                 setView('landing'); });
                         });
 
-                        console.log('Firebase initialized');
+                        console.log('Firebase initialized with ropay-11bf2 project');
                     };
                     document.head.appendChild(s3);
                 };
@@ -2576,7 +2599,7 @@
             document.getElementById('btn-done')?.addEventListener('click', () => {
                 DOM.wallet.successMessage.textContent = 'The Solana Devnet account was scanned successfully.';
                 switchWalletView(DOM.wallet.successView);
-                // Save wallet to Firestore (or localStorage fallback)
+                // Save wallet to Firestore
                 saveWalletToFirestore(fetchedAccounts[0]);
             });
 
@@ -2588,18 +2611,15 @@
 
             document.getElementById('btn-return')?.addEventListener('click', () => {
                 hideWalletModal();
-                // Refresh dashboard
                 updateDashboardUI();
             });
 
-            // Close modal via backdrop / close button (we use backdrop click)
             if (DOM.wallet.modal) {
                 DOM.wallet.modal.addEventListener('click', (e) => {
                     if (e.target === DOM.wallet.modal) hideWalletModal();
                 });
             }
 
-            // Quick button
             if (DOM.wallet.quickBtn) {
                 DOM.wallet.quickBtn.addEventListener('click', showWalletModal);
             }
@@ -2619,19 +2639,17 @@
 
         /* ============================================================
            FIRESTORE WALLET PERSISTENCE — Professional Indexing Architecture
-           ============================================================
            Structure:
              users/{uid}/
                profile: { displayName, email, photoURL, createdAt, lastLogin }
-               settings: { theme, notifications, ... }
                wallets/{address}/   <-- subcollection (indexed)
                  address: string   (indexed)
                  provider: string  (indexed)
                  network: string   (indexed)
                  isPrimary: boolean
                  balances: { sol, feed, usdc }
-                 firstConnected: timestamp (indexed)
-                 lastUpdated: timestamp (indexed)
+                 firstConnected: timestamp
+                 lastUpdated: timestamp
                  metadata: { name, chainId }
            ============================================================ */
 
@@ -2639,11 +2657,6 @@
             return `feed_wallets_${userId}`;
         }
 
-        /**
-         * Save a wallet to Firestore using professional subcollection architecture.
-         * Each wallet becomes a separate document under users/{uid}/wallets/{address}.
-         * This enables efficient querying, indexing, and per-wallet updates.
-         */
         async function saveWalletToFirestore(account) {
             const auth = window.__feed?.auth;
             if (!auth) return;
@@ -2652,12 +2665,11 @@
             const db = window.__feed?.db;
             const uid = user.uid;
 
-            // Build the wallet document with professional fields
             const walletData = {
                 address: account.address,
                 provider: account.provider || 'Solana',
                 network: APP_CONFIG.blockchain.network,
-                isPrimary: linkedWallets.length === 0, // first wallet becomes primary
+                isPrimary: linkedWallets.length === 0,
                 balances: {
                     sol: account.sol || '0.0000',
                     feed: account.feed || '0.00',
@@ -2672,7 +2684,6 @@
             };
 
             // Update in-memory linkedWallets
-            // Remove existing entry with same address
             linkedWallets = linkedWallets.filter(w => w.address !== account.address);
             linkedWallets.push({
                 address: account.address,
@@ -2687,15 +2698,14 @@
                 linkedWallets = linkedWallets.slice(-APP_CONFIG.limits.maxWallets);
             }
 
-            // Save to localStorage as fallback
+            // LocalStorage fallback
             try {
                 localStorage.setItem(getLocalStorageKey(uid), JSON.stringify(linkedWallets));
-            } catch (e) { /* ignore */ }
+            } catch (e) {}
 
-            // Save to Firestore using subcollection architecture
+            // Firestore write
             if (db) {
                 try {
-                    // 1. Update or create the user profile document
                     const userRef = db.collection('users').doc(uid);
                     await userRef.set({
                         profile: {
@@ -2707,13 +2717,11 @@
                         updatedAt: new Date().toISOString()
                     }, { merge: true });
 
-                    // 2. Write the wallet as a subcollection document
                     const walletRef = userRef.collection('wallets').doc(account.address);
                     await walletRef.set(walletData, { merge: true });
 
-                    // 3. If this is the first wallet, set it as primary
+                    // If first wallet, set as primary
                     if (linkedWallets.length === 1) {
-                        // Ensure only one primary
                         const allWallets = await userRef.collection('wallets').get();
                         const batch = db.batch();
                         allWallets.forEach(doc => {
@@ -2729,8 +2737,8 @@
                         'success');
                 } catch (err) {
                     console.warn('Firestore save failed, using localStorage fallback:', err);
-                    toast('Wallet saved locally', `Address ${shortAddress(account.address)} stored in your browser (offline mode).`,
-                        'warning');
+                    toast('Wallet saved locally',
+                        `Address ${shortAddress(account.address)} stored in your browser (offline mode).`, 'warning');
                 }
             } else {
                 toast('Wallet saved locally',
@@ -2740,20 +2748,14 @@
             updateDashboardUI();
         }
 
-        /**
-         * Load wallets from Firestore using professional subcollection architecture.
-         * Queries the wallets subcollection with optional sorting/indexing.
-         */
         async function loadUserWallets(user) {
             if (!user) return;
             const db = window.__feed?.db;
             const uid = user.uid;
 
-            // Try Firestore first with indexed query
             if (db) {
                 try {
                     const userRef = db.collection('users').doc(uid);
-                    // Query wallets subcollection, ordered by lastUpdated (uses index)
                     const snapshot = await userRef.collection('wallets')
                         .orderBy('lastUpdated', 'desc')
                         .limit(APP_CONFIG.limits.maxWallets)
@@ -2777,10 +2779,9 @@
                         });
                         if (loaded.length) {
                             linkedWallets = loaded;
-                            // Cache to localStorage
                             try {
                                 localStorage.setItem(getLocalStorageKey(uid), JSON.stringify(linkedWallets));
-                            } catch (e) { /* ignore */ }
+                            } catch (e) {}
                             updateDashboardUI();
                             toast('Wallets loaded',
                                 `${linkedWallets.length} wallet(s) restored from your account.`, 'info');
@@ -2800,21 +2801,17 @@
                     if (Array.isArray(parsed) && parsed.length) {
                         linkedWallets = parsed;
                         updateDashboardUI();
-                        toast('Wallets loaded from local cache', `${linkedWallets.length} wallet(s) restored.`,
+                        toast('Wallets loaded from local cache', `${linkedWallets.length} wallet(s) restored.',
                             'info');
                         return;
                     }
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) {}
 
             linkedWallets = [];
             updateDashboardUI();
         }
 
-        /**
-         * Update the primary wallet designation in Firestore.
-         * Useful for promoting a specific wallet to primary.
-         */
         async function setPrimaryWallet(address) {
             const auth = window.__feed?.auth;
             if (!auth) return;
@@ -2832,7 +2829,6 @@
                     batch.update(doc.ref, { isPrimary: doc.id === address });
                 });
                 await batch.commit();
-                // Update in-memory
                 linkedWallets.forEach(w => {
                     w.isPrimary = w.address === address;
                 });
@@ -2844,9 +2840,6 @@
             }
         }
 
-        /**
-         * Delete a wallet from Firestore and local storage.
-         */
         async function deleteWalletFromFirestore(address) {
             const auth = window.__feed?.auth;
             if (!auth) return;
@@ -2860,12 +2853,10 @@
                     const userRef = db.collection('users').doc(uid);
                     await userRef.collection('wallets').doc(address).delete();
                 }
-                // Remove from memory
                 linkedWallets = linkedWallets.filter(w => w.address !== address);
-                // Update localStorage
                 try {
                     localStorage.setItem(getLocalStorageKey(uid), JSON.stringify(linkedWallets));
-                } catch (e) { /* ignore */ }
+                } catch (e) {}
                 updateDashboardUI();
                 toast('Wallet removed', `Address ${shortAddress(address)} disconnected.`, 'info');
                 return true;
@@ -2892,7 +2883,6 @@
                 `${linkedWallets.length}/${APP_CONFIG.limits.maxWallets} wallets` :
                 'Connect wallet';
 
-            // Balances
             const sol = hasWallet ? wallet.sol || '0.0000' : '0.0000';
             const feed = hasWallet ? wallet.feed || '0.00' : '0.00';
             const usdc = hasWallet ? wallet.usdc || '0.00' : '0.00';
@@ -2907,14 +2897,13 @@
             if (DOM.dashboard.profileFeedBalance) DOM.dashboard.profileFeedBalance.textContent = feed;
             if (DOM.dashboard.profileUsdcBalance) DOM.dashboard.profileUsdcBalance.textContent = usdc;
 
-            // Update settings view if visible
             if (DOM.dashboard.settings && !DOM.dashboard.settings.classList.contains('hidden')) {
                 renderSettingsView();
             }
         }
 
         /* ============================================================
-           SETTINGS VIEW — with professional Firestore management
+           SETTINGS VIEW — Firestore management
            ============================================================ */
         function renderSettingsView() {
             const el = DOM.dashboard.settings;
@@ -2927,7 +2916,7 @@
                             <h2 class="mt-3 font-display text-3xl font-black">Wallet &amp; account controls</h2>
                             <p class="mt-2 max-w-2xl text-sm leading-relaxed text-gray-500">Manage the Solana wallets linked to this Google account. Data is stored in Firestore with professional indexing.</p>
                         </div>
-                        <span class="firestore-badge"><i class="ph-bold ph-database"></i> users/{uid}/wallets/</span>
+                        <span class="firestore-badge online"><i class="ph-bold ph-database"></i> users/{uid}/wallets/</span>
                     </div>
                     <div class="mt-8 grid gap-4 md:grid-cols-2">
                         <div class="rounded-3xl border border-gray-200 bg-white p-6">
@@ -2959,7 +2948,8 @@
                 linkedWallets.forEach((w, i) => {
                     const isPrimary = w.isPrimary === true;
                     const row = document.createElement('div');
-                    row.className = `rounded-2xl border ${isPrimary ? 'border-[#6036E1]/30 bg-violet-50/50' : 'border-gray-200 bg-white'} p-4 transition`;
+                    row.className =
+                        `rounded-2xl border ${isPrimary ? 'border-[#6036E1]/30 bg-violet-50/50' : 'border-gray-200 bg-white'} p-4 transition`;
                     row.innerHTML = `
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -2978,7 +2968,6 @@
                             <button type="button" data-delete class="rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-700">Remove</button>
                         </div>
                     `;
-                    // Set primary handler
                     const primaryBtn = row.querySelector('[data-set-primary]');
                     if (primaryBtn) {
                         primaryBtn.addEventListener('click', async () => {
@@ -2986,7 +2975,6 @@
                             renderSettingsView();
                         });
                     }
-                    // Delete handler
                     row.querySelector('[data-delete]').addEventListener('click', async () => {
                         if (!confirm(`Remove wallet ${shortAddress(w.address)} from your account?`)) return;
                         await deleteWalletFromFirestore(w.address);
@@ -3007,8 +2995,7 @@
                     const userRef = db.collection('users').doc(user.uid);
                     const batch = db.batch();
                     for (const addr of addresses) {
-                        const ref = userRef.collection('wallets').doc(addr);
-                        batch.delete(ref);
+                        batch.delete(userRef.collection('wallets').doc(addr));
                     }
                     await batch.commit();
                 }
@@ -3075,12 +3062,11 @@
            ============================================================ */
         setInterval(() => {
             if (document.body.classList.contains('dashboard-active') && linkedWallets.length) {
-                // Optionally refresh balances from RPC
-                // For simplicity, we keep stored balances.
+                // Placeholder for future balance refresh
             }
         }, APP_CONFIG.limits.walletRefreshMs);
 
-        console.log('FEED application initialized with professional Firestore indexing architecture');
+        console.log('FEED initialized with new Firebase project: ropay-11bf2');
         APP_STATE.initialized = true;
     </script>
 
